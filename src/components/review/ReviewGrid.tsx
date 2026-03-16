@@ -191,9 +191,21 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                 : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
             )}
           >
-            {f.label}
+          {f.label}
           </button>
         ))}
+        <div className="w-px h-4 bg-border mx-1" />
+        <button
+          onClick={() => setEssentialOnly((v) => !v)}
+          className={cn(
+            "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border",
+            essentialOnly
+              ? "bg-primary text-primary-foreground border-primary"
+              : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
+          )}
+        >
+          ★ 필수
+        </button>
       </div>
 
       {/* Spreadsheet table */}
