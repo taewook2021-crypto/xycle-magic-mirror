@@ -44,7 +44,7 @@ export default function ActivityStream({ activities, onUserClick }: ActivityStre
                     {a.userName}
                   </button>
                   <span className="text-muted-foreground">—</span>
-                  <span className="text-muted-foreground truncate flex-1">{a.bookTitle} 풀이 중</span>
+                  <span className="text-muted-foreground truncate flex-1">{a.bookTitle}{a.chapterTitle && <span className="text-foreground font-medium"> {a.chapterTitle}</span>} 풀이 중</span>
                   <span className="text-[10px] text-muted-foreground whitespace-nowrap">{a.minutesAgo}분 전</span>
                 </div>
               ))}
