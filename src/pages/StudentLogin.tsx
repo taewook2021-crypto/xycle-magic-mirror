@@ -14,9 +14,9 @@ import CookieConsent from "@/components/CookieConsent";
 import AppMockup from "@/components/AppMockup";
 
 const reviewCardsData = [
-  { num: "01", title: "망각 곡선 기반", desc: "에빙하우스 망각 곡선에 따라\n최적 타이밍에 복습을 제안합니다" },
-  { num: "02", title: "개인 맞춤 난이도", desc: "틀린 횟수·정답률을 반영해\n취약 문항을 우선 선별합니다" },
-  { num: "03", title: "핵심만 모아보기", desc: "시험 직전, 상위 30% 취약 문항만\n골라 집중 복습할 수 있습니다" },
+  { num: "01", title: "오답만 모아보기", desc: "틀린 문제만 골라서\n한 번에 복습할 수 있습니다" },
+  { num: "02", title: "주제별 크로스 필터", desc: "교재가 달라도 같은 주제에서\n틀린 문제를 전부 볼 수 있습니다" },
+  { num: "03", title: "회차별·횟수별 정렬", desc: "원하는 회차만, 자주 틀리는 순으로\n추려서 확인할 수 있습니다" },
 ];
 
 function ReviewCardItem({ item, i, isLightMode, monoFont }: { item: typeof reviewCardsData[0]; i: number; isLightMode: boolean; monoFont: string }) {
@@ -648,7 +648,7 @@ export default function StudentLogin() {
                     <span style={{ color: "#EA5027", transition: "color 0.8s ease" }}>Xycle로 기록하세요</span>
                   </h3>
                   <p style={{ color: isLightMode ? "rgba(51,51,51,0.55)" : "rgba(236,236,236,0.6)", fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", fontWeight: 400, lineHeight: 1.7, letterSpacing: "-0.025em", fontFamily: "'Pretendard Variable', Pretendard, sans-serif", transition: "color 0.8s ease" }}>
-                    같은 교재를 푸는 학생들과 경쟁하고, 내 <strong style={{ fontWeight: 700, color: "#EA5027" }}>현재 등수</strong>를 확인하세요. Xycle이 성적을 분석해서 <strong style={{ fontWeight: 700, color: "#EA5027" }}>부족한 부분</strong>이 어디인지, 어떤 문제들로 그것을 극복해낼 수 있는지 모든 방법을 알려드릴게요.
+                    종이 회독표에선 틀린 문제만 골라보거나, 특정 회차만 따로 확인할 수 없습니다. Xycle은 <strong style={{ fontWeight: 700, color: "#EA5027" }}>오답만, 주제별, 회차별</strong>로 원하는 기준대로 바로 추려볼 수 있습니다.
                   </p>
                 </motion.div>
 
@@ -883,64 +883,17 @@ export default function StudentLogin() {
                       maxWidth: "400px",
                       transition: "color 0.8s ease"
                     }}>
-                      <span style={{ fontWeight: 700, color: "#EA5027" }}>대한민국 회계학, 세법 1타 강사</span> <span style={{ fontWeight: 700 }}>오정화 선생님</span>의 검증된 교재들이 Xycle에 등록되어 있습니다. 동일한 교재를 푸는 수험생들과 나를 비교하고 부족한 부분을 점검하세요.
+                      Xycle에 등록된 교재들은 <span style={{ fontWeight: 700, color: "#EA5027" }}>주제가 서로 연결</span>되어 있습니다. 교재가 달라도 같은 주제에서 틀린 문제를 한 번에 모아볼 수 있습니다.
                     </p>
-                    <div
-                      className="inline-flex items-center gap-3 px-5 py-3 group/free cursor-pointer"
-                      style={{
-                        background: isLightMode ? "rgba(234,80,39,0.08)" : "rgba(234,80,39,0.15)",
-                        border: `1px solid ${isLightMode ? "rgba(234,80,39,0.2)" : "rgba(234,80,39,0.3)"}`,
-                        transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-                        borderRadius: "9999px",
-                      }}
-                      onMouseEnter={(e) => {
-                        const el = e.currentTarget;
-                        el.style.background = "rgba(234,80,39,1)";
-                        el.style.borderColor = "rgba(234,80,39,1)";
-                        el.style.boxShadow = "0 0 24px rgba(234,80,39,0.4), 0 0 48px rgba(234,80,39,0.15)";
-                        el.style.transform = "translateY(-1px)";
-                        const spans = el.querySelectorAll("span");
-                        spans.forEach(s => (s as HTMLElement).style.color = "#FFFFFF");
-                      }}
-                      onMouseLeave={(e) => {
-                        const el = e.currentTarget;
-                        el.style.background = isLightMode ? "rgba(234,80,39,0.08)" : "rgba(234,80,39,0.15)";
-                        el.style.borderColor = isLightMode ? "rgba(234,80,39,0.2)" : "rgba(234,80,39,0.3)";
-                        el.style.boxShadow = "none";
-                        el.style.transform = "translateY(0)";
-                        const spans = el.querySelectorAll("span");
-                        (spans[0] as HTMLElement).style.color = "#EA5027";
-                        (spans[1] as HTMLElement).style.color = isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.7)";
-                      }}>
-                      <span style={{
-                        color: "#EA5027",
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        letterSpacing: "0.1em",
-                        fontFamily: monoFont,
-                        transition: "color 0.5s cubic-bezier(0.4, 0, 0.2, 1)"
-                      }}>
-                        FREE
-                      </span>
-                      <span style={{
-                        color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.7)",
-                        fontSize: "12px",
-                        fontWeight: 400,
-                        fontFamily: monoFont,
-                        transition: "color 0.5s cubic-bezier(0.4, 0, 0.2, 1)"
-                      }}>
-                        오정화 강사 수강생 전원 무료 이용
-                      </span>
-                    </div>
                   </div>
                 </motion.div>
 
                 {/* Gallery Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[
-                    { num: "01", title: "2026 오정화 회계학 실전 동형모의고사", author: "오정화", subject: "회계학", exams: 12, questions: 20 },
-                    { num: "02", title: "2026 오정화 세법 실전동형 모의고사", author: "오정화", subject: "세법", exams: 12, questions: 20 },
-                    { num: "03", title: "세무사 1차 실전모의고사 세법학개론", author: "오정화", subject: "세법", exams: 5, questions: 40 },
+                    { num: "01", title: "2026 회계학 실전 동형모의고사", subject: "회계학", exams: 12, questions: 20 },
+                    { num: "02", title: "2026 세법 실전동형 모의고사", subject: "세법", exams: 12, questions: 20 },
+                    { num: "03", title: "세무사 1차 실전모의고사 세법학개론", subject: "세법", exams: 5, questions: 40 },
                   ].map((book, i) => (
                     <motion.div
                       key={book.num}
@@ -969,10 +922,6 @@ export default function StudentLogin() {
                           {book.title}
                         </h4>
                         <div className="flex items-center gap-6">
-                          <div className="space-y-1">
-                            <span style={{ color: isLightMode ? "rgba(51,51,51,0.35)" : "rgba(236,236,236,0.3)", fontSize: "9px", fontWeight: 500, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: monoFont, display: "block" }}>AUTHOR</span>
-                            <span style={{ color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.6)", fontSize: "13px", fontWeight: 500, fontFamily: monoFont }}>{book.author}</span>
-                          </div>
                           <div className="space-y-1">
                             <span style={{ color: isLightMode ? "rgba(51,51,51,0.35)" : "rgba(236,236,236,0.3)", fontSize: "9px", fontWeight: 500, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: monoFont, display: "block" }}>ROUNDS</span>
                             <span style={{ color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.6)", fontSize: "13px", fontWeight: 500, fontFamily: monoFont }}>{book.exams}회</span>
@@ -1025,11 +974,11 @@ export default function StudentLogin() {
                 <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
                   <div className="space-y-0">
                     {[
-                      { num: "01", title: "당신의 현재 등수부터", desc: "같은 교재를 푸는 학생들 중 내가 몇 등인지 바로 확인하세요.", mockupIdx: 0 },
-                      { num: "02", title: "개인 복습 일정까지", desc: "검증된 간격 반복 알고리즘으로 틀린 문제를 완벽히 소화하세요.", mockupIdx: 1 },
-                      { num: "03", title: "모든 성장을 추적합니다", desc: "어제의 나와 비교하며 매일 성장하는 과정을 데이터로 확인하세요.", mockupIdx: 2 },
-                      { num: "04", title: "회독표", desc: "교재의 정오 기록이 깔끔하게 정리됩니다.", mockupIdx: 3 },
-                      { num: "05", title: "복습 리스트", desc: "복습 주기에 맞춰 매일 복습할 문제를 자동으로 알려줍니다.", mockupIdx: 4 },
+                      { num: "01", title: "동차생 비교", desc: "같은 교재를 푸는 동차생들과 오늘의 풀이량을 비교하세요.", mockupIdx: 0 },
+                      { num: "02", title: "주제별 오답 모아보기", desc: "교재가 달라도 같은 주제에서 틀린 문제를 전부 모아볼 수 있습니다.", mockupIdx: 1 },
+                      { num: "03", title: "디지털 회독표", desc: "오답만·회차별·틀린 횟수순으로 자유롭게 추려볼 수 있습니다.", mockupIdx: 2 },
+                      { num: "04", title: "풀이 기록 추적", desc: "매일 몇 문제를 풀었는지, 정답률은 어떤지 한눈에 확인하세요.", mockupIdx: 3 },
+                      { num: "05", title: "간편 채점", desc: "답을 입력하면 채점부터 기록까지 한번에 끝납니다.", mockupIdx: 4 },
                     ].map((feature, i) => (
                       <React.Fragment key={feature.num}>
                         <motion.div
@@ -1127,9 +1076,9 @@ export default function StudentLogin() {
                     letterSpacing: "-0.03em",
                     transition: "color 0.8s ease"
                   }}>
-                    시험 전날,<br />
-                    <span style={{ color: "#EA5027" }}>뭘 봐야 할지</span><br />
-                    저희가 골라드립니다
+                    종이 회독표에선{' '}<br />
+                    <span style={{ color: "#EA5027" }}>못 하는 것,</span><br />
+                    Xycle은 됩니다
                   </h3>
                   <p style={{
                     color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.6)",
@@ -1142,14 +1091,11 @@ export default function StudentLogin() {
                     maxWidth: "520px",
                     transition: "color 0.8s ease"
                   }}>
-                    <span className="hidden sm:inline">망각 곡선 기반 간격 반복(Spaced Repetition) 알고리즘이</span>
-                    <span className="sm:hidden">망각 곡선 기반 간격 반복 알고리즘이</span>
-                    <br />
-                    정답/오답 이력, 복습 횟수, 난이도를 분석하여<br />
+                    오답만 모아보기, 특정 주제에서 교재 상관없이 틀린 문제 전부 보기, 회차별 필터.<br />
                     <strong style={{ fontWeight: 700, color: isLightMode ? "#222222" : "#ECECEC" }}>
-                      가장 잊혀질 확률이 높은 문제
+                      종이에선 불가능한 선별
                     </strong>
-                    만 선별합니다.
+                    이 Xycle에선 터치 한 번이면 됩니다.
                   </p>
                 </motion.div>
 
@@ -1279,8 +1225,8 @@ export default function StudentLogin() {
                       marginTop: "32px",
                       maxWidth: "420px"
                     }}>
-                    같은 교재를 푸는 학생들과 경쟁하고,<br className="sm:hidden" />
-                    내 현재 등수를 확인하세요.
+                    종이 회독표 대신 Xycle로 기록하고,<br className="sm:hidden" />
+                    동차생들과 비교하세요.
                   </motion.p>
 
                   <motion.button
