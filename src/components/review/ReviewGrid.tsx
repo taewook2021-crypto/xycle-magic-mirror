@@ -89,10 +89,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         const [{ data: aData }, { data: skipData }] = await Promise.all([
           supabase
             .from("attempts")
-            .select("question_id, is_correct, attempted_at")
+            .select("question_id, result, round, attempted_at")
             .eq("user_id", user.id)
             .in("question_id", qIds)
-            .order("attempted_at"),
+            .order("round"),
           supabase
             .from("user_question_skips")
             .select("question_id")
@@ -102,10 +102,15 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         if (aData) {
           for (const a of aData as any[]) {
             if (!attemptsMap[a.question_id]) attemptsMap[a.question_id] = [];
-            attemptsMap[a.question_id].push({
-              result: a.is_correct ? "correct" : "wrong",
+            const roundIdx = (a.round ?? 1) - 1;
+            // Ensure array is long enough
+            while (attemptsMap[a.question_id].length <= roundIdx) {
+              attemptsMap[a.question_id].push({ result: null });
+            }
+            attemptsMap[a.question_id][roundIdx] = {
+              result: a.result as CellResult,
               date: new Date(a.attempted_at).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
-            });
+            };
           }
         }
         setSkippedSet(new Set((skipData ?? []).map((s: any) => s.question_id)));
