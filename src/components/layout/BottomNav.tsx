@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Grid3X3, PenLine, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Grid3X3, PenLine, BarChart3, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const tabs = [
