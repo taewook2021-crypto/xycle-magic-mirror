@@ -259,7 +259,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                             <span className="text-[9px] text-muted-foreground">
                               {q.questionType === "past_exam" && (
                                 <span className="text-primary/70 font-semibold">
-                                  기출{q.examYear ? ` '${q.examYear.slice(-2)}` : ""}
+                                  {q.examYear ? `${q.examYear.slice(-2)}기출` : "기출"}
                                 </span>
                               )}
                               {q.questionType === "practice" && <span className="font-semibold">실전</span>}
