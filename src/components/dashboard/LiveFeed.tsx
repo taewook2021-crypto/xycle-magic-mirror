@@ -176,6 +176,8 @@ export default function LiveFeed({ books = [], isMePublic = false, onGoPublic }:
         peer={selectedPeer}
         open={sheetOpen}
         onOpenChange={setSheetOpen}
+        isMePublic={isMePublic}
+        onGoPublic={onGoPublic}
       />
     </>
   );
