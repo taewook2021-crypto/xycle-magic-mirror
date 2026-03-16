@@ -11,7 +11,7 @@ import NicknameSetup from "@/components/NicknameSetup";
 import { useAuth } from "@/hooks/useAuth";
 import { useReferral } from "@/hooks/useReferral";
 import { Switch } from "@/components/ui/switch";
-import { type ChapterData } from "@/components/review/ReviewGrid";
+import { type PeerChapter } from "@/components/dashboard/PeerReviewSheet";
 
 const mockHero = {
   displayName: "수험생",
@@ -54,7 +54,7 @@ const mockPeerAvgProgress: PeerAvgProgress[] = [
   { bookTitle: "재무관리", avgChapter: 2, totalChapters: 9, avgChapterTitle: "Ch.2 자본예산" },
 ];
 
-const makeMockChapters = (): ChapterData[] => [
+const makeMockChapters = (): PeerChapter[] => [
   {
     chapterId: "c1",
     chapterTitle: "Ch.1 재무보고와 국제회계기준",

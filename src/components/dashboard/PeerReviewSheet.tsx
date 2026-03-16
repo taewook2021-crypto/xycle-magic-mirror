@@ -7,13 +7,22 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
-import ReviewGrid, { type ChapterData } from "@/components/review/ReviewGrid";
 import { cn } from "@/lib/utils";
+import { type CellResult } from "@/components/review/ReviewCell";
+
+export interface PeerChapter {
+  chapterId: string;
+  chapterTitle: string;
+  questions: {
+    questionNumber: number;
+    rounds: { result: CellResult; date?: string }[];
+  }[];
+}
 
 export interface PeerBook {
   id: string;
   title: string;
-  chapters: ChapterData[];
+  chapters: PeerChapter[];
 }
 
 interface PeerReviewSheetProps {
@@ -21,7 +30,6 @@ interface PeerReviewSheetProps {
   onOpenChange: (open: boolean) => void;
   peerName: string;
   peerBooks: PeerBook[];
-  /** Whether the current user is public (can view others) */
   isMePublic: boolean;
   onGoPublic?: () => void;
 }
@@ -35,7 +43,6 @@ export default function PeerReviewSheet({
   onGoPublic,
 }: PeerReviewSheetProps) {
   const [selectedBookId, setSelectedBookId] = useState<string>(peerBooks[0]?.id ?? "");
-
   const selectedBook = peerBooks.find((b) => b.id === selectedBookId);
 
   return (
@@ -61,7 +68,6 @@ export default function PeerReviewSheet({
           </div>
         ) : (
           <>
-            {/* Book tabs */}
             {peerBooks.length > 1 && (
               <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-hide">
                 {peerBooks.map((book) => (
@@ -81,10 +87,11 @@ export default function PeerReviewSheet({
               </div>
             )}
 
-            {/* Read-only grid */}
             <div className="flex-1 overflow-y-auto">
               {selectedBook ? (
-                <ReviewGrid chapters={selectedBook.chapters} readOnly />
+                <p className="text-sm text-muted-foreground text-center py-12">
+                  동차생 회독표 열람 기능 준비 중
+                </p>
               ) : (
                 <p className="text-sm text-muted-foreground text-center py-12">교재 데이터가 없습니다.</p>
               )}
