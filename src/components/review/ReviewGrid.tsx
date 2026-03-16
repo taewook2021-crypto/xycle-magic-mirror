@@ -36,6 +36,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
   const [questions, setQuestions] = useState<QuestionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("all");
+  const [essentialOnly, setEssentialOnly] = useState(false);
 
   // Fetch chapters list
   useEffect(() => {
