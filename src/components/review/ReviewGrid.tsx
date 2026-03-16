@@ -111,7 +111,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
       let attemptsMap: Record<string, { result: CellResult; date?: string }[]> = {};
       if (user && qData.length > 0) {
         const qIds = qData.map((q: any) => q.id);
-        const [{ data: aData }, { data: skipData }] = await Promise.all([
+        const [{ data: aData }, { data: skipData }, { data: memoData }] = await Promise.all([
           supabase
             .from("attempts")
             .select("question_id, result, round, attempted_at")
@@ -121,6 +121,11 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
           supabase
             .from("user_question_skips")
             .select("question_id")
+            .eq("user_id", user.id)
+            .in("question_id", qIds),
+          supabase
+            .from("user_question_memos" as any)
+            .select("question_id, content")
             .eq("user_id", user.id)
             .in("question_id", qIds),
         ]);
