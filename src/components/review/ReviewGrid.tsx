@@ -321,6 +321,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         </button>
       </div>
 
+      {/* Input guide - show when no cell is active */}
+      {!activeCell && !readOnly && <InputGuide />}
+
       {/* Table */}
       {filtered.length === 0 ? (
         <div className="text-center py-8 text-xs text-muted-foreground">해당 유형의 문항이 없습니다.</div>
