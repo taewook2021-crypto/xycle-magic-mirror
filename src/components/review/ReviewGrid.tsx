@@ -504,7 +504,15 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                             </span>
                           </td>
                           <td className={cn("sticky left-[88px] z-10 min-w-[120px] px-2 py-0 text-left border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
-                            <span className="text-[10px] text-muted-foreground truncate block max-w-[160px]">{q.topic || "–"}</span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] text-muted-foreground truncate max-w-[140px]">{q.topic || "–"}</span>
+                              {!readOnly && (
+                                <MemoPopover
+                                  memo={memos[q.questionId] ?? ""}
+                                  onSave={(content) => saveMemo(q.questionId, content)}
+                                />
+                              )}
+                            </div>
                           </td>
                           {q.rounds.map((round, rIdx) => (
                             <td key={rIdx} className="p-0 border-b border-r border-border last:border-r-0">
