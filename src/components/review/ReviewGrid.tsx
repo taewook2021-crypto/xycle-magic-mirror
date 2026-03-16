@@ -241,7 +241,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                     {sectionFilter === "all" && (
                       <tr key={`header-${group.type}`}>
                         <td
-                          colSpan={2 + roundCount}
+                          colSpan={3 + roundCount}
                           className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider"
                         >
                           {typeLabels[group.type]} ({group.rows.length})
