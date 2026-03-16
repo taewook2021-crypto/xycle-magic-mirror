@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageSquare } from "lucide-react";
+import { StickyNote } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -38,15 +38,15 @@ export default function MemoPopover({ memo, onSave }: MemoPopoverProps) {
       <PopoverTrigger asChild>
         <button
           className={cn(
-            "p-0.5 rounded transition-colors",
+            "p-0.5 rounded transition-colors shrink-0",
             hasMemo
               ? "text-primary hover:text-primary/80"
-              : "text-muted-foreground/30 hover:text-muted-foreground/60"
+              : "text-muted-foreground/25 hover:text-muted-foreground/50"
           )}
           onClick={(e) => e.stopPropagation()}
           title={hasMemo ? memo : "메모 추가"}
         >
-          <MessageSquare className="h-3 w-3" />
+          <StickyNote className="h-3 w-3" />
         </button>
       </PopoverTrigger>
       <PopoverContent

@@ -448,6 +448,31 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
         >
           ★ 필수
         </button>
+        <button
+          onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
+          className={cn(
+            "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border",
+            memoOnly
+              ? "bg-primary text-primary-foreground border-primary"
+              : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
+          )}
+        >
+          📝 메모
+        </button>
+        <div className="w-px h-4 bg-border mx-1" />
+        <select
+          value={wrongCountFilter}
+          onChange={(e) => { setWrongCountFilter(Number(e.target.value)); setActiveCell(null); }}
+          className={cn(
+            "px-2 py-1 rounded-md text-[11px] font-medium transition-all border bg-secondary text-secondary-foreground border-border hover:bg-accent appearance-none cursor-pointer",
+            wrongCountFilter > 0 && "bg-destructive/15 text-destructive border-destructive/30"
+          )}
+        >
+          <option value={0}>오답 필터</option>
+          <option value={1}>오답 ≥1</option>
+          <option value={2}>오답 ≥2</option>
+          <option value={3}>오답 ≥3</option>
+        </select>
       </div>
 
       {/* Floating input guide button */}
