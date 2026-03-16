@@ -149,6 +149,7 @@ export type Database = {
           id: string
           is_essential: boolean
           question_number: number
+          question_type: string
           sub_topic_id: string | null
         }
         Insert: {
@@ -159,6 +160,7 @@ export type Database = {
           id?: string
           is_essential?: boolean
           question_number: number
+          question_type?: string
           sub_topic_id?: string | null
         }
         Update: {
@@ -169,6 +171,7 @@ export type Database = {
           id?: string
           is_essential?: boolean
           question_number?: number
+          question_type?: string
           sub_topic_id?: string | null
         }
         Relationships: [
