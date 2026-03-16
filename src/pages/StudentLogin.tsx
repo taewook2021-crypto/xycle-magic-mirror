@@ -891,9 +891,9 @@ export default function StudentLogin() {
                 {/* Gallery Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[
-                    { num: "01", title: "2026 오정화 회계학 실전 동형모의고사", author: "오정화", subject: "회계학", exams: 12, questions: 20 },
-                    { num: "02", title: "2026 오정화 세법 실전동형 모의고사", author: "오정화", subject: "세법", exams: 12, questions: 20 },
-                    { num: "03", title: "세무사 1차 실전모의고사 세법학개론", author: "오정화", subject: "세법", exams: 5, questions: 40 },
+                    { num: "01", title: "2026 회계학 실전 동형모의고사", subject: "회계학", exams: 12, questions: 20 },
+                    { num: "02", title: "2026 세법 실전동형 모의고사", subject: "세법", exams: 12, questions: 20 },
+                    { num: "03", title: "세무사 1차 실전모의고사 세법학개론", subject: "세법", exams: 5, questions: 40 },
                   ].map((book, i) => (
                     <motion.div
                       key={book.num}
