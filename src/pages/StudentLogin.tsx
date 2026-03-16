@@ -974,11 +974,11 @@ export default function StudentLogin() {
                 <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
                   <div className="space-y-0">
                     {[
-                      { num: "01", title: "당신의 현재 등수부터", desc: "같은 교재를 푸는 학생들 중 내가 몇 등인지 바로 확인하세요.", mockupIdx: 0 },
-                      { num: "02", title: "개인 복습 일정까지", desc: "검증된 간격 반복 알고리즘으로 틀린 문제를 완벽히 소화하세요.", mockupIdx: 1 },
-                      { num: "03", title: "모든 성장을 추적합니다", desc: "어제의 나와 비교하며 매일 성장하는 과정을 데이터로 확인하세요.", mockupIdx: 2 },
-                      { num: "04", title: "회독표", desc: "교재의 정오 기록이 깔끔하게 정리됩니다.", mockupIdx: 3 },
-                      { num: "05", title: "복습 리스트", desc: "복습 주기에 맞춰 매일 복습할 문제를 자동으로 알려줍니다.", mockupIdx: 4 },
+                      { num: "01", title: "동차생 비교", desc: "같은 교재를 푸는 동차생들과 오늘의 풀이량을 비교하세요.", mockupIdx: 0 },
+                      { num: "02", title: "주제별 오답 모아보기", desc: "교재가 달라도 같은 주제에서 틀린 문제를 전부 모아볼 수 있습니다.", mockupIdx: 1 },
+                      { num: "03", title: "디지털 회독표", desc: "오답만·회차별·틀린 횟수순으로 자유롭게 추려볼 수 있습니다.", mockupIdx: 2 },
+                      { num: "04", title: "풀이 기록 추적", desc: "매일 몇 문제를 풀었는지, 정답률은 어떤지 한눈에 확인하세요.", mockupIdx: 3 },
+                      { num: "05", title: "간편 채점", desc: "답을 입력하면 채점부터 기록까지 한번에 끝납니다.", mockupIdx: 4 },
                     ].map((feature, i) => (
                       <React.Fragment key={feature.num}>
                         <motion.div
