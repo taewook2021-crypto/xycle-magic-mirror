@@ -1,59 +1,97 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Trophy, RefreshCw, BookOpen, ChevronRight, Flame, TrendingUp } from "lucide-react";
 
-/* ─── 1. Ranking (mirrors Grading.tsx result card) ─── */
+/* ─── 1. Ranking (동차생 비교) ─── */
 function MockRanking() {
   const ranking = [
-    { rank: 1, name: "세무달인", score: 38, medal: "🥇" },
-    { rank: 2, name: "합격예감", score: 36, medal: "🥈" },
-    { rank: 3, name: "세법마스터", score: 35, medal: "🥉" },
-    { rank: 4, name: "열공중", score: 33 },
-    { rank: 5, name: "나", score: 32, me: true },
-    { rank: 6, name: "응시자 6", score: 30 },
-    { rank: 7, name: "응시자 7", score: 28 },
+    { rank: 1, name: "김O현", score: 47, total: 50, percent: 2 },
+    { rank: 2, name: "이O준", score: 45, total: 50, percent: 5 },
+    { rank: 16, name: "나", score: 38, total: 50, percent: 12, me: true },
+  ];
+
+  const subjects = [
+    { name: "민법총칙", rate: 85, change: 12, barWidth: "85%" },
+    { name: "물권법", rate: 72, change: 8, barWidth: "72%" },
+    { name: "채권법", rate: 64, change: 15, barWidth: "64%" },
   ];
 
   return (
-    <div className="p-3 space-y-2">
-      <div className="flex flex-col items-center py-3 space-y-1.5">
-        <div className="flex items-baseline gap-1">
-          <span className="text-4xl font-bold" style={{ color: "hsl(0 0% 14%)" }}>32</span>
-          <span className="text-lg font-medium" style={{ color: "hsl(0 0% 45%)" }}>/ 40</span>
-        </div>
-        <div className="flex items-center gap-2 text-[11px] px-3 py-1.5 rounded-md" style={{ border: "1px solid hsl(0 0% 90%)", background: "hsl(0 0% 96%)" }}>
-          <Trophy className="h-3 w-3" style={{ color: "hsl(0 0% 45%)" }} />
-          <span style={{ color: "hsl(0 0% 45%)" }}>전체</span>
-          <span className="font-bold" style={{ color: "hsl(0 0% 14%)" }}>12명</span>
-          <span style={{ color: "hsl(0 0% 45%)" }}>중</span>
-          <span className="font-bold" style={{ color: "hsl(0 0% 14%)" }}>5등</span>
-          <span style={{ color: "hsl(0 0% 45%)" }}>·</span>
-          <span className="font-bold" style={{ color: "hsl(0 0% 14%)" }}>상위 42%</span>
+    <div className="p-3 space-y-2.5">
+      {/* 내 등수 */}
+      <div className="rounded-lg p-3" style={{ background: "hsl(0 0% 96%)", border: "1px solid hsl(0 0% 90%)" }}>
+        <span className="text-[10px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>내 등수</span>
+        <div className="flex items-end justify-between mt-1">
+          <div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-black" style={{ color: "hsl(0 0% 14%)" }}>16</span>
+              <span className="text-sm font-medium" style={{ color: "hsl(0 0% 45%)" }}>/ 132</span>
+            </div>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-[11px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>38점</span>
+              <span className="text-[11px] font-bold" style={{ color: "#EA5027" }}>상위 12%</span>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <div className="flex items-center gap-1">
+              <span className="text-[10px]" style={{ color: "hsl(142 72% 40%)" }}>▲</span>
+              <span className="text-xs font-bold" style={{ color: "hsl(142 72% 40%)" }}>+5점</span>
+            </div>
+            <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "hsl(142 72% 40% / 0.12)", color: "hsl(142 72% 40%)" }}>
+              성장 중! 🔥
+            </span>
+          </div>
         </div>
       </div>
-      <div className="space-y-1">
-        {ranking.map((r) => (
-          <div
-            key={r.rank}
-            className="flex items-center justify-between rounded-lg px-3 py-2 text-xs"
-            style={{
-              border: `1px solid ${r.me ? "hsl(0 0% 14% / 0.3)" : "hsl(0 0% 90%)"}`,
-              background: r.me ? "hsl(0 0% 14% / 0.05)" : "transparent",
-            }}
-          >
-            <div className="flex items-center gap-2.5">
-              <span className="w-5 text-center font-bold text-[11px]">
-                {r.medal || r.rank}
-              </span>
-              <span className="font-medium" style={{ color: "hsl(0 0% 14%)" }}>
-                {r.me ? "나" : r.name}
-              </span>
-              {r.me && (
-                <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded" style={{ background: "hsl(0 0% 96%)", color: "hsl(0 0% 14%)" }}>
-                  ME
+
+      {/* 실시간 랭킹 */}
+      <div className="rounded-lg p-3 space-y-1.5" style={{ background: "hsl(0 0% 96%)", border: "1px solid hsl(0 0% 90%)" }}>
+        <span className="text-[10px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>실시간 랭킹</span>
+        <div className="space-y-1">
+          {ranking.map((r) => (
+            <div
+              key={r.rank}
+              className="flex items-center justify-between rounded-md px-2.5 py-2 text-xs"
+              style={{
+                background: r.me ? "hsl(14 82% 51% / 0.08)" : "hsl(0 0% 100% / 0.6)",
+                border: r.me ? "1px solid hsl(14 82% 51% / 0.2)" : "1px solid hsl(0 0% 90%)",
+              }}
+            >
+              <div className="flex items-center gap-2.5">
+                <span className="w-5 text-center font-bold text-[11px]" style={{ color: r.me ? "#EA5027" : "hsl(0 0% 45%)" }}>
+                  {r.rank}
                 </span>
-              )}
+                <span className="font-semibold" style={{ color: r.me ? "#EA5027" : "hsl(0 0% 14%)" }}>
+                  {r.name}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-[11px] tabular-nums" style={{ color: "hsl(0 0% 14%)" }}>
+                  {r.score}/{r.total}
+                </span>
+                <span className="text-[9px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>
+                  상위 {r.percent}%
+                </span>
+              </div>
             </div>
-            <span className="font-bold text-[11px]" style={{ color: "hsl(0 0% 14%)" }}>{r.score}점</span>
+          ))}
+        </div>
+      </div>
+
+      {/* 정답률 분석 */}
+      <div className="rounded-lg p-3 space-y-2" style={{ background: "hsl(0 0% 96%)", border: "1px solid hsl(0 0% 90%)" }}>
+        <span className="text-[10px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>정답률 분석</span>
+        {subjects.map((s) => (
+          <div key={s.name} className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold" style={{ color: "hsl(0 0% 14%)" }}>{s.name}</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-bold tabular-nums" style={{ color: "hsl(0 0% 14%)" }}>{s.rate}%</span>
+                <span className="text-[10px] font-semibold" style={{ color: "hsl(142 72% 40%)" }}>+{s.change}%</span>
+              </div>
+            </div>
+            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "hsl(0 0% 88%)" }}>
+              <div className="h-full rounded-full" style={{ width: s.barWidth, background: "#EA5027" }} />
+            </div>
           </div>
         ))}
       </div>
