@@ -221,7 +221,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
         }
       }
     },
-    [activeCell, user, questions, filtered, sectionFilter, skippedSet, filteredGlobalIndices]
+    [activeCell, user, questions, visualOrder, skippedSet]
   );
 
   const clearAndMoveUp = useCallback(() => {
