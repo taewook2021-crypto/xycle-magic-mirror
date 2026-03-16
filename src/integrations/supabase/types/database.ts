@@ -46,7 +46,9 @@ export interface Question {
   chapter_id: string;
   sub_topic_id: string | null;
   question_number: number;
-  correct_answer: number;
+  correct_answer: number | null;
+  is_essential: boolean;
+  exam_year: string | null;
   created_at: string;
 }
 
