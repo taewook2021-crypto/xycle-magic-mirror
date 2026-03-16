@@ -669,7 +669,8 @@ export default function StudentLogin() {
                     lineHeight: 1.1,
                     fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
                     letterSpacing: "-0.04em",
-                    transition: "color 0.8s ease"
+                    transition: "color 0.8s ease",
+                    wordBreak: "keep-all"
                   }}>
                     내가 푼 이 단원,<br />
                     <span style={{ color: "#EA5027", transition: "color 0.8s ease", wordBreak: "keep-all" }}>나는 전국에서 몇 등일까?</span>
