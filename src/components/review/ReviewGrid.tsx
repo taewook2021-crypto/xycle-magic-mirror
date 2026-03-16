@@ -15,6 +15,7 @@ export interface ChapterData {
 interface ReviewGridProps {
   chapters?: ChapterData[];
   roundCount?: number;
+  readOnly?: boolean;
 }
 
 type ColorFilter = "all" | "correct" | "wrong" | "half";

@@ -7,6 +7,7 @@ interface ReviewCellProps {
   result: CellResult;
   date?: string;
   realtimeMode: boolean;
+  readOnly?: boolean;
   onChange: (result: CellResult) => void;
 }
 
