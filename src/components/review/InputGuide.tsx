@@ -29,9 +29,9 @@ export default function InputGuide() {
       {/* Floating trigger button */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 right-4 z-40 h-10 w-10 rounded-full bg-card border border-border shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform md:bottom-6"
+        className="fixed bottom-20 right-4 z-40 h-12 w-12 rounded-full bg-primary shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform md:bottom-6"
       >
-        <img src={xycleLogomark} alt="입력 가이드" className="h-5 w-5" />
+        <img src={xycleLogomark} alt="입력 가이드" className="h-6 w-6 brightness-0 invert" />
       </button>
 
       {/* Guide overlay */}
