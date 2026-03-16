@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 export type CellResult = "correct" | "wrong" | "half" | null;
@@ -6,42 +6,39 @@ export type CellResult = "correct" | "wrong" | "half" | null;
 interface ReviewCellProps {
   result: CellResult;
   date?: string;
-  realtimeMode: boolean;
   readOnly?: boolean;
   onChange: (result: CellResult) => void;
 }
 
-const resultDisplay: Record<string, { label: string; className: string }> = {
-  correct: { label: "O", className: "bg-success/15 text-success border-success/30" },
-  wrong: { label: "X", className: "bg-destructive/15 text-destructive border-destructive/30" },
-  half: { label: "△", className: "bg-warning/15 text-warning border-warning/30" },
+const resultStyles: Record<string, { label: string; bg: string; text: string }> = {
+  correct: { label: "O", bg: "bg-success/20", text: "text-success" },
+  wrong: { label: "X", bg: "bg-destructive/20", text: "text-destructive" },
+  half: { label: "△", bg: "bg-warning/20", text: "text-warning" },
 };
 
-const cycleOrder: CellResult[] = ["correct", "wrong", null];
+const cycleOrder: CellResult[] = [null, "correct", "wrong", "half"];
 
-export default function ReviewCell({ result, date, realtimeMode, readOnly, onChange }: ReviewCellProps) {
+export default function ReviewCell({ result, date, readOnly, onChange }: ReviewCellProps) {
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
 
   const handleClick = useCallback(() => {
-    if (readOnly || !realtimeMode || didLongPress.current) {
+    if (readOnly || didLongPress.current) {
       didLongPress.current = false;
       return;
     }
-    // Cycle: null → correct → wrong → null
-    const currentIndex = cycleOrder.indexOf(result);
-    const next = cycleOrder[(currentIndex + 1) % cycleOrder.length];
-    onChange(next);
-  }, [result, realtimeMode, onChange]);
+    const idx = cycleOrder.indexOf(result);
+    onChange(cycleOrder[(idx + 1) % cycleOrder.length]);
+  }, [result, readOnly, onChange]);
 
   const handlePointerDown = useCallback(() => {
-    if (readOnly || !realtimeMode) return;
+    if (readOnly) return;
     didLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
       didLongPress.current = true;
       onChange("half");
     }, 500);
-  }, [realtimeMode, onChange]);
+  }, [readOnly, onChange]);
 
   const handlePointerUp = useCallback(() => {
     if (longPressTimer.current) {
@@ -50,7 +47,7 @@ export default function ReviewCell({ result, date, realtimeMode, readOnly, onCha
     }
   }, []);
 
-  const display = result ? resultDisplay[result] : null;
+  const style = result ? resultStyles[result] : null;
 
   return (
     <button
@@ -59,20 +56,14 @@ export default function ReviewCell({ result, date, realtimeMode, readOnly, onCha
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
       className={cn(
-        "w-full h-full min-h-[44px] flex flex-col items-center justify-center rounded border text-xs font-semibold transition-all select-none touch-manipulation",
-        display ? display.className : "bg-muted/30 border-border/50 text-muted-foreground/30",
-        realtimeMode && !readOnly && "active:scale-95 cursor-pointer",
+        "w-full h-8 flex items-center justify-center text-xs font-semibold select-none touch-manipulation transition-colors",
+        style ? `${style.bg} ${style.text}` : "text-muted-foreground/20",
+        !readOnly && "hover:bg-accent/40 active:scale-95 cursor-pointer",
         readOnly && "cursor-default"
       )}
+      title={date}
     >
-      {display ? (
-        <>
-          <span className="text-sm leading-none">{display.label}</span>
-          {date && <span className="text-[8px] font-normal opacity-60 mt-0.5">{date}</span>}
-        </>
-      ) : (
-        <span className="text-[10px]">–</span>
-      )}
+      {style ? style.label : "–"}
     </button>
   );
 }
