@@ -11,7 +11,7 @@ import NicknameSetup from "@/components/NicknameSetup";
 import { useAuth } from "@/hooks/useAuth";
 import { useReferral } from "@/hooks/useReferral";
 import { Switch } from "@/components/ui/switch";
-import { type ChapterData } from "@/components/review/ReviewGrid";
+import { type PeerChapter } from "@/components/dashboard/PeerReviewSheet";
 
 const mockHero = {
   displayName: "수험생",
