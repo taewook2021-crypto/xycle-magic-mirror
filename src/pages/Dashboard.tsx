@@ -88,7 +88,7 @@ export default function Dashboard() {
       )}
       <div className="px-4 pt-5 pb-8 space-y-4">
         <DashboardHero {...mockHero} />
-        <ActivityStream activities={mockActivities} />
+        <ActivityStream activities={mockActivities} peerAvgProgress={mockPeerAvgProgress} />
         <TodayStatsCard stats={mockStats} />
         <PeerComparisonCard weekData={mockWeekData} />
         <LiveFeed books={mockBooks} />
