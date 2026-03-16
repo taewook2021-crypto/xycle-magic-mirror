@@ -5,8 +5,11 @@ import TodayStatsCard from "@/components/dashboard/TodayStatsCard";
 import LiveFeed, { type BookFeedItem } from "@/components/dashboard/LiveFeed";
 import ActivityStream, { type ActivityItem, type PeerAvgProgress } from "@/components/dashboard/ActivityStream";
 import DashboardHero from "@/components/dashboard/DashboardHero";
+import ReferralBanner from "@/components/dashboard/ReferralBanner";
+import LockedInsight from "@/components/dashboard/LockedInsight";
 import NicknameSetup from "@/components/NicknameSetup";
 import { useAuth } from "@/hooks/useAuth";
+import { useReferral } from "@/hooks/useReferral";
 import { Switch } from "@/components/ui/switch";
 import { type ChapterData } from "@/components/review/ReviewGrid";
 
