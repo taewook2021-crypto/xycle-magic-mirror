@@ -1076,9 +1076,9 @@ export default function StudentLogin() {
                     letterSpacing: "-0.03em",
                     transition: "color 0.8s ease"
                   }}>
-                    시험 전날,<br />
-                    <span style={{ color: "#EA5027" }}>뭘 봐야 할지</span><br />
-                    저희가 골라드립니다
+                    종이 회독표에선{' '}<br />
+                    <span style={{ color: "#EA5027" }}>못 하는 것,</span><br />
+                    Xycle은 됩니다
                   </h3>
                   <p style={{
                     color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.6)",
@@ -1091,14 +1091,11 @@ export default function StudentLogin() {
                     maxWidth: "520px",
                     transition: "color 0.8s ease"
                   }}>
-                    <span className="hidden sm:inline">망각 곡선 기반 간격 반복(Spaced Repetition) 알고리즘이</span>
-                    <span className="sm:hidden">망각 곡선 기반 간격 반복 알고리즘이</span>
-                    <br />
-                    정답/오답 이력, 복습 횟수, 난이도를 분석하여<br />
+                    오답만 모아보기, 특정 주제에서 교재 상관없이 틀린 문제 전부 보기, 회차별 필터.<br />
                     <strong style={{ fontWeight: 700, color: isLightMode ? "#222222" : "#ECECEC" }}>
-                      가장 잊혀질 확률이 높은 문제
+                      종이에선 불가능한 선별
                     </strong>
-                    만 선별합니다.
+                    이 Xycle에선 터치 한 번이면 됩니다.
                   </p>
                 </motion.div>
 
