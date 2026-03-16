@@ -7,6 +7,7 @@ interface ReviewCellProps {
   result: CellResult;
   date?: string;
   realtimeMode: boolean;
+  readOnly?: boolean;
   onChange: (result: CellResult) => void;
 }
 
@@ -18,12 +19,12 @@ const resultDisplay: Record<string, { label: string; className: string }> = {
 
 const cycleOrder: CellResult[] = ["correct", "wrong", null];
 
-export default function ReviewCell({ result, date, realtimeMode, onChange }: ReviewCellProps) {
+export default function ReviewCell({ result, date, realtimeMode, readOnly, onChange }: ReviewCellProps) {
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
 
   const handleClick = useCallback(() => {
-    if (!realtimeMode || didLongPress.current) {
+    if (readOnly || !realtimeMode || didLongPress.current) {
       didLongPress.current = false;
       return;
     }
@@ -34,7 +35,7 @@ export default function ReviewCell({ result, date, realtimeMode, onChange }: Rev
   }, [result, realtimeMode, onChange]);
 
   const handlePointerDown = useCallback(() => {
-    if (!realtimeMode) return;
+    if (readOnly || !realtimeMode) return;
     didLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
       didLongPress.current = true;
@@ -60,7 +61,8 @@ export default function ReviewCell({ result, date, realtimeMode, onChange }: Rev
       className={cn(
         "w-full h-full min-h-[44px] flex flex-col items-center justify-center rounded border text-xs font-semibold transition-all select-none touch-manipulation",
         display ? display.className : "bg-muted/30 border-border/50 text-muted-foreground/30",
-        realtimeMode && "active:scale-95 cursor-pointer"
+        realtimeMode && !readOnly && "active:scale-95 cursor-pointer",
+        readOnly && "cursor-default"
       )}
     >
       {display ? (

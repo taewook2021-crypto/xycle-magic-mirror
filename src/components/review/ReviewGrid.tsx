@@ -15,11 +15,12 @@ export interface ChapterData {
 interface ReviewGridProps {
   chapters?: ChapterData[];
   roundCount?: number;
+  readOnly?: boolean;
 }
 
 type ColorFilter = "all" | "correct" | "wrong" | "half";
 
-export default function ReviewGrid({ chapters: initialChapters = [], roundCount = 3 }: ReviewGridProps) {
+export default function ReviewGrid({ chapters: initialChapters = [], roundCount = 3, readOnly = false }: ReviewGridProps) {
   const [realtimeMode, setRealtimeMode] = useState(false);
   const [colorFilter, setColorFilter] = useState<ColorFilter>("all");
   const [data, setData] = useState(initialChapters);
@@ -88,10 +89,12 @@ export default function ReviewGrid({ chapters: initialChapters = [], roundCount 
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] text-muted-foreground">실시간</span>
-          <Switch checked={realtimeMode} onCheckedChange={setRealtimeMode} className="scale-75" />
-        </div>
+        {!readOnly && (
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-muted-foreground">실시간</span>
+            <Switch checked={realtimeMode} onCheckedChange={setRealtimeMode} className="scale-75" />
+          </div>
+        )}
       </div>
 
       {/* Grid */}
@@ -154,6 +157,7 @@ export default function ReviewGrid({ chapters: initialChapters = [], roundCount 
                                 result={round.result}
                                 date={round.date}
                                 realtimeMode={realtimeMode}
+                                readOnly={readOnly}
                                 onChange={(result) => handleCellChange(chapterIdx, originalIdx, roundIdx, result)}
                               />
                             </div>
