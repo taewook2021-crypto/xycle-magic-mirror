@@ -1225,8 +1225,8 @@ export default function StudentLogin() {
                       marginTop: "32px",
                       maxWidth: "420px"
                     }}>
-                    같은 교재를 푸는 학생들과 경쟁하고,<br className="sm:hidden" />
-                    내 현재 등수를 확인하세요.
+                    종이 회독표 대신 Xycle로 기록하고,<br className="sm:hidden" />
+                    동차생들과 비교하세요.
                   </motion.p>
 
                   <motion.button
