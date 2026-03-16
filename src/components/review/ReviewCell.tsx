@@ -19,7 +19,7 @@ const resultDisplay: Record<string, { label: string; className: string }> = {
 
 const cycleOrder: CellResult[] = ["correct", "wrong", null];
 
-export default function ReviewCell({ result, date, realtimeMode, onChange }: ReviewCellProps) {
+export default function ReviewCell({ result, date, realtimeMode, readOnly, onChange }: ReviewCellProps) {
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
 
