@@ -20,7 +20,7 @@ interface ReviewGridProps {
 
 type ColorFilter = "all" | "correct" | "wrong" | "half";
 
-export default function ReviewGrid({ chapters: initialChapters = [], roundCount = 3 }: ReviewGridProps) {
+export default function ReviewGrid({ chapters: initialChapters = [], roundCount = 3, readOnly = false }: ReviewGridProps) {
   const [realtimeMode, setRealtimeMode] = useState(false);
   const [colorFilter, setColorFilter] = useState<ColorFilter>("all");
   const [data, setData] = useState(initialChapters);
