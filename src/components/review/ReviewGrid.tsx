@@ -2,22 +2,23 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import ReviewCell, { type CellResult } from "./ReviewCell";
-import { Switch } from "@/components/ui/switch";
+import ChapterTabs from "./ChapterTabs";
 import { cn } from "@/lib/utils";
 import type { QuestionType } from "@/integrations/supabase/types/database";
 
-export interface ChapterData {
-  chapterId: string;
-  chapterTitle: string;
-  chapterNumber: number;
-  questions: {
-    questionId: string;
-    questionNumber: number;
-    questionType: QuestionType;
-    isEssential: boolean;
-    examYear: string | null;
-    rounds: { result: CellResult; date?: string }[];
-  }[];
+interface QuestionRow {
+  questionId: string;
+  questionNumber: number;
+  questionType: QuestionType;
+  isEssential: boolean;
+  examYear: string | null;
+  rounds: { result: CellResult; date?: string }[];
+}
+
+interface ChapterInfo {
+  id: string;
+  title: string;
+  number: number;
 }
 
 interface ReviewGridProps {
@@ -27,126 +28,97 @@ interface ReviewGridProps {
 }
 
 type SectionFilter = "all" | "example" | "past_exam" | "practice";
-type ColorFilter = "all" | "correct" | "wrong" | "half";
 
 export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }: ReviewGridProps) {
   const { user } = useAuth();
-  const [chapters, setChapters] = useState<ChapterData[]>([]);
+  const [chapters, setChapters] = useState<ChapterInfo[]>([]);
+  const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
+  const [questions, setQuestions] = useState<QuestionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("all");
-  const [colorFilter, setColorFilter] = useState<ColorFilter>("all");
-  const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
 
+  // Fetch chapters list
   useEffect(() => {
-    const fetchData = async () => {
+    const fetch = async () => {
       setLoading(true);
-
-      // Fetch chapters for this book
-      const { data: chaptersData, error: chaptersErr } = await supabase
+      const { data, error } = await supabase
         .from("chapters")
         .select("id, title, chapter_number")
         .eq("book_id", bookId)
         .order("display_order");
 
-      if (chaptersErr || !chaptersData) {
-        setLoading(false);
-        return;
-      }
+      if (error || !data) { setLoading(false); return; }
 
-      // Fetch questions for these chapters
-      const chapterIds = chaptersData.map((c: any) => c.id);
-      const { data: questionsData, error: questionsErr } = await supabase
+      const mapped = data.map((c: any) => ({ id: c.id, title: c.title, number: c.chapter_number }));
+      setChapters(mapped);
+      if (mapped.length > 0) setSelectedChapterId(mapped[0].id);
+      setLoading(false);
+    };
+    fetch();
+  }, [bookId]);
+
+  // Fetch questions for selected chapter
+  useEffect(() => {
+    if (!selectedChapterId) return;
+    const fetchQuestions = async () => {
+      const { data: qData, error: qErr } = await supabase
         .from("questions")
-        .select("id, chapter_id, question_number, question_type, is_essential, exam_year")
-        .in("chapter_id", chapterIds)
+        .select("id, question_number, question_type, is_essential, exam_year")
+        .eq("chapter_id", selectedChapterId)
         .order("question_number");
 
-      if (questionsErr) {
-        setLoading(false);
-        return;
-      }
+      if (qErr || !qData) return;
 
-      // Fetch user attempts for these questions
       let attemptsMap: Record<string, { result: CellResult; date?: string }[]> = {};
-      if (user && questionsData) {
-        const questionIds = questionsData.map((q: any) => q.id);
-        if (questionIds.length > 0) {
-          const { data: attemptsData } = await supabase
-            .from("attempts")
-            .select("question_id, is_correct, attempted_at")
-            .eq("user_id", user.id)
-            .in("question_id", questionIds)
-            .order("attempted_at");
+      if (user && qData.length > 0) {
+        const qIds = qData.map((q: any) => q.id);
+        const { data: aData } = await supabase
+          .from("attempts")
+          .select("question_id, is_correct, attempted_at")
+          .eq("user_id", user.id)
+          .in("question_id", qIds)
+          .order("attempted_at");
 
-          if (attemptsData) {
-            for (const a of attemptsData as any[]) {
-              if (!attemptsMap[a.question_id]) attemptsMap[a.question_id] = [];
-              attemptsMap[a.question_id].push({
-                result: a.is_correct ? "correct" : "wrong",
-                date: new Date(a.attempted_at).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
-              });
-            }
+        if (aData) {
+          for (const a of aData as any[]) {
+            if (!attemptsMap[a.question_id]) attemptsMap[a.question_id] = [];
+            attemptsMap[a.question_id].push({
+              result: a.is_correct ? "correct" : "wrong",
+              date: new Date(a.attempted_at).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
+            });
           }
         }
       }
 
-      // Build chapter data
-      const result: ChapterData[] = chaptersData.map((c: any) => {
-        const qs = (questionsData ?? [])
-          .filter((q: any) => q.chapter_id === c.id)
-          .map((q: any) => {
-            const existingRounds = attemptsMap[q.id] ?? [];
-            const rounds = Array.from({ length: roundCount }, (_, i) => existingRounds[i] ?? { result: null });
-            return {
-              questionId: q.id,
-              questionNumber: q.question_number,
-              questionType: q.question_type as QuestionType,
-              isEssential: q.is_essential,
-              examYear: q.exam_year,
-              rounds,
-            };
-          });
+      const rows: QuestionRow[] = qData.map((q: any) => {
+        const existing = attemptsMap[q.id] ?? [];
         return {
-          chapterId: c.id,
-          chapterTitle: c.title,
-          chapterNumber: c.chapter_number,
-          questions: qs,
+          questionId: q.id,
+          questionNumber: q.question_number,
+          questionType: q.question_type as QuestionType,
+          isEssential: q.is_essential,
+          examYear: q.exam_year,
+          rounds: Array.from({ length: roundCount }, (_, i) => existing[i] ?? { result: null }),
         };
       });
 
-      setChapters(result);
-      setLoading(false);
+      setQuestions(rows);
     };
-
-    fetchData();
-  }, [bookId, user, roundCount]);
-
-  const toggleChapter = (id: string) => {
-    setExpandedChapters((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+    fetchQuestions();
+  }, [selectedChapterId, user, roundCount]);
 
   const handleCellChange = useCallback(
-    (chapterIdx: number, qIdx: number, roundIdx: number, result: CellResult) => {
-      setChapters((prev) => {
+    (qIdx: number, roundIdx: number, result: CellResult) => {
+      setQuestions((prev) => {
         const next = [...prev];
-        const chapter = { ...next[chapterIdx] };
-        const questions = [...chapter.questions];
-        const q = { ...questions[qIdx] };
+        const q = { ...next[qIdx] };
         const rounds = [...q.rounds];
         rounds[roundIdx] = {
-          ...rounds[roundIdx],
           result,
           date: result ? new Date().toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }) : undefined,
         };
         q.rounds = rounds;
-        questions[qIdx] = q;
-        chapter.questions = questions;
-        next[chapterIdx] = chapter;
+        next[qIdx] = q;
         return next;
       });
     },
@@ -160,12 +132,25 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     { key: "practice", label: "실전" },
   ];
 
-  const colorFilters: { key: ColorFilter; label: string; className: string }[] = [
-    { key: "all", label: "전체", className: "" },
-    { key: "wrong", label: "X", className: "text-destructive" },
-    { key: "half", label: "△", className: "text-warning" },
-    { key: "correct", label: "O", className: "text-success" },
-  ];
+  const filtered = questions.filter((q) => sectionFilter === "all" || q.questionType === sectionFilter);
+
+  // Group by type for section headers
+  const groupedByType = () => {
+    if (sectionFilter !== "all") return [{ type: sectionFilter, rows: filtered }];
+    const groups: { type: string; rows: QuestionRow[] }[] = [];
+    const typeOrder: QuestionType[] = ["example", "past_exam", "practice"];
+    for (const t of typeOrder) {
+      const rows = filtered.filter((q) => q.questionType === t);
+      if (rows.length > 0) groups.push({ type: t, rows });
+    }
+    return groups;
+  };
+
+  const typeLabels: Record<string, string> = {
+    example: "예제",
+    past_exam: "기출문제",
+    practice: "실전연습",
+  };
 
   if (loading) {
     return (
@@ -176,16 +161,19 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
   }
 
   if (chapters.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-sm text-muted-foreground">문항 데이터가 없습니다.</p>
-      </div>
-    );
+    return <div className="text-center py-12 text-sm text-muted-foreground">문항 데이터가 없습니다.</div>;
   }
 
   return (
     <div className="space-y-3">
-      {/* Section filter */}
+      {/* Chapter tabs */}
+      <ChapterTabs
+        chapters={chapters}
+        selectedId={selectedChapterId}
+        onSelect={setSelectedChapterId}
+      />
+
+      {/* Section filter pills */}
       <div className="flex gap-1.5">
         {sectionFilters.map((f) => (
           <button
@@ -203,136 +191,84 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         ))}
       </div>
 
-      {/* Color filter + controls */}
-      <div className="flex items-center justify-between">
-        <div className="flex gap-1">
-          {colorFilters.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setColorFilter(f.key)}
-              className={cn(
-                "px-2 py-0.5 rounded text-[10px] font-medium transition-all border",
-                colorFilter === f.key
-                  ? "bg-foreground text-background border-foreground"
-                  : `bg-secondary border-border ${f.className || "text-secondary-foreground"} hover:bg-accent`
-              )}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Chapters */}
-      <div className="space-y-2">
-        {chapters.map((chapter, chapterIdx) => {
-          const filteredQuestions = chapter.questions.filter((q) => {
-            if (sectionFilter !== "all" && q.questionType !== sectionFilter) return false;
-            if (colorFilter !== "all") return q.rounds.some((r) => r.result === colorFilter);
-            return true;
-          });
-
-          if (sectionFilter !== "all" && filteredQuestions.length === 0) return null;
-
-          const expanded = expandedChapters.has(chapter.chapterId);
-          const allResults = filteredQuestions.flatMap((q) => q.rounds.map((r) => r.result)).filter(Boolean);
-          const correctCount = allResults.filter((r) => r === "correct").length;
-          const totalCount = allResults.length;
-
-          // Count by section
-          const exCount = chapter.questions.filter((q) => q.questionType === "example").length;
-          const peCount = chapter.questions.filter((q) => q.questionType === "past_exam").length;
-          const prCount = chapter.questions.filter((q) => q.questionType === "practice").length;
-
-          return (
-            <div key={chapter.chapterId} className="rounded-lg border border-border overflow-hidden bg-card">
-              <button
-                onClick={() => toggleChapter(chapter.chapterId)}
-                className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-accent/50 transition-colors"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-[10px] text-muted-foreground font-mono w-5 text-right flex-shrink-0">
-                    {chapter.chapterNumber}
-                  </span>
-                  <span className="text-sm font-medium text-foreground truncate">{chapter.chapterTitle}</span>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-[9px] text-muted-foreground">
-                    {exCount > 0 && `예${exCount}`}
-                    {peCount > 0 && ` 기${peCount}`}
-                    {prCount > 0 && ` 실${prCount}`}
-                  </span>
-                  {totalCount > 0 && (
-                    <span className="text-[10px] text-muted-foreground">
-                      {Math.round((correctCount / totalCount) * 100)}%
-                    </span>
-                  )}
-                  <span className={cn("text-xs transition-transform", expanded && "rotate-90")}>▶</span>
-                </div>
-              </button>
-
-              {expanded && (
-                <div className="border-t border-border">
-                  <div className="grid gap-px bg-border" style={{ gridTemplateColumns: `64px repeat(${roundCount}, 1fr)` }}>
-                    <div className="bg-muted px-2 py-1.5 text-[10px] font-medium text-muted-foreground text-center">
-                      문항
-                    </div>
-                    {Array.from({ length: roundCount }, (_, i) => (
-                      <div key={i} className="bg-muted px-2 py-1.5 text-[10px] font-medium text-muted-foreground text-center">
-                        {i + 1}회독
-                      </div>
-                    ))}
-                  </div>
-
-                  {filteredQuestions.map((q) => {
-                    const originalIdx = chapter.questions.indexOf(q);
-                    const typeLabel = q.questionType === "past_exam" ? "기" : q.questionType === "practice" ? "실" : "";
-
-                    return (
-                      <div
-                        key={q.questionId}
-                        className="grid gap-px bg-border"
-                        style={{ gridTemplateColumns: `64px repeat(${roundCount}, 1fr)` }}
-                      >
-                        <div className="bg-card flex items-center justify-center gap-0.5 text-xs">
-                          {typeLabel && (
+      {/* Spreadsheet table */}
+      {filtered.length === 0 ? (
+        <div className="text-center py-8 text-xs text-muted-foreground">해당 유형의 문항이 없습니다.</div>
+      ) : (
+        <div className="border border-border rounded-lg overflow-hidden bg-card">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-xs">
+              <thead>
+                <tr className="bg-muted/60">
+                  <th className="sticky left-0 z-10 bg-muted/60 w-10 px-2 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border">
+                    #
+                  </th>
+                  <th className="sticky left-10 z-10 bg-muted/60 w-12 px-1 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border">
+                    유형
+                  </th>
+                  {Array.from({ length: roundCount }, (_, i) => (
+                    <th key={i} className="px-2 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border last:border-r-0 min-w-[56px]">
+                      {i + 1}회독
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {groupedByType().map((group) => (
+                  <>
+                    {sectionFilter === "all" && (
+                      <tr key={`header-${group.type}`}>
+                        <td
+                          colSpan={2 + roundCount}
+                          className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider"
+                        >
+                          {typeLabels[group.type]} ({group.rows.length})
+                        </td>
+                      </tr>
+                    )}
+                    {group.rows.map((q) => {
+                      const globalIdx = questions.indexOf(q);
+                      return (
+                        <tr key={q.questionId} className="hover:bg-accent/20 transition-colors">
+                          <td className="sticky left-0 z-10 bg-card w-10 px-2 py-0 text-center border-b border-r border-border">
                             <span className={cn(
-                              "text-[8px] font-bold",
-                              q.questionType === "past_exam" ? "text-primary/70" : "text-accent-foreground"
+                              "font-medium text-xs",
+                              q.isEssential ? "text-primary font-bold" : "text-foreground"
                             )}>
-                              {typeLabel}
+                              {q.questionNumber}
                             </span>
-                          )}
-                          <span className={cn(
-                            "font-medium",
-                            q.isEssential ? "text-primary" : "text-muted-foreground"
-                          )}>
-                            {q.questionNumber}
-                          </span>
-                          {q.examYear && (
-                            <span className="text-[7px] text-muted-foreground">'{q.examYear.slice(-2)}</span>
-                          )}
-                        </div>
-                        {q.rounds.map((round, roundIdx) => (
-                          <div key={roundIdx} className="bg-card p-0.5">
-                            <ReviewCell
-                              result={round.result}
-                              date={round.date}
-                              realtimeMode={false}
-                              readOnly={readOnly}
-                              onChange={(result) => handleCellChange(chapterIdx, originalIdx, roundIdx, result)}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+                          </td>
+                          <td className="sticky left-10 z-10 bg-card w-12 px-1 py-0 text-center border-b border-r border-border">
+                            <span className="text-[9px] text-muted-foreground">
+                              {q.questionType === "past_exam" && (
+                                <span className="text-primary/70 font-semibold">
+                                  기{q.examYear ? `'${q.examYear.slice(-2)}` : ""}
+                                </span>
+                              )}
+                              {q.questionType === "practice" && <span className="font-semibold">실</span>}
+                              {q.questionType === "example" && <span className="font-semibold">예</span>}
+                            </span>
+                          </td>
+                          {q.rounds.map((round, rIdx) => (
+                            <td key={rIdx} className="p-0 border-b border-r border-border last:border-r-0">
+                              <ReviewCell
+                                result={round.result}
+                                date={round.date}
+                                readOnly={readOnly}
+                                onChange={(result) => handleCellChange(globalIdx, rIdx, result)}
+                              />
+                            </td>
+                          ))}
+                        </tr>
+                      );
+                    })}
+                  </>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
