@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import ReviewCell, { type CellResult } from "./ReviewCell";
 import ChapterTabs from "./ChapterTabs";
+import FloatingInputBar from "./FloatingInputBar";
 import { cn } from "@/lib/utils";
 import type { QuestionType } from "@/integrations/supabase/types/database";
 
@@ -29,6 +30,7 @@ interface ReviewGridProps {
 }
 
 type SectionFilter = "all" | "example" | "past_exam" | "practice";
+type ActiveCell = { qIdx: number; rIdx: number } | null;
 
 export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }: ReviewGridProps) {
   const { user } = useAuth();
@@ -38,8 +40,19 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
   const [loading, setLoading] = useState(true);
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("all");
   const [essentialOnly, setEssentialOnly] = useState(false);
+  const [activeCell, setActiveCell] = useState<ActiveCell>(null);
 
-  // Fetch chapters list
+  // Filtered indices mapping
+  const filtered = questions.filter((q) => {
+    if (sectionFilter !== "all" && q.questionType !== sectionFilter) return false;
+    if (essentialOnly && !q.isEssential) return false;
+    return true;
+  });
+
+  // Build flat list of visible cells for navigation
+  const filteredGlobalIndices = filtered.map((q) => questions.indexOf(q));
+
+  // Fetch chapters
   useEffect(() => {
     const fetch = async () => {
       setLoading(true);
@@ -48,9 +61,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         .select("id, title, chapter_number")
         .eq("book_id", bookId)
         .order("display_order");
-
       if (error || !data) { setLoading(false); return; }
-
       const mapped = data.map((c: any) => ({ id: c.id, title: c.title, number: c.chapter_number }));
       setChapters(mapped);
       if (mapped.length > 0) setSelectedChapterId(mapped[0].id);
@@ -59,7 +70,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     fetch();
   }, [bookId]);
 
-  // Fetch questions for selected chapter
+  // Fetch questions
   useEffect(() => {
     if (!selectedChapterId) return;
     const fetchQuestions = async () => {
@@ -68,7 +79,6 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         .select("id, question_number, question_type, is_essential, exam_year, topic")
         .eq("chapter_id", selectedChapterId)
         .order("question_number");
-
       if (qErr || !qData) return;
 
       let attemptsMap: Record<string, { result: CellResult; date?: string }[]> = {};
@@ -80,7 +90,6 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
           .eq("user_id", user.id)
           .in("question_id", qIds)
           .order("attempted_at");
-
         if (aData) {
           for (const a of aData as any[]) {
             if (!attemptsMap[a.question_id]) attemptsMap[a.question_id] = [];
@@ -104,19 +113,23 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
           rounds: Array.from({ length: roundCount }, (_, i) => existing[i] ?? { result: null }),
         };
       });
-
       setQuestions(rows);
     };
     fetchQuestions();
+    setActiveCell(null);
   }, [selectedChapterId, user, roundCount]);
 
-  const handleCellChange = useCallback(
-    (qIdx: number, roundIdx: number, result: CellResult) => {
+  // Apply result to active cell + auto-advance
+  const applyResult = useCallback(
+    (result: CellResult) => {
+      if (!activeCell) return;
+      const { qIdx, rIdx } = activeCell;
+
       setQuestions((prev) => {
         const next = [...prev];
         const q = { ...next[qIdx] };
         const rounds = [...q.rounds];
-        rounds[roundIdx] = {
+        rounds[rIdx] = {
           result,
           date: result ? new Date().toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }) : undefined,
         };
@@ -124,10 +137,98 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         next[qIdx] = q;
         return next;
       });
+
+      // Auto-advance to next row in same column
+      const currentFilteredIdx = filteredGlobalIndices.indexOf(qIdx);
+      if (currentFilteredIdx < filteredGlobalIndices.length - 1) {
+        setActiveCell({ qIdx: filteredGlobalIndices[currentFilteredIdx + 1], rIdx });
+      }
     },
-    []
+    [activeCell, filteredGlobalIndices]
   );
 
+  const clearActiveCell = useCallback(() => {
+    if (!activeCell) return;
+    applyResult(null);
+    // Stay on same cell after clearing
+    setActiveCell(activeCell);
+  }, [activeCell, applyResult]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (readOnly || !activeCell) return;
+    const handleKey = (e: KeyboardEvent) => {
+      const { qIdx, rIdx } = activeCell;
+      const fIdx = filteredGlobalIndices.indexOf(qIdx);
+
+      switch (e.key) {
+        case "1":
+          e.preventDefault();
+          applyResult("correct");
+          break;
+        case "2":
+          e.preventDefault();
+          applyResult("half");
+          break;
+        case "3":
+          e.preventDefault();
+          applyResult("wrong");
+          break;
+        case "0":
+        case "Backspace":
+          e.preventDefault();
+          clearActiveCell();
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          if (fIdx > 0) setActiveCell({ qIdx: filteredGlobalIndices[fIdx - 1], rIdx });
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          if (fIdx < filteredGlobalIndices.length - 1) setActiveCell({ qIdx: filteredGlobalIndices[fIdx + 1], rIdx });
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          if (rIdx > 0) setActiveCell({ qIdx, rIdx: rIdx - 1 });
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          if (rIdx < roundCount - 1) setActiveCell({ qIdx, rIdx: rIdx + 1 });
+          break;
+        case "Escape":
+          e.preventDefault();
+          setActiveCell(null);
+          break;
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [activeCell, readOnly, filteredGlobalIndices, roundCount, applyResult, clearActiveCell]);
+
+  const navigate = useCallback(
+    (dir: "up" | "down" | "left" | "right") => {
+      if (!activeCell) return;
+      const { qIdx, rIdx } = activeCell;
+      const fIdx = filteredGlobalIndices.indexOf(qIdx);
+      switch (dir) {
+        case "up":
+          if (fIdx > 0) setActiveCell({ qIdx: filteredGlobalIndices[fIdx - 1], rIdx });
+          break;
+        case "down":
+          if (fIdx < filteredGlobalIndices.length - 1) setActiveCell({ qIdx: filteredGlobalIndices[fIdx + 1], rIdx });
+          break;
+        case "left":
+          if (rIdx > 0) setActiveCell({ qIdx, rIdx: rIdx - 1 });
+          break;
+        case "right":
+          if (rIdx < roundCount - 1) setActiveCell({ qIdx, rIdx: rIdx + 1 });
+          break;
+      }
+    },
+    [activeCell, filteredGlobalIndices, roundCount]
+  );
+
+  // Section filter config
   const sectionFilters: { key: SectionFilter; label: string }[] = [
     { key: "all", label: "전체" },
     { key: "example", label: "예제" },
@@ -135,13 +236,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     { key: "practice", label: "실전" },
   ];
 
-  const filtered = questions.filter((q) => {
-    if (sectionFilter !== "all" && q.questionType !== sectionFilter) return false;
-    if (essentialOnly && !q.isEssential) return false;
-    return true;
-  });
-
-  // Group by type for section headers
+  // Group by type
   const groupedByType = () => {
     if (sectionFilter !== "all") return [{ type: sectionFilter, rows: filtered }];
     const groups: { type: string; rows: QuestionRow[] }[] = [];
@@ -159,6 +254,8 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     practice: "실전연습",
   };
 
+  const activeQuestion = activeCell ? questions[activeCell.qIdx] : undefined;
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -173,19 +270,14 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
 
   return (
     <div className="space-y-3">
-      {/* Chapter tabs */}
-      <ChapterTabs
-        chapters={chapters}
-        selectedId={selectedChapterId}
-        onSelect={setSelectedChapterId}
-      />
+      <ChapterTabs chapters={chapters} selectedId={selectedChapterId} onSelect={setSelectedChapterId} />
 
       {/* Section filter pills */}
       <div className="flex items-center gap-1.5">
         {sectionFilters.map((f) => (
           <button
             key={f.key}
-            onClick={() => setSectionFilter(f.key)}
+            onClick={() => { setSectionFilter(f.key); setActiveCell(null); }}
             className={cn(
               "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border",
               sectionFilter === f.key
@@ -193,12 +285,12 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                 : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
             )}
           >
-          {f.label}
+            {f.label}
           </button>
         ))}
         <div className="w-px h-4 bg-border mx-1" />
         <button
-          onClick={() => setEssentialOnly((v) => !v)}
+          onClick={() => { setEssentialOnly((v) => !v); setActiveCell(null); }}
           className={cn(
             "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border",
             essentialOnly
@@ -210,24 +302,18 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         </button>
       </div>
 
-      {/* Spreadsheet table */}
+      {/* Table */}
       {filtered.length === 0 ? (
         <div className="text-center py-8 text-xs text-muted-foreground">해당 유형의 문항이 없습니다.</div>
       ) : (
-        <div className="border border-border rounded-lg overflow-hidden bg-card">
+        <div className={cn("border border-border rounded-lg overflow-hidden bg-card", activeCell && "mb-16")}>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-xs">
               <thead>
                 <tr className="bg-muted/60">
-                  <th className="sticky left-0 z-10 bg-muted/60 w-10 px-2 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border">
-                    #
-                  </th>
-                  <th className="sticky left-10 z-10 bg-muted/60 w-12 px-1 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border">
-                    유형
-                  </th>
-                  <th className="sticky left-[88px] z-10 bg-muted/60 min-w-[120px] px-2 py-2 text-left font-semibold text-muted-foreground border-b border-r border-border">
-                    주제
-                  </th>
+                  <th className="sticky left-0 z-10 bg-muted/60 w-10 px-2 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border">#</th>
+                  <th className="sticky left-10 z-10 bg-muted/60 w-12 px-1 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border">유형</th>
+                  <th className="sticky left-[88px] z-10 bg-muted/60 min-w-[120px] px-2 py-2 text-left font-semibold text-muted-foreground border-b border-r border-border">주제</th>
                   {Array.from({ length: roundCount }, (_, i) => (
                     <th key={i} className="px-2 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border last:border-r-0 min-w-[56px]">
                       {i + 1}회독
@@ -240,41 +326,32 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                   <>
                     {sectionFilter === "all" && (
                       <tr key={`header-${group.type}`}>
-                        <td
-                          colSpan={3 + roundCount}
-                          className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider"
-                        >
+                        <td colSpan={3 + roundCount} className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider">
                           {typeLabels[group.type]} ({group.rows.length})
                         </td>
                       </tr>
                     )}
                     {group.rows.map((q) => {
                       const globalIdx = questions.indexOf(q);
+                      const isActiveRow = activeCell?.qIdx === globalIdx;
                       return (
-                        <tr key={q.questionId} className="hover:bg-accent/20 transition-colors">
-                          <td className="sticky left-0 z-10 bg-card w-10 px-2 py-0 text-center border-b border-r border-border">
-                            <span className={cn(
-                              "font-medium text-xs",
-                              q.isEssential ? "text-primary font-bold" : "text-foreground"
-                            )}>
+                        <tr key={q.questionId} className={cn("transition-colors", isActiveRow ? "bg-primary/5" : "hover:bg-accent/20")}>
+                          <td className={cn("sticky left-0 z-10 w-10 px-2 py-0 text-center border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
+                            <span className={cn("font-medium text-xs", q.isEssential ? "text-primary font-bold" : "text-foreground")}>
                               {q.questionNumber}
                             </span>
                           </td>
-                          <td className="sticky left-10 z-10 bg-card w-12 px-1 py-0 text-center border-b border-r border-border">
+                          <td className={cn("sticky left-10 z-10 w-12 px-1 py-0 text-center border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
                             <span className="text-[9px] text-muted-foreground">
                               {q.questionType === "past_exam" && (
-                                <span className="text-primary/70 font-semibold">
-                                  {q.examYear ? `${q.examYear.slice(-2)}기출` : "기출"}
-                                </span>
+                                <span className="text-primary/70 font-semibold">{q.examYear ? `${q.examYear.slice(-2)}기출` : "기출"}</span>
                               )}
                               {q.questionType === "practice" && <span className="font-semibold">실전</span>}
                               {q.questionType === "example" && <span className="font-semibold">예제</span>}
                             </span>
                           </td>
-                          <td className="sticky left-[88px] z-10 bg-card min-w-[120px] px-2 py-0 text-left border-b border-r border-border">
-                            <span className="text-[10px] text-muted-foreground truncate block max-w-[160px]">
-                              {q.topic || "–"}
-                            </span>
+                          <td className={cn("sticky left-[88px] z-10 min-w-[120px] px-2 py-0 text-left border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
+                            <span className="text-[10px] text-muted-foreground truncate block max-w-[160px]">{q.topic || "–"}</span>
                           </td>
                           {q.rounds.map((round, rIdx) => (
                             <td key={rIdx} className="p-0 border-b border-r border-border last:border-r-0">
@@ -282,7 +359,11 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                                 result={round.result}
                                 date={round.date}
                                 readOnly={readOnly}
-                                onChange={(result) => handleCellChange(globalIdx, rIdx, result)}
+                                isActive={activeCell?.qIdx === globalIdx && activeCell?.rIdx === rIdx}
+                                onChange={(result) => {
+                                  // Direct change (legacy)
+                                }}
+                                onSelect={() => setActiveCell({ qIdx: globalIdx, rIdx })}
                               />
                             </td>
                           ))}
@@ -295,6 +376,22 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
             </table>
           </div>
         </div>
+      )}
+
+      {/* Floating input bar */}
+      {!readOnly && (
+        <FloatingInputBar
+          visible={activeCell !== null}
+          currentQuestion={
+            activeQuestion
+              ? { number: activeQuestion.questionNumber, round: (activeCell?.rIdx ?? 0) + 1 }
+              : undefined
+          }
+          onInput={applyResult}
+          onClear={clearActiveCell}
+          onClose={() => setActiveCell(null)}
+          onNavigate={navigate}
+        />
       )}
     </div>
   );
