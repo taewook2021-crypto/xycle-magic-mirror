@@ -28,17 +28,19 @@ interface ReviewGridProps {
   bookId: string;
   roundCount?: number;
   readOnly?: boolean;
+  initialChapterId?: string;
+  singleChapter?: boolean;
 }
 
 type SectionFilter = "all" | "example" | "past_exam" | "practice";
 type ActiveCell = { qIdx: number; rIdx: number } | null;
 
-export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }: ReviewGridProps) {
+export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, initialChapterId, singleChapter = false }: ReviewGridProps) {
   const { user } = useAuth();
   const [chapters, setChapters] = useState<ChapterInfo[]>([]);
-  const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
+  const [selectedChapterId, setSelectedChapterId] = useState<string | null>(initialChapterId ?? null);
   const [questions, setQuestions] = useState<QuestionRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!singleChapter);
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("all");
   const [essentialOnly, setEssentialOnly] = useState(false);
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
@@ -54,8 +56,13 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
   // Build flat list of visible cells for navigation
   const filteredGlobalIndices = filtered.map((q) => questions.indexOf(q));
 
-  // Fetch chapters
+  // Fetch chapters (skip if singleChapter mode)
   useEffect(() => {
+    if (singleChapter) {
+      // Already have chapterId, set it directly
+      if (initialChapterId) setSelectedChapterId(initialChapterId);
+      return;
+    }
     const fetch = async () => {
       setLoading(true);
       const { data, error } = await supabase
@@ -70,7 +77,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
       setLoading(false);
     };
     fetch();
-  }, [bookId]);
+  }, [bookId, singleChapter, initialChapterId]);
 
   // Fetch questions + skips
   useEffect(() => {
@@ -364,13 +371,13 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     );
   }
 
-  if (chapters.length === 0) {
+  if (!singleChapter && chapters.length === 0) {
     return <div className="text-center py-12 text-sm text-muted-foreground">문항 데이터가 없습니다.</div>;
   }
 
   return (
     <div className="space-y-3">
-      <ChapterTabs chapters={chapters} selectedId={selectedChapterId} onSelect={setSelectedChapterId} />
+      {!singleChapter && <ChapterTabs chapters={chapters} selectedId={selectedChapterId} onSelect={setSelectedChapterId} />}
 
       {/* Section filter pills */}
       <div className="flex items-center gap-1.5">
