@@ -1,31 +1,18 @@
 
 
-## 문제 원인
+## 버림 토글 해제 방식
 
-`seed_financial_management.sql`이 `INSERT INTO public.questions ...`를 실행하려 하지만, **테이블 자체가 아직 생성되지 않았습니다.** 프로젝트에 `CREATE TABLE` SQL이 전혀 없습니다. 즉, Supabase에 `subjects`, `books`, `chapters`, `questions` 등의 테이블이 만들어진 적이 없습니다.
+같은 문제 번호를 다시 탭하면 취소선이 해제됩니다. 토글 방식이므로 별도 해제 UI가 필요 없습니다.
 
-## 해결 계획
+**동작 흐름:**
+1. 문제 번호 탭 → 취소선 + 흐림 적용 (버림)
+2. 같은 번호 다시 탭 → 취소선 해제 (복원)
 
-**Migration 도구를 사용하여 테이블을 생성합니다.** 그 후 seed 데이터를 Insert 도구로 적재합니다.
+**키보드:** 활성 셀이 있을 때 `S` 키로도 동일하게 토글
 
-### Step 1 — 테이블 생성 (Migration)
+**구현:**
+- `skippedSet`에 question_id가 있으면 제거 (DELETE), 없으면 추가 (INSERT)
+- 번호 셀에 `cursor-pointer` 스타일 + hover 시 미세한 시각 힌트 (밑줄 or 색상 변화)
 
-다음 테이블들을 순서대로 생성:
-
-1. `subjects` (id, name, display_order, created_at)
-2. `topics` (id, subject_id FK, name, display_order, created_at)
-3. `sub_topics` (id, topic_id FK, name, display_order, created_at)
-4. `books` (id, subject_id FK, title, author, display_order, created_at)
-5. `chapters` (id, book_id FK, title, chapter_number, display_order, created_at)
-6. `questions` (id, chapter_id FK, sub_topic_id FK nullable, question_number, correct_answer nullable, is_essential boolean, exam_year text nullable, created_at)
-7. `attempts` (id, user_id FK, question_id FK, student_answer, is_correct, attempted_at)
-8. `user_roles` (id, user_id FK, role app_role enum)
-
-각 테이블에 RLS를 활성화하고 기본 정책을 설정합니다.
-
-### Step 2 — Seed 데이터 삽입 (Insert 도구)
-
-`seed_financial_management.sql`의 내용을 Insert 도구로 실행하여 재무관리 과목, 교재, 챕터, 문항 데이터를 적재합니다.
-
-기존 `seed.sql`의 중급회계 데이터도 함께 삽입합니다.
+별도 취소 버튼이나 UI 없이, 번호 탭 토글만으로 충분합니다.
 
