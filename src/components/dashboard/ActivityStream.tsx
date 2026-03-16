@@ -5,9 +5,10 @@ export interface ActivityItem {
   id: string;
   userName: string;
   bookTitle: string;
+  chapterTitle?: string;
   questionCount?: number;
   minutesAgo: number;
-  isLive: boolean; // still studying vs completed
+  isLive: boolean;
 }
 
 interface ActivityStreamProps {
