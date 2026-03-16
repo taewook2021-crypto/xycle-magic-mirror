@@ -42,6 +42,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("all");
   const [essentialOnly, setEssentialOnly] = useState(false);
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
+  const [skippedSet, setSkippedSet] = useState<Set<string>>(new Set());
 
   // Filtered indices mapping
   const filtered = questions.filter((q) => {
@@ -71,7 +72,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     fetch();
   }, [bookId]);
 
-  // Fetch questions
+  // Fetch questions + skips
   useEffect(() => {
     if (!selectedChapterId) return;
     const fetchQuestions = async () => {
@@ -85,12 +86,19 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
       let attemptsMap: Record<string, { result: CellResult; date?: string }[]> = {};
       if (user && qData.length > 0) {
         const qIds = qData.map((q: any) => q.id);
-        const { data: aData } = await supabase
-          .from("attempts")
-          .select("question_id, is_correct, attempted_at")
-          .eq("user_id", user.id)
-          .in("question_id", qIds)
-          .order("attempted_at");
+        const [{ data: aData }, { data: skipData }] = await Promise.all([
+          supabase
+            .from("attempts")
+            .select("question_id, is_correct, attempted_at")
+            .eq("user_id", user.id)
+            .in("question_id", qIds)
+            .order("attempted_at"),
+          supabase
+            .from("user_question_skips")
+            .select("question_id")
+            .eq("user_id", user.id)
+            .in("question_id", qIds),
+        ]);
         if (aData) {
           for (const a of aData as any[]) {
             if (!attemptsMap[a.question_id]) attemptsMap[a.question_id] = [];
@@ -100,6 +108,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
             });
           }
         }
+        setSkippedSet(new Set((skipData ?? []).map((s: any) => s.question_id)));
+      } else {
+        setSkippedSet(new Set());
       }
 
       const rows: QuestionRow[] = qData.map((q: any) => {
@@ -119,6 +130,22 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     fetchQuestions();
     setActiveCell(null);
   }, [selectedChapterId, user, roundCount]);
+
+  // Toggle skip
+  const toggleSkip = useCallback(
+    async (questionId: string) => {
+      if (!user) return;
+      const isSkipped = skippedSet.has(questionId);
+      if (isSkipped) {
+        setSkippedSet((prev) => { const next = new Set(prev); next.delete(questionId); return next; });
+        await supabase.from("user_question_skips").delete().eq("user_id", user.id).eq("question_id", questionId);
+      } else {
+        setSkippedSet((prev) => new Set(prev).add(questionId));
+        await supabase.from("user_question_skips").insert({ user_id: user.id, question_id: questionId });
+      }
+    },
+    [user, skippedSet]
+  );
 
   // Apply result to active cell + auto-advance
   const applyResult = useCallback(
@@ -159,8 +186,13 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         }
       }
       const currentVisualIdx = visibleOrder.indexOf(qIdx);
-      if (currentVisualIdx < visibleOrder.length - 1) {
-        setActiveCell({ qIdx: visibleOrder[currentVisualIdx + 1], rIdx });
+      // Find next non-skipped row
+      for (let i = currentVisualIdx + 1; i < visibleOrder.length; i++) {
+        const nextIdx = visibleOrder[i];
+        if (!skippedSet.has(questions[nextIdx].questionId)) {
+          setActiveCell({ qIdx: nextIdx, rIdx });
+          break;
+        }
       }
     },
     [activeCell, filteredGlobalIndices]
@@ -231,11 +263,16 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
           e.preventDefault();
           setActiveCell(null);
           break;
+        case "s":
+        case "S":
+          e.preventDefault();
+          toggleSkip(questions[qIdx].questionId);
+          break;
       }
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [activeCell, readOnly, filteredGlobalIndices, roundCount, applyResult, clearAndMoveUp]);
+  }, [activeCell, readOnly, filteredGlobalIndices, roundCount, applyResult, clearAndMoveUp, toggleSkip, questions]);
 
   const navigate = useCallback(
     (dir: "up" | "down" | "left" | "right") => {
@@ -369,10 +406,19 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                     {group.rows.map((q) => {
                       const globalIdx = questions.indexOf(q);
                       const isActiveRow = activeCell?.qIdx === globalIdx;
+                      const isSkipped = skippedSet.has(q.questionId);
                       return (
-                        <tr key={q.questionId} className={cn("transition-colors", isActiveRow ? "bg-primary/5" : "hover:bg-accent/20")}>
-                          <td className={cn("sticky left-0 z-10 w-10 px-2 py-0 text-center border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
-                            <span className={cn("font-medium text-xs", q.isEssential ? "text-primary font-bold" : "text-foreground")}>
+                        <tr key={q.questionId} className={cn("transition-colors", isSkipped && "opacity-40", isActiveRow ? "bg-primary/5" : "hover:bg-accent/20")}>
+                          <td
+                            className={cn("sticky left-0 z-10 w-10 px-2 py-0 text-center border-b border-r border-border cursor-pointer select-none", isActiveRow ? "bg-primary/5" : "bg-card")}
+                            onClick={() => toggleSkip(q.questionId)}
+                          >
+                            <span className={cn(
+                              "font-medium text-xs transition-all",
+                              isSkipped && "line-through decoration-2 text-muted-foreground",
+                              !isSkipped && q.isEssential ? "text-primary font-bold" : !isSkipped ? "text-foreground" : "",
+                              !isSkipped && "hover:text-muted-foreground/70"
+                            )}>
                               {q.questionNumber}
                             </span>
                           </td>
@@ -393,12 +439,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                               <ReviewCell
                                 result={round.result}
                                 date={round.date}
-                                readOnly={readOnly}
-                                isActive={activeCell?.qIdx === globalIdx && activeCell?.rIdx === rIdx}
-                                onChange={(result) => {
-                                  // Direct change (legacy)
-                                }}
-                                onSelect={() => setActiveCell({ qIdx: globalIdx, rIdx })}
+                                readOnly={readOnly || isSkipped}
+                                isActive={!isSkipped && activeCell?.qIdx === globalIdx && activeCell?.rIdx === rIdx}
+                                onChange={() => {}}
+                                onSelect={() => { if (!isSkipped) setActiveCell({ qIdx: globalIdx, rIdx }); }}
                               />
                             </td>
                           ))}

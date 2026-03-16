@@ -71,6 +71,13 @@ export interface UserRole {
   role: AppRole;
 }
 
+export interface UserQuestionSkip {
+  id: string;
+  user_id: string;
+  question_id: string;
+  created_at: string;
+}
+
 // Joined types for common queries
 export interface QuestionWithContext extends Question {
   chapter?: Chapter & { book?: Book };
