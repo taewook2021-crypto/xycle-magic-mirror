@@ -151,6 +151,7 @@ export type Database = {
           question_number: number
           question_type: string
           sub_topic_id: string | null
+          topic: string | null
         }
         Insert: {
           chapter_id: string
@@ -162,6 +163,7 @@ export type Database = {
           question_number: number
           question_type?: string
           sub_topic_id?: string | null
+          topic?: string | null
         }
         Update: {
           chapter_id?: string
@@ -173,6 +175,7 @@ export type Database = {
           question_number?: number
           question_type?: string
           sub_topic_id?: string | null
+          topic?: string | null
         }
         Relationships: [
           {
