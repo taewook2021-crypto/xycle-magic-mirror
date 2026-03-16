@@ -1,0 +1,33 @@
+
+CREATE TABLE public.user_question_memos (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  question_id uuid NOT NULL REFERENCES public.questions(id) ON DELETE CASCADE,
+  content text NOT NULL DEFAULT '',
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (user_id, question_id)
+);
+
+ALTER TABLE public.user_question_memos ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can read own memos"
+  ON public.user_question_memos FOR SELECT
+  TO authenticated
+  USING (user_id = auth.uid());
+
+CREATE POLICY "Users can insert own memos"
+  ON public.user_question_memos FOR INSERT
+  TO authenticated
+  WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "Users can update own memos"
+  ON public.user_question_memos FOR UPDATE
+  TO authenticated
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "Users can delete own memos"
+  ON public.user_question_memos FOR DELETE
+  TO authenticated
+  USING (user_id = auth.uid());
