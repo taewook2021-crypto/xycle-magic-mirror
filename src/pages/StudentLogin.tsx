@@ -1081,59 +1081,8 @@ export default function StudentLogin() {
 
 
 
-            {/* Demo Section */}
-            <div
-              ref={demoRef}
-              className="px-5 sm:px-10 lg:px-20 relative"
-              style={{ paddingTop: "clamp(4rem, 10vw, 10rem)", paddingBottom: "clamp(6rem, 15vw, 22rem)" }}>
-              <div className="max-w-lg mx-auto">
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  className="mb-8">
-                  <span style={{
-                    color: isLightMode ? "rgba(51,51,51,0.35)" : "rgba(236,236,236,0.3)",
-                    fontSize: "11px", fontWeight: 500, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: monoFont,
-                    transition: "color 0.8s ease"
-                  }}>
-                    [ try it ]
-                  </span>
-                  <h3 style={{
-                    color: isLightMode ? "#222222" : "#ECECEC",
-                    fontSize: "clamp(1.8rem, 4vw, 3rem)",
-                    fontWeight: 800,
-                    lineHeight: 1.25,
-                    marginTop: "20px",
-                    letterSpacing: "-0.03em",
-                    transition: "color 0.8s ease"
-                  }}>
-                    직접 <span style={{ color: "#EA5027" }}>채점</span>해보세요
-                  </h3>
-                  <p style={{
-                    color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.6)",
-                    fontSize: "clamp(0.88rem, 1.5vw, 1.1rem)",
-                    fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
-                    fontWeight: 300,
-                    lineHeight: 1.7,
-                    letterSpacing: "-0.025em",
-                    marginTop: "28px",
-                    maxWidth: "520px",
-                    transition: "color 0.8s ease"
-                  }}>
-                    1~5번까지 답을 입력하면 채점, 랭킹, 복습 등록까지<br />
-                    한번에 체험할 수 있어요.
-                  </p>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.1 }}>
-                  <GradingDemo />
-                </motion.div>
-              </div>
-            </div>
+
+
 
             {/* Footer CTA */}
             <section
