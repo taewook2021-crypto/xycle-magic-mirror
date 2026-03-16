@@ -2,7 +2,7 @@ import AppShell from "@/components/layout/AppShell";
 import PeerComparisonCard from "@/components/dashboard/PeerComparisonCard";
 import TodayStatsCard from "@/components/dashboard/TodayStatsCard";
 import LiveFeed, { type BookFeedItem } from "@/components/dashboard/LiveFeed";
-import ActivityStream, { type ActivityItem } from "@/components/dashboard/ActivityStream";
+import ActivityStream, { type ActivityItem, type PeerAvgProgress } from "@/components/dashboard/ActivityStream";
 import DashboardHero from "@/components/dashboard/DashboardHero";
 import NicknameSetup from "@/components/NicknameSetup";
 import { useAuth } from "@/hooks/useAuth";
@@ -39,6 +39,13 @@ const mockActivities: ActivityItem[] = [
   { id: "a5", userName: "정O민", bookTitle: "중급회계 연습서", chapterTitle: "Ch.4 금융자산", questionCount: 22, minutesAgo: 18, isLive: false },
   { id: "a6", userName: "한O서", bookTitle: "재무관리", chapterTitle: "Ch.1 화폐의 시간가치", questionCount: 8, minutesAgo: 25, isLive: false },
   { id: "a7", userName: "김O현", bookTitle: "원가관리회계", chapterTitle: "Ch.6 표준원가", questionCount: 30, minutesAgo: 45, isLive: false },
+];
+
+const mockPeerAvgProgress: PeerAvgProgress[] = [
+  { bookTitle: "중급회계 연습서", avgChapter: 5, totalChapters: 12, avgChapterTitle: "Ch.5 유가증권" },
+  { bookTitle: "세법개론", avgChapter: 3, totalChapters: 10, avgChapterTitle: "Ch.3 부가가치세" },
+  { bookTitle: "원가관리회계", avgChapter: 4, totalChapters: 8, avgChapterTitle: "Ch.4 종합원가" },
+  { bookTitle: "재무관리", avgChapter: 2, totalChapters: 9, avgChapterTitle: "Ch.2 자본예산" },
 ];
 
 const mockBooks: BookFeedItem[] = [
@@ -81,7 +88,7 @@ export default function Dashboard() {
       )}
       <div className="px-4 pt-5 pb-8 space-y-4">
         <DashboardHero {...mockHero} />
-        <ActivityStream activities={mockActivities} />
+        <ActivityStream activities={mockActivities} peerAvgProgress={mockPeerAvgProgress} />
         <TodayStatsCard stats={mockStats} />
         <PeerComparisonCard weekData={mockWeekData} />
         <LiveFeed books={mockBooks} />

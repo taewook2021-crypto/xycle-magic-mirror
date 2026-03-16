@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 export interface ActivityItem {
@@ -11,12 +12,20 @@ export interface ActivityItem {
   isLive: boolean;
 }
 
+export interface PeerAvgProgress {
+  bookTitle: string;
+  avgChapter: number;
+  totalChapters: number;
+  avgChapterTitle: string;
+}
+
 interface ActivityStreamProps {
   activities: ActivityItem[];
+  peerAvgProgress?: PeerAvgProgress[];
   onUserClick?: (userName: string, userId: string) => void;
 }
 
-export default function ActivityStream({ activities, onUserClick }: ActivityStreamProps) {
+export default function ActivityStream({ activities, peerAvgProgress, onUserClick }: ActivityStreamProps) {
   const liveUsers = activities.filter((a) => a.isLive);
   const recentDone = activities.filter((a) => !a.isLive);
 
@@ -83,6 +92,30 @@ export default function ActivityStream({ activities, onUserClick }: ActivityStre
             )}
           </div>
         </div>
+
+        {/* Peer average progress */}
+        {peerAvgProgress && peerAvgProgress.length > 0 && (
+          <div className="px-4 py-3 border-t border-border">
+            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">동차생 평균 진도</span>
+            <div className="mt-2 space-y-2.5">
+              {peerAvgProgress.map((p) => {
+                const pct = Math.round((p.avgChapter / p.totalChapters) * 100);
+                return (
+                  <div key={p.bookTitle} className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-foreground">{p.bookTitle}</span>
+                      <span className="text-[10px] text-muted-foreground">{p.avgChapterTitle}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Progress value={pct} className="h-1.5 flex-1" />
+                      <span className="text-[10px] tabular-nums text-muted-foreground whitespace-nowrap">{p.avgChapter}/{p.totalChapters}장</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
