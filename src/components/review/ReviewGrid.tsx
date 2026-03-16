@@ -157,6 +157,7 @@ export default function ReviewGrid({ chapters: initialChapters = [], roundCount 
                                 result={round.result}
                                 date={round.date}
                                 realtimeMode={realtimeMode}
+                                readOnly={readOnly}
                                 onChange={(result) => handleCellChange(chapterIdx, originalIdx, roundIdx, result)}
                               />
                             </div>
