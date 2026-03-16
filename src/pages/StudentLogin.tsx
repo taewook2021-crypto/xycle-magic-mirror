@@ -923,10 +923,6 @@ export default function StudentLogin() {
                         </h4>
                         <div className="flex items-center gap-6">
                           <div className="space-y-1">
-                            <span style={{ color: isLightMode ? "rgba(51,51,51,0.35)" : "rgba(236,236,236,0.3)", fontSize: "9px", fontWeight: 500, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: monoFont, display: "block" }}>AUTHOR</span>
-                            <span style={{ color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.6)", fontSize: "13px", fontWeight: 500, fontFamily: monoFont }}>{book.author}</span>
-                          </div>
-                          <div className="space-y-1">
                             <span style={{ color: isLightMode ? "rgba(51,51,51,0.35)" : "rgba(236,236,236,0.3)", fontSize: "9px", fontWeight: 500, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: monoFont, display: "block" }}>ROUNDS</span>
                             <span style={{ color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.6)", fontSize: "13px", fontWeight: 500, fontFamily: monoFont }}>{book.exams}회</span>
                           </div>
