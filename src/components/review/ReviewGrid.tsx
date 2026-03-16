@@ -386,7 +386,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
 
   // Group by type
   const groupedByType = () => {
-    if (sectionFilter !== "all") return [{ type: sectionFilter, rows: filtered }];
+    if (sectionFilter !== "all" || wrongCountFilter > 0) return [{ type: sectionFilter !== "all" ? sectionFilter : "all", rows: filtered }];
     const groups: { type: string; rows: QuestionRow[] }[] = [];
     const typeOrder: QuestionType[] = ["example", "past_exam", "practice"];
     for (const t of typeOrder) {
@@ -502,7 +502,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
               <tbody>
                 {groupedByType().map((group) => (
                   <>
-                    {sectionFilter === "all" && (
+                    {sectionFilter === "all" && wrongCountFilter === 0 && (
                       <tr key={`header-${group.type}`}>
                         <td colSpan={3 + roundCount} className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider">
                           {typeLabels[group.type]} ({group.rows.length})
