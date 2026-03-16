@@ -14,9 +14,9 @@ import CookieConsent from "@/components/CookieConsent";
 import AppMockup from "@/components/AppMockup";
 
 const reviewCardsData = [
-  { num: "01", title: "오답만 모아보기", desc: "틀린 문제만 골라서\n한 번에 복습할 수 있습니다" },
-  { num: "02", title: "주제별 크로스 필터", desc: "교재가 달라도 같은 주제에서\n틀린 문제를 전부 볼 수 있습니다" },
-  { num: "03", title: "회차별·횟수별 정렬", desc: "원하는 회차만, 자주 틀리는 순으로\n추려서 확인할 수 있습니다" },
+  { num: "01", title: "교재 횡단 취약 단원", desc: "김기동 연습서 → 파이널,\n교재가 달라도 같은 단원에서\n틀린 문제를 전부 모아봅니다" },
+  { num: "02", title: "동차생 대비 내 풀이량", desc: "종이는 혼자입니다.\n동차생·3유예 평균과\n내 풀이량을 실시간 비교합니다" },
+  { num: "03", title: "N번 틀린 것만 필터", desc: "종이는 전체를 훑어야 합니다.\n2번 이상 틀린 문제만\n터치 한 번으로 추려냅니다" },
 ];
 
 function ReviewCardItem({ item, i, isLightMode, monoFont }: { item: typeof reviewCardsData[0]; i: number; isLightMode: boolean; monoFont: string }) {
