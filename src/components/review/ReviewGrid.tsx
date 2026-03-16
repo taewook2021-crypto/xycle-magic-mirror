@@ -12,6 +12,7 @@ interface QuestionRow {
   questionType: QuestionType;
   isEssential: boolean;
   examYear: string | null;
+  topic: string | null;
   rounds: { result: CellResult; date?: string }[];
 }
 
@@ -64,7 +65,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     const fetchQuestions = async () => {
       const { data: qData, error: qErr } = await supabase
         .from("questions")
-        .select("id, question_number, question_type, is_essential, exam_year")
+        .select("id, question_number, question_type, is_essential, exam_year, topic")
         .eq("chapter_id", selectedChapterId)
         .order("question_number");
 
@@ -99,6 +100,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
           questionType: q.question_type as QuestionType,
           isEssential: q.is_essential,
           examYear: q.exam_year,
+          topic: q.topic,
           rounds: Array.from({ length: roundCount }, (_, i) => existing[i] ?? { result: null }),
         };
       });
@@ -223,6 +225,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                   <th className="sticky left-10 z-10 bg-muted/60 w-12 px-1 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border">
                     유형
                   </th>
+                  <th className="sticky left-[88px] z-10 bg-muted/60 min-w-[120px] px-2 py-2 text-left font-semibold text-muted-foreground border-b border-r border-border">
+                    주제
+                  </th>
                   {Array.from({ length: roundCount }, (_, i) => (
                     <th key={i} className="px-2 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border last:border-r-0 min-w-[56px]">
                       {i + 1}회독
@@ -236,7 +241,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                     {sectionFilter === "all" && (
                       <tr key={`header-${group.type}`}>
                         <td
-                          colSpan={2 + roundCount}
+                          colSpan={3 + roundCount}
                           className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider"
                         >
                           {typeLabels[group.type]} ({group.rows.length})
@@ -264,6 +269,11 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                               )}
                               {q.questionType === "practice" && <span className="font-semibold">실전</span>}
                               {q.questionType === "example" && <span className="font-semibold">예제</span>}
+                            </span>
+                          </td>
+                          <td className="sticky left-[88px] z-10 bg-card min-w-[120px] px-2 py-0 text-left border-b border-r border-border">
+                            <span className="text-[10px] text-muted-foreground truncate block max-w-[160px]">
+                              {q.topic || "–"}
                             </span>
                           </td>
                           {q.rounds.map((round, rIdx) => (

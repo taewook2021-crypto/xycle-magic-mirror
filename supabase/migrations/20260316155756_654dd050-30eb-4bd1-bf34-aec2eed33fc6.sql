@@ -1,0 +1,196 @@
+-- Update example question topics from CSV
+-- Ch.1
+UPDATE questions SET topic = '현재가치/연금계산' WHERE id = 'f1010101-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'APR/EAR' WHERE id = 'f1010102-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '산술평균/기하평균/내부수익률' WHERE id = 'f1010103-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '피셔의 분리정리' WHERE id = 'f1010104-0000-0000-0000-000000000000';
+-- Ch.2
+UPDATE questions SET topic = '영업CF 운용 및 조달' WHERE id = 'f1010201-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'FCFF, FCFE, CCF 계산' WHERE id = 'f1010202-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '투자안 현금흐름' WHERE id = 'f1010203-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '실질CF NPV' WHERE id = 'f1010204-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'EAC 계산 시 실질CF/이자율' WHERE id = 'f1010205-0000-0000-0000-000000000000';
+-- Ch.3
+UPDATE questions SET topic = 'CEQ' WHERE id = 'f1010301-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '상태선호모형' WHERE id = 'f1010302-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'CER (수익률)' WHERE id = 'f1010303-0000-0000-0000-000000000000';
+-- Ch.4
+UPDATE questions SET topic = 'MVP와 공분산 등 계산' WHERE id = 'f1010401-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '체계적위험과 비체계적위험' WHERE id = 'f1010402-0000-0000-0000-000000000000';
+-- Ch.5
+UPDATE questions SET topic = '샤프지수' WHERE id = 'f1010501-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'MVP, 접점포트폴리오' WHERE id = 'f1010502-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '대출/차입포트폴리오' WHERE id = 'f1010503-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '확실성등가수익률' WHERE id = 'f1010504-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '사후적베타 계산' WHERE id = 'f1010505-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '베타로 상관계수 역산' WHERE id = 'f1010506-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '시장모형, 젠센지수' WHERE id = 'f1010507-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '완전공분산모형과 시장모형의 비교' WHERE id = 'f1010508-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '성과기여분석' WHERE id = 'f1010509-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'SML/CML/투자안' WHERE id = 'f1010510-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '베타가 음수인 자산' WHERE id = 'f1010511-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'CAPM & CEQ' WHERE id = 'f1010512-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '제로베타 포트폴리오' WHERE id = 'f1010513-0000-0000-0000-000000000000';
+-- Ch.6
+UPDATE questions SET topic = '단일요인모형 계산' WHERE id = 'f1010601-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '다요인모형' WHERE id = 'f1010602-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '요인모형과 APT' WHERE id = 'f1010603-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'APT vs. CAPM' WHERE id = 'f1010604-0000-0000-0000-000000000000';
+-- Ch.7
+UPDATE questions SET topic = '전망이론' WHERE id = 'f1010701-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '유보율이 바뀌는 경우' WHERE id = 'f1010702-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '무성장주가' WHERE id = 'f1010703-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '신주인수권 가치 / 차익거래' WHERE id = 'f1010704-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '유보이익과 신주의 자본비용' WHERE id = 'f1010705-0000-0000-0000-000000000000';
+-- Ch.8
+UPDATE questions SET topic = '영업/재무/결합레버리지도' WHERE id = 'f1010801-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'EBIT-EPS 분석' WHERE id = 'f1010802-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'MM(58) 제1명제' WHERE id = 'f1010803-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'MM(58) 제3명제' WHERE id = 'f1010804-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '차입이자율 차이 존재 시' WHERE id = 'f1010805-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'MM(63) 수정 제1명제 차익거래' WHERE id = 'f1010806-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'MM(63) 수정 제2명제' WHERE id = 'f1010807-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'MM(63) 수정 제3명제' WHERE id = 'f1010808-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '법인세율의 변화' WHERE id = 'f1010809-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'Hamada 모형' WHERE id = 'f1010810-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '베타에 반영된 위험의 범위' WHERE id = 'f1010811-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '하마다 모형 위험부채' WHERE id = 'f1010812-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '자산베타와 주식베타' WHERE id = 'f1010813-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'Miller 균형부채이론' WHERE id = 'f1010814-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '회사채시장의 균형과 기업가치' WHERE id = 'f1010815-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '개인소득세가 가치에 미치는 영향' WHERE id = 'f1010816-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '파산비용이론' WHERE id = 'f1010817-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '대리비용' WHERE id = 'f1010818-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '신호이론' WHERE id = 'f1010819-0000-0000-0000-000000000000';
+-- Ch.9
+UPDATE questions SET topic = '주주현금흐름법' WHERE id = 'f1010901-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '수정현재가치법' WHERE id = 'f1010902-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'WACC vs. FTE vs. APV' WHERE id = 'f1010903-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '확실성등가법' WHERE id = 'f1010904-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '균형리스료 계산' WHERE id = 'f1010905-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '리스의 부채등가액과 APV' WHERE id = 'f1010906-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'EVA, MVA' WHERE id = 'f1010907-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '재무비율분석' WHERE id = 'f1010908-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '내부성장률과 지속가능성장률' WHERE id = 'f1010909-0000-0000-0000-000000000000';
+-- Ch.10
+UPDATE questions SET topic = '배당과 기업가치 무관련성 (MM)' WHERE id = 'f1011001-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '안정배당 및 잔여배당' WHERE id = 'f1011002-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '면세채 이용 실질 소득세율' WHERE id = 'f1011003-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '증자와 자사주매입' WHERE id = 'f1011004-0000-0000-0000-000000000000';
+-- Ch.11
+UPDATE questions SET topic = '합병기초' WHERE id = 'f1011101-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '인수 + 시너지 (기업가치)' WHERE id = 'f1011102-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '인수 + 시너지(CF)' WHERE id = 'f1011103-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '결합 + 시너지 (기업가치)' WHERE id = 'f1011104-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '결합 + 시너지(CF)' WHERE id = 'f1011105-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '결합 + 합병 후 부채비율 X' WHERE id = 'f1011106-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '현금인수 및 주식교환 합병' WHERE id = 'f1011107-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '주식교환비율 결정' WHERE id = 'f1011108-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '주가기준 (시너지 이용)' WHERE id = 'f1011109-0000-0000-0000-000000000000';
+-- Ch.12
+UPDATE questions SET topic = '콜옵션 & 풋옵션' WHERE id = 'f1011201-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '보호풋 전략' WHERE id = 'f1011202-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '방비콜 전략' WHERE id = 'f1011203-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '풋-콜 패리티 전략' WHERE id = 'f1011204-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '강세 및 약세스프레드' WHERE id = 'f1011205-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '박스스프레드' WHERE id = 'f1011206-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '나비스프레드' WHERE id = 'f1011207-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '미국형 옵션' WHERE id = 'f1011208-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '옵션의 현재가격 영향 요인' WHERE id = 'f1011209-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '풋-콜 패리티' WHERE id = 'f1011210-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '미국형 옵션의 풋-콜 부등식' WHERE id = 'f1011211-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '헤지포트폴리오 접근법' WHERE id = 'f1011212-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '복제포트폴리오 접근법' WHERE id = 'f1011213-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '위험중립접근법' WHERE id = 'f1011214-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '다기간 이항모형' WHERE id = 'f1011215-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '위험조정할인율법 & 위험중립접근법' WHERE id = 'f1011216-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '블랙숄즈모형 (BSM)' WHERE id = 'f1011217-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '내재변동성' WHERE id = 'f1011218-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'BSM과 이항모형의 비교' WHERE id = 'f1011219-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '델타헤징' WHERE id = 'f1011220-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '감마헤징' WHERE id = 'f1011221-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '베가헤징' WHERE id = 'f1011222-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '교차헤지' WHERE id = 'f1011223-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '옵션만기 이전에 발생하는 배당' WHERE id = 'f1011224-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '이항모형 - 확정배당 (￦ 배당)' WHERE id = 'f1011225-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '이항모형 - 확정배당 (% 배당)' WHERE id = 'f1011226-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '이항모형 - 확정배당 (배당액 분리)' WHERE id = 'f1011227-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '이항모형 - 연속지급배당모형' WHERE id = 'f1011228-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'BSM - 확정배당모형' WHERE id = 'f1011229-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'BSM - 연속지급배당모형' WHERE id = 'f1011230-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '미국형 옵션의 가격' WHERE id = 'f1011231-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '미국형 옵션의 특징' WHERE id = 'f1011232-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '미국형 옵션의 특징' WHERE id = 'f1011233-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '이자율 기간구조 하 위험중립접근' WHERE id = 'f1011234-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '주가지수옵션 차익거래' WHERE id = 'f1011235-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '주가지수옵션 헤지' WHERE id = 'f1011236-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '디지털옵션' WHERE id = 'f1011237-0000-0000-0000-000000000000';
+-- Ch.13
+UPDATE questions SET topic = '포트폴리오 보험' WHERE id = 'f1011301-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '다양한 보호풋전략' WHERE id = 'f1011302-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '자기자본가치와 부채가치' WHERE id = 'f1011303-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '담보부채권' WHERE id = 'f1011304-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '신주인수권' WHERE id = 'f1011305-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '전환사채 (부분균형 접근법)' WHERE id = 'f1011306-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '전환사채 (일반균형 접근법)' WHERE id = 'f1011307-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '수의상환사채, 상환청구권부사채' WHERE id = 'f1011308-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '처분옵션 (포기옵션)' WHERE id = 'f1011309-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '처분옵션 (포기옵션)' WHERE id = 'f1011310-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '연기옵션' WHERE id = 'f1011311-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '연기옵션' WHERE id = 'f1011312-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '확장옵션' WHERE id = 'f1011313-0000-0000-0000-000000000000';
+-- Ch.14
+UPDATE questions SET topic = '선도계약, 선물계약' WHERE id = 'f1011401-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '현물-선물 패리티 단순모형' WHERE id = 'f1011402-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '보유수익(배당 등)이 존재' WHERE id = 'f1011403-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '보유비용 모형' WHERE id = 'f1011404-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '시장의 불완전성 고려' WHERE id = 'f1011405-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '공매의 제약이 있는경우' WHERE id = 'f1011406-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '불완전헤지' WHERE id = 'f1011407-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '선물델타 이용 동적헤지전략' WHERE id = 'f1011408-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '최소분산헤지' WHERE id = 'f1011409-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '최적헤지비율' WHERE id = 'f1011410-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '교차헤지' WHERE id = 'f1011411-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '주가지수선물의 균형가격' WHERE id = 'f1011412-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '주가지수선물을 이용한 헤지' WHERE id = 'f1011413-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'CAPM과 선물가격결정이론' WHERE id = 'f1011414-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '합성선물과 풋-콜-선물 패리티' WHERE id = 'f1011415-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '선물을 이용한 동적헤지' WHERE id = 'f1011416-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '만기별 선물가격' WHERE id = 'f1011417-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '선물옵션' WHERE id = 'f1011418-0000-0000-0000-000000000000';
+-- Ch.15
+UPDATE questions SET topic = '채권의 기초' WHERE id = 'f1011501-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '이표채의 복제' WHERE id = 'f1011502-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '듀레이션' WHERE id = 'f1011503-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '금액볼록성과 볼록성' WHERE id = 'f1011504-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '이자지급기간이 1년미만인 채권' WHERE id = 'f1011505-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '이자율 탄력성' WHERE id = 'f1011506-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '영구채권의 듀레이션' WHERE id = 'f1011507-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '면역전략' WHERE id = 'f1011508-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '현금흐름매칭전략' WHERE id = 'f1011509-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '수익률곡선타기전략' WHERE id = 'f1011510-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '은행의 순자산가치의 유지' WHERE id = 'f1011511-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '은행의 자기자본비율의 유지' WHERE id = 'f1011512-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '이자율 현물-선물 패리티' WHERE id = 'f1011513-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '금리선물을 이용한 헤지전략' WHERE id = 'f1011514-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '이자율 기간구조 이론' WHERE id = 'f1011515-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '이자율 위험구조' WHERE id = 'f1011516-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'T-Bill 선물의 기초개념' WHERE id = 'f1011517-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'T-Bill 선물의 차익거래' WHERE id = 'f1011518-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '유로달러선물' WHERE id = 'f1011519-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '유로달러선물' WHERE id = 'f1011520-0000-0000-0000-000000000000';
+UPDATE questions SET topic = 'T-Bond 선물' WHERE id = 'f1011521-0000-0000-0000-000000000000';
+-- Ch.16
+UPDATE questions SET topic = '환율결정이론' WHERE id = 'f1011601-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '금리평가설과 외환차익거래' WHERE id = 'f1011602-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '외환헤지거래' WHERE id = 'f1011603-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '국제자본예산' WHERE id = 'f1011604-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '외환옵션의 가치평가' WHERE id = 'f1011605-0000-0000-0000-000000000000';
+-- Ch.17
+UPDATE questions SET topic = '금리스왑 (금융기관의 개입)' WHERE id = 'f1011701-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '스왑금리' WHERE id = 'f1011702-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '통화스왑의 구조' WHERE id = 'f1011703-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '통화스왑계약의 가치' WHERE id = 'f1011704-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '정규분포와 VaR의 측정' WHERE id = 'f1011705-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '포트폴리오의 VaR' WHERE id = 'f1011706-0000-0000-0000-000000000000';
+UPDATE questions SET topic = '채권의 VaR' WHERE id = 'f1011707-0000-0000-0000-000000000000';
