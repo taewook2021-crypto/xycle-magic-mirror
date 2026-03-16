@@ -211,27 +211,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
         ).then();
       }
 
-      // Auto-advance: next visible non-skipped row
-      const visibleOrder: number[] = [];
-      const groups = sectionFilter !== "all"
-        ? [{ rows: filtered }]
-        : (() => {
-            const typeOrder: QuestionType[] = ["example", "past_exam", "practice"];
-            const g: { rows: QuestionRow[] }[] = [];
-            for (const t of typeOrder) {
-              const rows = filtered.filter((q) => q.questionType === t);
-              if (rows.length > 0) g.push({ rows });
-            }
-            return g;
-          })();
-      for (const group of groups) {
-        for (const row of group.rows) {
-          visibleOrder.push(questions.indexOf(row));
-        }
-      }
-      const currentVisualIdx = visibleOrder.indexOf(qIdx);
-      for (let i = currentVisualIdx + 1; i < visibleOrder.length; i++) {
-        const nextIdx = visibleOrder[i];
+      // Auto-advance: next visible non-skipped row (using visualOrder)
+      const currentVisualIdx = visualOrder.indexOf(qIdx);
+      for (let i = currentVisualIdx + 1; i < visualOrder.length; i++) {
+        const nextIdx = visualOrder[i];
         if (!skippedSet.has(questions[nextIdx].questionId)) {
           setActiveCell({ qIdx: nextIdx, rIdx });
           break;
