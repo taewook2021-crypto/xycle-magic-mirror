@@ -247,7 +247,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     if (fIdx > 0) {
       setActiveCell({ qIdx: filteredGlobalIndices[fIdx - 1], rIdx });
     }
-  }, [activeCell, filteredGlobalIndices]);
+  }, [activeCell, user, questions, filteredGlobalIndices]);
 
   // Keyboard navigation
   useEffect(() => {
