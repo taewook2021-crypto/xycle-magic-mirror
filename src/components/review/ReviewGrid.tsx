@@ -89,10 +89,12 @@ export default function ReviewGrid({ chapters: initialChapters = [], roundCount 
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] text-muted-foreground">실시간</span>
-          <Switch checked={realtimeMode} onCheckedChange={setRealtimeMode} className="scale-75" />
-        </div>
+        {!readOnly && (
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-muted-foreground">실시간</span>
+            <Switch checked={realtimeMode} onCheckedChange={setRealtimeMode} className="scale-75" />
+          </div>
+        )}
       </div>
 
       {/* Grid */}
