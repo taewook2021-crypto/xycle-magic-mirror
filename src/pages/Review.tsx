@@ -7,6 +7,16 @@ import AddBookSheet from "@/components/review/AddBookSheet";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, BookOpen, Plus, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface UserBook {
   id: string;
@@ -286,16 +296,8 @@ export default function Review() {
               ))
             )}
 
-            {/* Remove book button */}
-            <div className="pt-3">
-              <button
-                onClick={() => { handleRemoveBook(view.bookId); setView({ step: "books" }); }}
-                className="flex items-center gap-1.5 text-xs text-destructive hover:text-destructive/80 transition-colors mx-auto"
-              >
-                <Trash2 className="h-3 w-3" />
-                교재 삭제
-              </button>
-            </div>
+            {/* Remove book button with confirmation */}
+            <RemoveBookButton onConfirm={() => { handleRemoveBook(view.bookId); setView({ step: "books" }); }} />
           </div>
         )}
 
@@ -310,6 +312,39 @@ export default function Review() {
 
 /** Thin wrapper that renders ReviewGrid for a single chapter */
 function ReviewGridForChapter({ bookId, chapterId }: { bookId: string; chapterId: string }) {
-  // We pass chapterId directly to a modified grid
   return <ReviewGrid bookId={bookId} initialChapterId={chapterId} singleChapter />;
+}
+
+/** Remove book button with confirmation dialog */
+function RemoveBookButton({ onConfirm }: { onConfirm: () => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <div className="pt-3">
+        <button
+          onClick={() => setOpen(true)}
+          className="flex items-center gap-1.5 text-xs text-destructive hover:text-destructive/80 transition-colors mx-auto"
+        >
+          <Trash2 className="h-3 w-3" />
+          교재 삭제
+        </button>
+      </div>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-base">교재를 삭제하시겠습니까?</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm">
+              삭제하면 이 교재의 회독 기록도 함께 사라집니다. 이 작업은 되돌릴 수 없습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              삭제
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
 }
