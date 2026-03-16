@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import ReviewCell, { type CellResult } from "./ReviewCell";
 import ChapterTabs from "./ChapterTabs";
 import FloatingInputBar from "./FloatingInputBar";
+import InputGuide from "./InputGuide";
 import { cn } from "@/lib/utils";
 import type { QuestionType } from "@/integrations/supabase/types/database";
 
@@ -319,6 +320,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
           ★ 필수
         </button>
       </div>
+
+      {/* Input guide - show when no cell is active */}
+      {!activeCell && !readOnly && <InputGuide />}
 
       {/* Table */}
       {filtered.length === 0 ? (
