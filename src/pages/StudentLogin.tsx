@@ -673,7 +673,7 @@ export default function StudentLogin() {
                     wordBreak: "keep-all"
                   }}>
                     내가 푼 이 단원,<br />
-                    <span style={{ color: "#EA5027", transition: "color 0.8s ease", wordBreak: "keep-all" }}>나는 전국에서 몇 등일까?</span>
+                    <span style={{ color: "#EA5027", transition: "color 0.8s ease", whiteSpace: "nowrap" }}>나는 전국에서 몇 등일까?</span>
                   </h3>
                   <p style={{ color: isLightMode ? "rgba(51,51,51,0.55)" : "rgba(236,236,236,0.6)", fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", fontWeight: 400, lineHeight: 1.7, letterSpacing: "-0.025em", fontFamily: "'Pretendard Variable', Pretendard, sans-serif", transition: "color 0.8s ease" }}>
                     같은 교재를 푸는 동차생들과 단원별 풀이량을 비교하고, 교재를 횡단해 취약 단원을 찾고, 자주 틀리는 문제만 골라냅니다. <strong style={{ fontWeight: 700, color: "#EA5027" }}>혼자 종이 위에선 절대 알 수 없던 내 위치를, Xycle이 보여줍니다.</strong>
