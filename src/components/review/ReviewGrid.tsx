@@ -72,7 +72,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     fetch();
   }, [bookId]);
 
-  // Fetch questions
+  // Fetch questions + skips
   useEffect(() => {
     if (!selectedChapterId) return;
     const fetchQuestions = async () => {
@@ -86,12 +86,19 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
       let attemptsMap: Record<string, { result: CellResult; date?: string }[]> = {};
       if (user && qData.length > 0) {
         const qIds = qData.map((q: any) => q.id);
-        const { data: aData } = await supabase
-          .from("attempts")
-          .select("question_id, is_correct, attempted_at")
-          .eq("user_id", user.id)
-          .in("question_id", qIds)
-          .order("attempted_at");
+        const [{ data: aData }, { data: skipData }] = await Promise.all([
+          supabase
+            .from("attempts")
+            .select("question_id, is_correct, attempted_at")
+            .eq("user_id", user.id)
+            .in("question_id", qIds)
+            .order("attempted_at"),
+          supabase
+            .from("user_question_skips")
+            .select("question_id")
+            .eq("user_id", user.id)
+            .in("question_id", qIds),
+        ]);
         if (aData) {
           for (const a of aData as any[]) {
             if (!attemptsMap[a.question_id]) attemptsMap[a.question_id] = [];
@@ -101,6 +108,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
             });
           }
         }
+        setSkippedSet(new Set((skipData ?? []).map((s: any) => s.question_id)));
+      } else {
+        setSkippedSet(new Set());
       }
 
       const rows: QuestionRow[] = qData.map((q: any) => {
@@ -120,6 +130,22 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     fetchQuestions();
     setActiveCell(null);
   }, [selectedChapterId, user, roundCount]);
+
+  // Toggle skip
+  const toggleSkip = useCallback(
+    async (questionId: string) => {
+      if (!user) return;
+      const isSkipped = skippedSet.has(questionId);
+      if (isSkipped) {
+        setSkippedSet((prev) => { const next = new Set(prev); next.delete(questionId); return next; });
+        await supabase.from("user_question_skips").delete().eq("user_id", user.id).eq("question_id", questionId);
+      } else {
+        setSkippedSet((prev) => new Set(prev).add(questionId));
+        await supabase.from("user_question_skips").insert({ user_id: user.id, question_id: questionId });
+      }
+    },
+    [user, skippedSet]
+  );
 
   // Apply result to active cell + auto-advance
   const applyResult = useCallback(
