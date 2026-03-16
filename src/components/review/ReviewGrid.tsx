@@ -235,7 +235,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [activeCell, readOnly, filteredGlobalIndices, roundCount, applyResult, clearActiveCell]);
+  }, [activeCell, readOnly, filteredGlobalIndices, roundCount, applyResult, clearAndMoveUp]);
 
   const navigate = useCallback(
     (dir: "up" | "down" | "left" | "right") => {
