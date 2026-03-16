@@ -1078,56 +1078,8 @@ export default function StudentLogin() {
               </div>
             </div>
 
-            {/* Science Section */}
-            <div className="px-5 sm:px-10 lg:px-20 relative" style={{ paddingTop: "clamp(4rem, 10vw, 10rem)", paddingBottom: "clamp(4rem, 10vw, 10rem)" }}>
-              <div className="max-w-4xl mx-auto">
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  className="mb-12"
-                >
-                  <span style={{
-                    color: isLightMode ? "rgba(51,51,51,0.35)" : "rgba(236,236,236,0.3)",
-                    fontSize: "11px", fontWeight: 500, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: monoFont,
-                    transition: "color 0.8s ease"
-                  }}>
-                    [ review ]
-                  </span>
-                  <h3 style={{
-                    color: isLightMode ? "#222222" : "#ECECEC",
-                    fontSize: "clamp(1.8rem, 4vw, 3rem)",
-                    fontWeight: 800,
-                    lineHeight: 1.25,
-                    marginTop: "20px",
-                    letterSpacing: "-0.03em",
-                    transition: "color 0.8s ease"
-                  }}>
-                    종이는{' '}<br />
-                    <span style={{ color: "#EA5027" }}>절대 못 합니다</span>
-                  </h3>
-                  <p style={{
-                    color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.6)",
-                    fontSize: "clamp(0.85rem, 1.5vw, 1.1rem)",
-                    fontWeight: 300,
-                    lineHeight: 1.7,
-                    letterSpacing: "-0.025em",
-                    fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
-                    marginTop: "28px",
-                    maxWidth: "520px",
-                    transition: "color 0.8s ease"
-                  }}>
-                    교재를 넘나들며 취약 단원을 찾고, 동차생과 풀이량을 비교하고, 2번 이상 틀린 문제만 골라보는 것.<br />
-                    <strong style={{ fontWeight: 700, color: isLightMode ? "#222222" : "#ECECEC" }}>
-                      종이 위에선 불가능한 세 가지
-                    </strong>
-                    를 Xycle은 터치 한 번으로 해냅니다.
-                  </p>
-                </motion.div>
 
-                <ReviewCardsSection isLightMode={isLightMode} monoFont={monoFont} />
-              </div>
-            </div>
+
 
             {/* Demo Section */}
             <div
