@@ -219,8 +219,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
   );
 
   const clearAndMoveUp = useCallback(() => {
-    if (!activeCell) return;
+    if (!activeCell || !user) return;
     const { qIdx, rIdx } = activeCell;
+    const questionId = questions[qIdx]?.questionId;
+
     // Clear the cell
     setQuestions((prev) => {
       const next = [...prev];
@@ -231,6 +233,15 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
       next[qIdx] = q;
       return next;
     });
+
+    // Delete from Supabase
+    if (questionId) {
+      supabase.from("attempts").delete()
+        .eq("user_id", user.id)
+        .eq("question_id", questionId)
+        .eq("round", rIdx + 1)
+        .then();
+    }
     // Move up
     const fIdx = filteredGlobalIndices.indexOf(qIdx);
     if (fIdx > 0) {
