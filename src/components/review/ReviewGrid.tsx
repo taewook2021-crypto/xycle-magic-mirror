@@ -144,8 +144,14 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
           }
         }
         setSkippedSet(new Set((skipData ?? []).map((s: any) => s.question_id)));
+        const memoMap: Record<string, string> = {};
+        for (const m of (memoData ?? []) as any[]) {
+          memoMap[m.question_id] = m.content;
+        }
+        setMemos(memoMap);
       } else {
         setSkippedSet(new Set());
+        setMemos({});
       }
 
       const rows: QuestionRow[] = qData.map((q: any) => {
