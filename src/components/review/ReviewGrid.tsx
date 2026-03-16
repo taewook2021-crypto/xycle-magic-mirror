@@ -186,8 +186,13 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         }
       }
       const currentVisualIdx = visibleOrder.indexOf(qIdx);
-      if (currentVisualIdx < visibleOrder.length - 1) {
-        setActiveCell({ qIdx: visibleOrder[currentVisualIdx + 1], rIdx });
+      // Find next non-skipped row
+      for (let i = currentVisualIdx + 1; i < visibleOrder.length; i++) {
+        const nextIdx = visibleOrder[i];
+        if (!skippedSet.has(questions[nextIdx].questionId)) {
+          setActiveCell({ qIdx: nextIdx, rIdx });
+          break;
+        }
       }
     },
     [activeCell, filteredGlobalIndices]
