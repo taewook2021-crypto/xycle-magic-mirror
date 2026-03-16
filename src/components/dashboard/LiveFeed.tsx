@@ -131,7 +131,7 @@ function BookSection({
   );
 }
 
-export default function LiveFeed({ books = [] }: LiveFeedProps) {
+export default function LiveFeed({ books = [], isMePublic = false, onGoPublic }: LiveFeedProps) {
   const [selectedPeer, setSelectedPeer] = useState<PeerProfile | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
 
