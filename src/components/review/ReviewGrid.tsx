@@ -446,7 +446,6 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                               />
                             </td>
                           ))}
-                          ))}
                         </tr>
                       );
                     })}
