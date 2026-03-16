@@ -12,12 +12,12 @@ interface TodayStatsCardProps {
   stats?: StatsData | null;
 }
 
-const items = [
+const items: { key: keyof StatsData; label: string; suffix: string; prefix?: string; icon: typeof PenLine }[] = [
   { key: "todaySolved", label: "오늘 풀이", suffix: "문제", icon: PenLine },
   { key: "weeklySolved", label: "이번 주", suffix: "문제", icon: BarChart3 },
   { key: "streak", label: "연속 학습", suffix: "일", icon: Flame },
   { key: "accuracyTrend", label: "정답률 추이", prefix: "↑ ", suffix: "%p", icon: TrendingUp },
-] as const;
+];
 
 export default function TodayStatsCard({ stats }: TodayStatsCardProps) {
   const data = stats ?? { todaySolved: 0, weeklySolved: 0, streak: 0, accuracyTrend: 0 };
