@@ -133,7 +133,11 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     { key: "practice", label: "실전" },
   ];
 
-  const filtered = questions.filter((q) => sectionFilter === "all" || q.questionType === sectionFilter);
+  const filtered = questions.filter((q) => {
+    if (sectionFilter !== "all" && q.questionType !== sectionFilter) return false;
+    if (essentialOnly && !q.isEssential) return false;
+    return true;
+  });
 
   // Group by type for section headers
   const groupedByType = () => {
