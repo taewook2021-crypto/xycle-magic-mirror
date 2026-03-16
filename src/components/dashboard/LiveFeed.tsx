@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Flame, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface FeedItem {
+export interface FeedItem {
   id: string;
   examType: string;
   subject: string;
@@ -15,13 +15,9 @@ interface FeedItem {
   reactions: number;
 }
 
-const mockFeed: FeedItem[] = [
-  { id: "1", examType: "동차생", subject: "재무회계", book: "김기동 연습서", chapter: "3단원", count: 8, accuracy: 87, timeAgo: "방금 전", reactions: 3 },
-  { id: "2", examType: "재시생", subject: "원가회계", book: "임세진 연습서", chapter: "8장", count: 15, accuracy: 72, timeAgo: "5분 전", reactions: 7 },
-  { id: "3", examType: "동차생", subject: "세법", book: "정우승 연습서", chapter: "2단원", count: 20, accuracy: 65, timeAgo: "12분 전", reactions: 2 },
-  { id: "4", examType: "3유예", subject: "재무회계", book: "김기동 연습서", chapter: "7단원", count: 10, accuracy: 91, timeAgo: "23분 전", reactions: 12 },
-  { id: "5", examType: "동차생", subject: "중급회계", book: "이효익 교과서", chapter: "5장", count: 6, accuracy: 78, timeAgo: "1시간 전", reactions: 1 },
-];
+interface LiveFeedProps {
+  items?: FeedItem[];
+}
 
 function FeedCard({ item }: { item: FeedItem }) {
   const [reacted, setReacted] = useState(false);
@@ -77,18 +73,22 @@ function FeedCard({ item }: { item: FeedItem }) {
   );
 }
 
-export default function LiveFeed() {
+export default function LiveFeed({ items = [] }: LiveFeedProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-foreground">실시간 학습 피드</h3>
         <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
       </div>
-      <div className="space-y-2">
-        {mockFeed.map((item) => (
-          <FeedCard key={item.id} item={item} />
-        ))}
-      </div>
+      {items.length === 0 ? (
+        <p className="text-xs text-muted-foreground text-center py-6">아직 학습 피드가 없습니다.</p>
+      ) : (
+        <div className="space-y-2">
+          {items.map((item) => (
+            <FeedCard key={item.id} item={item} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

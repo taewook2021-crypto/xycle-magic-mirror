@@ -3,7 +3,7 @@ import ReviewCell, { type CellResult } from "./ReviewCell";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
-interface ChapterData {
+export interface ChapterData {
   chapterId: string;
   chapterTitle: string;
   questions: {
@@ -12,54 +12,18 @@ interface ChapterData {
   }[];
 }
 
-// Mock data
-const mockRounds = 3;
-const mockChapters: ChapterData[] = [
-  {
-    chapterId: "1",
-    chapterTitle: "Ch.1 재무보고 개념체계",
-    questions: Array.from({ length: 8 }, (_, i) => ({
-      questionNumber: i + 1,
-      rounds: [
-        { result: (["correct", "wrong", "half", "correct", "correct", "wrong", "half", "correct"] as CellResult[])[i], date: "3/15" },
-        { result: i < 5 ? (["correct", "correct", "half", "correct", "correct"] as CellResult[])[i] : null, date: i < 5 ? "3/18" : undefined },
-        { result: null },
-      ],
-    })),
-  },
-  {
-    chapterId: "2",
-    chapterTitle: "Ch.2 재고자산",
-    questions: Array.from({ length: 10 }, (_, i) => ({
-      questionNumber: i + 1,
-      rounds: [
-        { result: (["correct", "wrong", "correct", "wrong", "half", "correct", "correct", "wrong", "correct", "half"] as CellResult[])[i], date: "3/12" },
-        { result: i < 7 ? (["correct", "half", "correct", "correct", "correct", "wrong", "correct"] as CellResult[])[i] : null, date: i < 7 ? "3/16" : undefined },
-        { result: null },
-      ],
-    })),
-  },
-  {
-    chapterId: "3",
-    chapterTitle: "Ch.3 유형자산",
-    questions: Array.from({ length: 6 }, (_, i) => ({
-      questionNumber: i + 1,
-      rounds: [
-        { result: (["wrong", "half", "wrong", "correct", "wrong", "half"] as CellResult[])[i], date: "3/14" },
-        { result: null },
-        { result: null },
-      ],
-    })),
-  },
-];
+interface ReviewGridProps {
+  chapters?: ChapterData[];
+  roundCount?: number;
+}
 
 type ColorFilter = "all" | "correct" | "wrong" | "half";
 
-export default function ReviewGrid() {
+export default function ReviewGrid({ chapters: initialChapters = [], roundCount = 3 }: ReviewGridProps) {
   const [realtimeMode, setRealtimeMode] = useState(false);
   const [colorFilter, setColorFilter] = useState<ColorFilter>("all");
-  const [data, setData] = useState(mockChapters);
-  const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set(["1"]));
+  const [data, setData] = useState(initialChapters);
+  const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
 
   const toggleChapter = (id: string) => {
     setExpandedChapters((prev) => {
@@ -96,6 +60,14 @@ export default function ReviewGrid() {
     { key: "correct", label: "O만", className: "text-success" },
   ];
 
+  if (data.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-sm text-muted-foreground">교재를 선택하면 회독표가 표시됩니다.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
       {/* Controls */}
@@ -126,14 +98,12 @@ export default function ReviewGrid() {
       <div className="space-y-2">
         {data.map((chapter, chapterIdx) => {
           const expanded = expandedChapters.has(chapter.chapterId);
-          // Stats
           const allResults = chapter.questions.flatMap((q) => q.rounds.map((r) => r.result)).filter(Boolean);
           const correctCount = allResults.filter((r) => r === "correct").length;
           const totalCount = allResults.length;
 
           return (
             <div key={chapter.chapterId} className="rounded-lg border border-border overflow-hidden bg-card">
-              {/* Chapter header */}
               <button
                 onClick={() => toggleChapter(chapter.chapterId)}
                 className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-accent/50 transition-colors"
@@ -149,34 +119,31 @@ export default function ReviewGrid() {
                 </div>
               </button>
 
-              {/* Questions grid */}
               {expanded && (
                 <div className="border-t border-border">
-                  {/* Header row */}
-                  <div className="grid gap-px bg-border" style={{ gridTemplateColumns: `56px repeat(${mockRounds}, 1fr)` }}>
+                  <div className="grid gap-px bg-border" style={{ gridTemplateColumns: `56px repeat(${roundCount}, 1fr)` }}>
                     <div className="bg-muted px-2 py-1.5 text-[10px] font-medium text-muted-foreground text-center">
                       문항
                     </div>
-                    {Array.from({ length: mockRounds }, (_, i) => (
+                    {Array.from({ length: roundCount }, (_, i) => (
                       <div key={i} className="bg-muted px-2 py-1.5 text-[10px] font-medium text-muted-foreground text-center">
                         {i + 1}회독
                       </div>
                     ))}
                   </div>
 
-                  {/* Data rows */}
                   {chapter.questions
                     .filter((q) => {
                       if (colorFilter === "all") return true;
                       return q.rounds.some((r) => r.result === colorFilter);
                     })
-                    .map((q, qIdx) => {
+                    .map((q) => {
                       const originalIdx = chapter.questions.indexOf(q);
                       return (
                         <div
                           key={q.questionNumber}
                           className="grid gap-px bg-border"
-                          style={{ gridTemplateColumns: `56px repeat(${mockRounds}, 1fr)` }}
+                          style={{ gridTemplateColumns: `56px repeat(${roundCount}, 1fr)` }}
                         >
                           <div className="bg-card flex items-center justify-center text-xs font-medium text-muted-foreground">
                             Q{q.questionNumber}
