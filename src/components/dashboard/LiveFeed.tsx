@@ -25,6 +25,8 @@ export interface PeerEntry {
 
 interface LiveFeedProps {
   books?: BookFeedItem[];
+  isMePublic?: boolean;
+  onGoPublic?: () => void;
 }
 
 // Generate mock heatmap for demo
