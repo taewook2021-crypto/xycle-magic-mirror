@@ -869,7 +869,7 @@ export default function StudentLogin() {
                       letterSpacing: "-0.03em",
                       transition: "color 0.8s ease"
                     }}>
-                      <span style={{ color: "#EA5027" }}>오정화 선생님</span>의{'\n'}<br />수강생들 사이 나는 몇 등?
+                      같은 교재를 푸는 <span style={{ color: "#EA5027" }}>동차생들</span> 사이,{'\n'}<br />나는 몇 문제?
                     </h3>
                   </div>
                   <div className="space-y-4 lg:pt-[calc(11px*1.5+1rem)]">
