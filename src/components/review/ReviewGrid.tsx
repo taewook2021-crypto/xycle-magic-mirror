@@ -209,7 +209,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         case "0":
         case "Backspace":
           e.preventDefault();
-          clearActiveCell();
+          clearAndMoveUp();
           break;
         case "ArrowUp":
           e.preventDefault();
