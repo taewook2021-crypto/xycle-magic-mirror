@@ -25,7 +25,7 @@ interface ActivityStreamProps {
   onUserClick?: (userName: string, userId: string) => void;
 }
 
-export default function ActivityStream({ activities, onUserClick }: ActivityStreamProps) {
+export default function ActivityStream({ activities, peerAvgProgress, onUserClick }: ActivityStreamProps) {
   const liveUsers = activities.filter((a) => a.isLive);
   const recentDone = activities.filter((a) => !a.isLive);
 
