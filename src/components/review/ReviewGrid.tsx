@@ -371,13 +371,13 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
     );
   }
 
-  if (chapters.length === 0) {
+  if (!singleChapter && chapters.length === 0) {
     return <div className="text-center py-12 text-sm text-muted-foreground">문항 데이터가 없습니다.</div>;
   }
 
   return (
     <div className="space-y-3">
-      <ChapterTabs chapters={chapters} selectedId={selectedChapterId} onSelect={setSelectedChapterId} />
+      {!singleChapter && <ChapterTabs chapters={chapters} selectedId={selectedChapterId} onSelect={setSelectedChapterId} />}
 
       {/* Section filter pills */}
       <div className="flex items-center gap-1.5">
