@@ -142,10 +142,19 @@ export default function Dashboard() {
           <Switch checked={isMePublic} onCheckedChange={setIsMePublic} />
         </div>
 
+        <ReferralBanner referral={referral} />
         <ActivityStream activities={mockActivities} peerAvgProgress={mockPeerAvgProgress} />
         <TodayStatsCard stats={mockStats} />
-        <PeerComparisonCard weekData={mockWeekData} />
-        <LiveFeed books={mockBooks} isMePublic={isMePublic} onGoPublic={handleGoPublic} />
+
+        {/* Tier 1: 주간 등수 변동 추이 — 1명 초대 필요 */}
+        <LockedInsight requiredTier={1} currentTier={referral.tier} unlockLabel="1명 초대하면 주간 비교 차트 해금">
+          <PeerComparisonCard weekData={mockWeekData} />
+        </LockedInsight>
+
+        {/* Tier 2: 파트별 세부 등수 + 상위권 닉네임 — 2명 초대 필요 */}
+        <LockedInsight requiredTier={2} currentTier={referral.tier} unlockLabel="2명 초대하면 세부 등수 해금">
+          <LiveFeed books={mockBooks} isMePublic={isMePublic} onGoPublic={handleGoPublic} />
+        </LockedInsight>
       </div>
     </AppShell>
   );
