@@ -12,8 +12,16 @@ export interface ActivityItem {
   isLive: boolean;
 }
 
+export interface PeerAvgProgress {
+  bookTitle: string;
+  avgChapter: number;
+  totalChapters: number;
+  avgChapterTitle: string;
+}
+
 interface ActivityStreamProps {
   activities: ActivityItem[];
+  peerAvgProgress?: PeerAvgProgress[];
   onUserClick?: (userName: string, userId: string) => void;
 }
 
