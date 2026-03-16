@@ -179,7 +179,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
       />
 
       {/* Section filter pills */}
-      <div className="flex gap-1.5">
+      <div className="flex items-center gap-1.5">
         {sectionFilters.map((f) => (
           <button
             key={f.key}
