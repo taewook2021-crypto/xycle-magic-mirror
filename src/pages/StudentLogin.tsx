@@ -974,9 +974,9 @@ export default function StudentLogin() {
                 <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
                   <div className="space-y-0">
                     {[
-                      { num: "01", title: "동차생 비교", desc: "같은 교재를 푸는 동차생들과 오늘의 풀이량을 비교하세요.", mockupIdx: 0 },
-                      { num: "02", title: "주제별 오답 모아보기", desc: "교재가 달라도 같은 주제에서 틀린 문제를 전부 모아볼 수 있습니다.", mockupIdx: 1 },
-                      { num: "03", title: "디지털 회독표", desc: "오답만·회차별·틀린 횟수순으로 자유롭게 추려볼 수 있습니다.", mockupIdx: 2 },
+                      { num: "01", title: "교재 횡단 취약 단원", desc: "연습서 → 파이널, 교재가 달라도 같은 단원에서 틀린 문제를 전부 모아봅니다.", mockupIdx: 0 },
+                      { num: "02", title: "동차생 풀이량 비교", desc: "종이는 혼자입니다. 동차생·3유예 평균과 내 풀이량을 실시간으로 비교하세요.", mockupIdx: 1 },
+                      { num: "03", title: "N번 틀린 것만 필터", desc: "종이는 전체를 훑어야 합니다. 2번 이상 틀린 문제만 터치 한 번으로 추려냅니다.", mockupIdx: 2 },
                       { num: "04", title: "풀이 기록 추적", desc: "매일 몇 문제를 풀었는지, 정답률은 어떤지 한눈에 확인하세요.", mockupIdx: 3 },
                       { num: "05", title: "간편 채점", desc: "답을 입력하면 채점부터 기록까지 한번에 끝납니다.", mockupIdx: 4 },
                     ].map((feature, i) => (
