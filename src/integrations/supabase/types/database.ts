@@ -41,6 +41,8 @@ export interface Chapter {
   created_at: string;
 }
 
+export type QuestionType = "example" | "past_exam" | "practice";
+
 export interface Question {
   id: string;
   chapter_id: string;
@@ -49,6 +51,7 @@ export interface Question {
   correct_answer: number | null;
   is_essential: boolean;
   exam_year: string | null;
+  question_type: QuestionType;
   created_at: string;
 }
 
