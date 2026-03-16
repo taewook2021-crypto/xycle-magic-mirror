@@ -55,26 +55,33 @@ const makeMockChapters = (): ChapterData[] => [
   {
     chapterId: "c1",
     chapterTitle: "Ch.1 재무보고와 국제회계기준",
-    questions: Array.from({ length: 8 }, (_, i) => ({
-      questionNumber: i + 1,
-      rounds: [
-        { result: (["correct", "wrong", "half", null] as const)[Math.floor(Math.random() * 4)], date: "3/12" },
-        { result: (["correct", "wrong", null] as const)[Math.floor(Math.random() * 3)], date: "3/14" },
-        { result: null as const },
-      ],
-    })),
+    questions: Array.from({ length: 8 }, (_, i) => {
+      const results = ["correct", "wrong", "half", null] as ("correct" | "wrong" | "half" | null)[];
+      const results2 = ["correct", "wrong", null] as ("correct" | "wrong" | null)[];
+      return {
+        questionNumber: i + 1,
+        rounds: [
+          { result: results[Math.floor(Math.random() * 4)], date: "3/12" },
+          { result: results2[Math.floor(Math.random() * 3)], date: "3/14" },
+          { result: null },
+        ],
+      };
+    }),
   },
   {
     chapterId: "c2",
     chapterTitle: "Ch.2 재무제표",
-    questions: Array.from({ length: 10 }, (_, i) => ({
-      questionNumber: i + 1,
-      rounds: [
-        { result: (["correct", "wrong", "half"] as const)[Math.floor(Math.random() * 3)], date: "3/10" },
-        { result: null as const },
-        { result: null as const },
-      ],
-    })),
+    questions: Array.from({ length: 10 }, (_, i) => {
+      const results = ["correct", "wrong", "half"] as ("correct" | "wrong" | "half")[];
+      return {
+        questionNumber: i + 1,
+        rounds: [
+          { result: results[Math.floor(Math.random() * 3)], date: "3/10" },
+          { result: null },
+          { result: null },
+        ],
+      };
+    }),
   },
 ];
 
