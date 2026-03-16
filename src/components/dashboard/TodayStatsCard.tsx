@@ -1,14 +1,18 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Flame, Target, BookOpen } from "lucide-react";
 
-const mockStats = {
-  solved: 12,
-  accuracy: 83,
-  streak: 7,
-};
+interface TodayStats {
+  solved: number;
+  accuracy: number;
+  streak: number;
+}
 
-export default function TodayStatsCard() {
-  const { solved, accuracy, streak } = mockStats;
+interface TodayStatsCardProps {
+  stats?: TodayStats | null;
+}
+
+export default function TodayStatsCard({ stats }: TodayStatsCardProps) {
+  const { solved = 0, accuracy = 0, streak = 0 } = stats ?? {};
 
   const items = [
     { icon: BookOpen, label: "오늘 풀이", value: `${solved}문제`, color: "text-primary" },

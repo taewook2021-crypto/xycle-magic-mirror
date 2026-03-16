@@ -11,19 +11,13 @@ export default function Dashboard() {
   return (
     <AppShell>
       <div className="px-4 pt-5 space-y-4">
-        {/* Header */}
         <div>
           <p className="text-xs text-muted-foreground">안녕하세요,</p>
           <h1 className="text-lg font-bold text-foreground">{displayName}님</h1>
         </div>
 
-        {/* Peer comparison hero */}
         <PeerComparisonCard />
-
-        {/* Today stats */}
         <TodayStatsCard />
-
-        {/* Live feed */}
         <LiveFeed />
       </div>
     </AppShell>
