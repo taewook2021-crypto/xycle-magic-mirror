@@ -263,6 +263,11 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
           e.preventDefault();
           setActiveCell(null);
           break;
+        case "s":
+        case "S":
+          e.preventDefault();
+          toggleSkip(questions[qIdx].questionId);
+          break;
       }
     };
     window.addEventListener("keydown", handleKey);
