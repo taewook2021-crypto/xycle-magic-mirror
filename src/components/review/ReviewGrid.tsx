@@ -12,6 +12,7 @@ interface QuestionRow {
   questionType: QuestionType;
   isEssential: boolean;
   examYear: string | null;
+  topic: string | null;
   rounds: { result: CellResult; date?: string }[];
 }
 
