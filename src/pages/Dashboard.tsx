@@ -1,7 +1,8 @@
 import AppShell from "@/components/layout/AppShell";
 import PeerComparisonCard from "@/components/dashboard/PeerComparisonCard";
 import TodayStatsCard from "@/components/dashboard/TodayStatsCard";
-import LiveFeed, { BookFeedItem } from "@/components/dashboard/LiveFeed";
+import LiveFeed, { type BookFeedItem } from "@/components/dashboard/LiveFeed";
+import ActivityStream, { type ActivityItem } from "@/components/dashboard/ActivityStream";
 import DashboardHero from "@/components/dashboard/DashboardHero";
 import NicknameSetup from "@/components/NicknameSetup";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,16 +31,26 @@ const mockWeekData = [
   { day: "일", me: 32, avg: 18 },
 ];
 
+const mockActivities: ActivityItem[] = [
+  { id: "a1", userName: "김O현", bookTitle: "세법개론", minutesAgo: 2, isLive: true },
+  { id: "a2", userName: "박O수", bookTitle: "중급회계 연습서", minutesAgo: 5, isLive: true },
+  { id: "a3", userName: "최O영", bookTitle: "원가관리회계", minutesAgo: 8, isLive: true },
+  { id: "a4", userName: "이O준", bookTitle: "세법개론", questionCount: 15, minutesAgo: 12, isLive: false },
+  { id: "a5", userName: "정O민", bookTitle: "중급회계 연습서", questionCount: 22, minutesAgo: 18, isLive: false },
+  { id: "a6", userName: "한O서", bookTitle: "재무관리", questionCount: 8, minutesAgo: 25, isLive: false },
+  { id: "a7", userName: "김O현", bookTitle: "원가관리회계", questionCount: 30, minutesAgo: 45, isLive: false },
+];
+
 const mockBooks: BookFeedItem[] = [
   {
     bookTitle: "중급회계 연습서",
     myCount: 18,
     avgCount: 12,
     peers: [
-      { id: "1", name: "김O현", count: 22, isPublic: true },
+      { id: "1", name: "김O현", count: 22, isPublic: true, streak: 15, weeklyCount: 140 },
       { id: "2", name: "나", count: 18, isMe: true, isPublic: true },
-      { id: "3", name: "박O수", count: 15, isPublic: true },
-      { id: "4", name: "이O준", count: 8, isPublic: false },
+      { id: "3", name: "박O수", count: 15, isPublic: true, streak: 8, weeklyCount: 95 },
+      { id: "4", name: "이O준", count: 8, isPublic: false, streak: 3, weeklyCount: 42 },
     ],
   },
   {
@@ -47,10 +58,10 @@ const mockBooks: BookFeedItem[] = [
     myCount: 14,
     avgCount: 16,
     peers: [
-      { id: "5", name: "최O영", count: 25, isPublic: true },
-      { id: "6", name: "박O수", count: 18, isPublic: true },
+      { id: "5", name: "최O영", count: 25, isPublic: true, streak: 22, weeklyCount: 180 },
+      { id: "6", name: "박O수", count: 18, isPublic: true, streak: 8, weeklyCount: 95 },
       { id: "7", name: "나", count: 14, isMe: true, isPublic: true },
-      { id: "8", name: "김O현", count: 10, isPublic: true },
+      { id: "8", name: "김O현", count: 10, isPublic: true, streak: 15, weeklyCount: 140 },
     ],
   },
 ];
@@ -70,6 +81,7 @@ export default function Dashboard() {
       )}
       <div className="px-4 pt-5 pb-8 space-y-4">
         <DashboardHero {...mockHero} />
+        <ActivityStream activities={mockActivities} />
         <TodayStatsCard stats={mockStats} />
         <PeerComparisonCard weekData={mockWeekData} />
         <LiveFeed books={mockBooks} />
