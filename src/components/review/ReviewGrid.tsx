@@ -65,7 +65,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     const fetchQuestions = async () => {
       const { data: qData, error: qErr } = await supabase
         .from("questions")
-        .select("id, question_number, question_type, is_essential, exam_year")
+        .select("id, question_number, question_type, is_essential, exam_year, topic")
         .eq("chapter_id", selectedChapterId)
         .order("question_number");
 
