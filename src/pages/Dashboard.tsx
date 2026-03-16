@@ -54,7 +54,7 @@ const mockPeerAvgProgress: PeerAvgProgress[] = [
   { bookTitle: "재무관리", avgChapter: 2, totalChapters: 9, avgChapterTitle: "Ch.2 자본예산" },
 ];
 
-const makeMockChapters = (): ChapterData[] => [
+const makeMockChapters = (): PeerChapter[] => [
   {
     chapterId: "c1",
     chapterTitle: "Ch.1 재무보고와 국제회계기준",
