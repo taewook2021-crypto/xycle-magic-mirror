@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Keyboard, X } from "lucide-react";
+import { Keyboard, MessageCircle, X } from "lucide-react";
 import xycleLogomark from "@/assets/xycle-logomark.svg";
+
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const shortcuts = [
