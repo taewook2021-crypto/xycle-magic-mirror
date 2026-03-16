@@ -5,6 +5,7 @@ import ReviewCell, { type CellResult } from "./ReviewCell";
 import ChapterTabs from "./ChapterTabs";
 import FloatingInputBar from "./FloatingInputBar";
 import InputGuide from "./InputGuide";
+import MemoPopover from "./MemoPopover";
 import { cn } from "@/lib/utils";
 import type { QuestionType } from "@/integrations/supabase/types/database";
 
@@ -45,6 +46,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
   const [essentialOnly, setEssentialOnly] = useState(false);
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
   const [skippedSet, setSkippedSet] = useState<Set<string>>(new Set());
+  const [memos, setMemos] = useState<Record<string, string>>({});
 
   // Filtered indices mapping
   const filtered = questions.filter((q) => {
@@ -109,7 +111,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
       let attemptsMap: Record<string, { result: CellResult; date?: string }[]> = {};
       if (user && qData.length > 0) {
         const qIds = qData.map((q: any) => q.id);
-        const [{ data: aData }, { data: skipData }] = await Promise.all([
+        const [{ data: aData }, { data: skipData }, { data: memoData }] = await Promise.all([
           supabase
             .from("attempts")
             .select("question_id, result, round, attempted_at")
@@ -119,6 +121,11 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
           supabase
             .from("user_question_skips")
             .select("question_id")
+            .eq("user_id", user.id)
+            .in("question_id", qIds),
+          supabase
+            .from("user_question_memos" as any)
+            .select("question_id, content")
             .eq("user_id", user.id)
             .in("question_id", qIds),
         ]);
@@ -137,8 +144,14 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
           }
         }
         setSkippedSet(new Set((skipData ?? []).map((s: any) => s.question_id)));
+        const memoMap: Record<string, string> = {};
+        for (const m of (memoData ?? []) as any[]) {
+          memoMap[m.question_id] = m.content;
+        }
+        setMemos(memoMap);
       } else {
         setSkippedSet(new Set());
+        setMemos({});
       }
 
       const rows: QuestionRow[] = qData.map((q: any) => {
@@ -173,6 +186,28 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
       }
     },
     [user, skippedSet]
+  );
+
+  // Save memo
+  const saveMemo = useCallback(
+    async (questionId: string, content: string) => {
+      if (!user) return;
+      setMemos((prev) => {
+        const next = { ...prev };
+        if (content) next[questionId] = content;
+        else delete next[questionId];
+        return next;
+      });
+      if (content) {
+        await supabase.from("user_question_memos" as any).upsert(
+          { user_id: user.id, question_id: questionId, content, updated_at: new Date().toISOString() },
+          { onConflict: "user_id,question_id" }
+        );
+      } else {
+        await supabase.from("user_question_memos" as any).delete().eq("user_id", user.id).eq("question_id", questionId);
+      }
+    },
+    [user]
   );
 
   // Apply result to active cell + auto-advance + persist
@@ -469,7 +504,15 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                             </span>
                           </td>
                           <td className={cn("sticky left-[88px] z-10 min-w-[120px] px-2 py-0 text-left border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
-                            <span className="text-[10px] text-muted-foreground truncate block max-w-[160px]">{q.topic || "–"}</span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] text-muted-foreground truncate max-w-[140px]">{q.topic || "–"}</span>
+                              {!readOnly && (
+                                <MemoPopover
+                                  memo={memos[q.questionId] ?? ""}
+                                  onSave={(content) => saveMemo(q.questionId, content)}
+                                />
+                              )}
+                            </div>
                           </td>
                           {q.rounds.map((round, rIdx) => (
                             <td key={rIdx} className="p-0 border-b border-r border-border last:border-r-0">
