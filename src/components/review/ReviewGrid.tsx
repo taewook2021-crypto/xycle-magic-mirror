@@ -166,12 +166,25 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     [activeCell, filteredGlobalIndices]
   );
 
-  const clearActiveCell = useCallback(() => {
+  const clearAndMoveUp = useCallback(() => {
     if (!activeCell) return;
-    applyResult(null);
-    // Stay on same cell after clearing
-    setActiveCell(activeCell);
-  }, [activeCell, applyResult]);
+    const { qIdx, rIdx } = activeCell;
+    // Clear the cell
+    setQuestions((prev) => {
+      const next = [...prev];
+      const q = { ...next[qIdx] };
+      const rounds = [...q.rounds];
+      rounds[rIdx] = { result: null };
+      q.rounds = rounds;
+      next[qIdx] = q;
+      return next;
+    });
+    // Move up
+    const fIdx = filteredGlobalIndices.indexOf(qIdx);
+    if (fIdx > 0) {
+      setActiveCell({ qIdx: filteredGlobalIndices[fIdx - 1], rIdx });
+    }
+  }, [activeCell, filteredGlobalIndices]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -196,7 +209,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         case "0":
         case "Backspace":
           e.preventDefault();
-          clearActiveCell();
+          clearAndMoveUp();
           break;
         case "ArrowUp":
           e.preventDefault();
@@ -222,7 +235,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [activeCell, readOnly, filteredGlobalIndices, roundCount, applyResult, clearActiveCell]);
+  }, [activeCell, readOnly, filteredGlobalIndices, roundCount, applyResult, clearAndMoveUp]);
 
   const navigate = useCallback(
     (dir: "up" | "down" | "left" | "right") => {
@@ -410,7 +423,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
               : undefined
           }
           onInput={applyResult}
-          onClear={clearActiveCell}
+          onClear={clearAndMoveUp}
           onClose={() => setActiveCell(null)}
           onNavigate={navigate}
         />
