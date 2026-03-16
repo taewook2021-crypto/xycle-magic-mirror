@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import ReviewCell, { type CellResult } from "./ReviewCell";
 import ChapterTabs from "./ChapterTabs";
 import FloatingInputBar from "./FloatingInputBar";
+import InputGuide from "./InputGuide";
 import { cn } from "@/lib/utils";
 import type { QuestionType } from "@/integrations/supabase/types/database";
 
