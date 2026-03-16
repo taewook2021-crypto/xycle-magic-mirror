@@ -423,7 +423,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
               : undefined
           }
           onInput={applyResult}
-          onClear={clearActiveCell}
+          onClear={clearAndMoveUp}
           onClose={() => setActiveCell(null)}
           onNavigate={navigate}
         />
