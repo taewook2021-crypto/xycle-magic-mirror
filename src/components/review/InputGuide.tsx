@@ -32,8 +32,9 @@ export default function InputGuide() {
         href="https://pf.kakao.com/_uSAyn"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-[8.5rem] right-4 z-40 h-12 w-12 rounded-full bg-[#FEE500] shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform md:bottom-[4.75rem]"
+        className="fixed bottom-[9.5rem] right-4 z-40 h-12 w-12 rounded-full bg-[#FEE500] shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform md:bottom-[5.75rem] group"
         aria-label="카카오톡 문의"
+        title="Xycle 카카오톡 채널로 문의하기"
       >
         <MessageCircle className="h-6 w-6 text-[#3C1E1E]" />
       </a>
