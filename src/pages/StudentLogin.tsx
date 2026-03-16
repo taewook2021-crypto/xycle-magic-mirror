@@ -644,11 +644,11 @@ export default function StudentLogin() {
                     letterSpacing: "-0.04em",
                     transition: "color 0.8s ease"
                   }}>
-                    종이 회독표는 이제 그만.<br />
-                    <span style={{ color: "#EA5027", transition: "color 0.8s ease" }}>Xycle로 기록하세요</span>
+                    종이가 절대 못 하는 것.<br />
+                    <span style={{ color: "#EA5027", transition: "color 0.8s ease" }}>이것만 살아남아야 해요</span>
                   </h3>
                   <p style={{ color: isLightMode ? "rgba(51,51,51,0.55)" : "rgba(236,236,236,0.6)", fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", fontWeight: 400, lineHeight: 1.7, letterSpacing: "-0.025em", fontFamily: "'Pretendard Variable', Pretendard, sans-serif", transition: "color 0.8s ease" }}>
-                    종이 회독표에선 틀린 문제만 골라보거나, 특정 회차만 따로 확인할 수 없습니다. Xycle은 <strong style={{ fontWeight: 700, color: "#EA5027" }}>오답만, 주제별, 회차별</strong>로 원하는 기준대로 바로 추려볼 수 있습니다.
+                    여러 교재를 횡단해서 취약 단원을 보는 것, 동차생과 풀이량을 비교하는 것, 2번 틀린 문제만 골라보는 것. <strong style={{ fontWeight: 700, color: "#EA5027" }}>종이로는 절대 안 됩니다.</strong>
                   </p>
                 </motion.div>
 
