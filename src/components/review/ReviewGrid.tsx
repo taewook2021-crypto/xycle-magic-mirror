@@ -225,6 +225,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                   <th className="sticky left-10 z-10 bg-muted/60 w-12 px-1 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border">
                     유형
                   </th>
+                  <th className="sticky left-[88px] z-10 bg-muted/60 min-w-[120px] px-2 py-2 text-left font-semibold text-muted-foreground border-b border-r border-border">
+                    주제
+                  </th>
                   {Array.from({ length: roundCount }, (_, i) => (
                     <th key={i} className="px-2 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border last:border-r-0 min-w-[56px]">
                       {i + 1}회독
