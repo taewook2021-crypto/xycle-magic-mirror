@@ -1,99 +1,118 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Trophy, RefreshCw, BookOpen, ChevronRight, Flame, TrendingUp } from "lucide-react";
 
-/* ─── 1. Ranking (동차생 비교) ─── */
+/* ─── 1. Ranking (동차생 비교 — 스트라바 스타일) ─── */
 function MockRanking() {
-  const ranking = [
-    { rank: 1, name: "김O현", score: 47, total: 50, percent: 2 },
-    { rank: 2, name: "이O준", score: 45, total: 50, percent: 5 },
-    { rank: 16, name: "나", score: 38, total: 50, percent: 12, me: true },
+  const weekData = [
+    { day: "월", me: 28, avg: 22 },
+    { day: "화", me: 35, avg: 20 },
+    { day: "수", me: 18, avg: 24 },
+    { day: "목", me: 32, avg: 19 },
+    { day: "금", me: 40, avg: 25 },
+    { day: "토", me: 22, avg: 18 },
+    { day: "일", me: 32, avg: 18 },
   ];
+  const maxVal = 45;
 
-  const subjects = [
-    { name: "민법총칙", rate: 85, change: 12, barWidth: "85%" },
-    { name: "물권법", rate: 72, change: 8, barWidth: "72%" },
-    { name: "채권법", rate: 64, change: 15, barWidth: "64%" },
+  const feed = [
+    { name: "김O현", count: 45, emoji: "🏃" },
+    { name: "박O수", count: 38, emoji: "📖" },
+    { name: "나", count: 32, me: true, emoji: "🔥" },
+    { name: "이O준", count: 28, emoji: "✏️" },
+    { name: "최O영", count: 21, emoji: "📚" },
   ];
 
   return (
     <div className="p-3 space-y-2.5">
-      {/* 내 등수 */}
+      {/* 오늘의 활동 */}
       <div className="rounded-lg p-3" style={{ background: "hsl(0 0% 96%)", border: "1px solid hsl(0 0% 90%)" }}>
-        <span className="text-[10px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>내 등수</span>
-        <div className="flex items-end justify-between mt-1">
-          <div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-black" style={{ color: "hsl(0 0% 14%)" }}>16</span>
-              <span className="text-sm font-medium" style={{ color: "hsl(0 0% 45%)" }}>/ 132</span>
-            </div>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[11px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>38점</span>
-              <span className="text-[11px] font-bold" style={{ color: "#EA5027" }}>상위 12%</span>
-            </div>
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>오늘의 풀이</span>
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "hsl(11 82% 54% / 0.1)", color: "hsl(11 82% 54%)" }}>
+            연속 12일째 🔥
+          </span>
+        </div>
+        <div className="flex items-end justify-between mt-1.5">
+          <div className="flex items-baseline gap-1">
+            <span className="text-3xl font-black tabular-nums" style={{ color: "hsl(0 0% 14%)" }}>32</span>
+            <span className="text-sm font-medium" style={{ color: "hsl(0 0% 45%)" }}>문제</span>
           </div>
-          <div className="flex flex-col items-end gap-1">
-            <div className="flex items-center gap-1">
-              <span className="text-[10px]" style={{ color: "hsl(142 72% 40%)" }}>▲</span>
-              <span className="text-xs font-bold" style={{ color: "hsl(142 72% 40%)" }}>+5점</span>
-            </div>
-            <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "hsl(142 72% 40% / 0.12)", color: "hsl(142 72% 40%)" }}>
-              성장 중! 🔥
+          <div className="text-right">
+            <span className="text-[11px] font-bold" style={{ color: "hsl(142 72% 40%)" }}>
+              ▲ 평균보다 14문제 더
             </span>
           </div>
         </div>
       </div>
 
-      {/* 실시간 랭킹 */}
-      <div className="rounded-lg p-3 space-y-1.5" style={{ background: "hsl(0 0% 96%)", border: "1px solid hsl(0 0% 90%)" }}>
-        <span className="text-[10px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>실시간 랭킹</span>
-        <div className="space-y-1">
-          {ranking.map((r) => (
-            <div
-              key={r.rank}
-              className="flex items-center justify-between rounded-md px-2.5 py-2 text-xs"
-              style={{
-                background: r.me ? "hsl(14 82% 51% / 0.08)" : "hsl(0 0% 100% / 0.6)",
-                border: r.me ? "1px solid hsl(14 82% 51% / 0.2)" : "1px solid hsl(0 0% 90%)",
-              }}
-            >
-              <div className="flex items-center gap-2.5">
-                <span className="w-5 text-center font-bold text-[11px]" style={{ color: r.me ? "#EA5027" : "hsl(0 0% 45%)" }}>
-                  {r.rank}
-                </span>
-                <span className="font-semibold" style={{ color: r.me ? "#EA5027" : "hsl(0 0% 14%)" }}>
-                  {r.name}
-                </span>
+      {/* 주간 풀이량 차트 (나 vs 평균) */}
+      <div className="rounded-lg p-3" style={{ background: "hsl(0 0% 96%)", border: "1px solid hsl(0 0% 90%)" }}>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[10px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>주간 풀이량</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm" style={{ background: "hsl(0 0% 14%)" }} />
+              <span className="text-[9px]" style={{ color: "hsl(0 0% 45%)" }}>나</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm" style={{ background: "hsl(0 0% 80%)" }} />
+              <span className="text-[9px]" style={{ color: "hsl(0 0% 45%)" }}>평균</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-end gap-1.5" style={{ height: "60px" }}>
+          {weekData.map((d) => (
+            <div key={d.day} className="flex-1 flex flex-col items-center gap-0.5">
+              <div className="w-full flex items-end gap-px" style={{ height: "48px" }}>
+                <div
+                  className="flex-1 rounded-t-sm"
+                  style={{
+                    height: `${(d.me / maxVal) * 100}%`,
+                    background: "hsl(0 0% 14%)",
+                  }}
+                />
+                <div
+                  className="flex-1 rounded-t-sm"
+                  style={{
+                    height: `${(d.avg / maxVal) * 100}%`,
+                    background: "hsl(0 0% 80%)",
+                  }}
+                />
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-[11px] tabular-nums" style={{ color: "hsl(0 0% 14%)" }}>
-                  {r.score}/{r.total}
-                </span>
-                <span className="text-[9px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>
-                  상위 {r.percent}%
-                </span>
-              </div>
+              <span className="text-[8px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>{d.day}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* 정답률 분석 */}
-      <div className="rounded-lg p-3 space-y-2" style={{ background: "hsl(0 0% 96%)", border: "1px solid hsl(0 0% 90%)" }}>
-        <span className="text-[10px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>정답률 분석</span>
-        {subjects.map((s) => (
-          <div key={s.name} className="space-y-1">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold" style={{ color: "hsl(0 0% 14%)" }}>{s.name}</span>
+      {/* 동차생 피드 */}
+      <div className="rounded-lg p-3 space-y-1.5" style={{ background: "hsl(0 0% 96%)", border: "1px solid hsl(0 0% 90%)" }}>
+        <span className="text-[10px] font-medium" style={{ color: "hsl(0 0% 45%)" }}>오늘의 동차생 풀이량</span>
+        <div className="space-y-1">
+          {feed.map((f, i) => (
+            <div
+              key={f.name}
+              className="flex items-center justify-between rounded-md px-2.5 py-2"
+              style={{
+                background: f.me ? "hsl(11 82% 54% / 0.06)" : "hsl(0 0% 100% / 0.6)",
+                border: f.me ? "1px solid hsl(11 82% 54% / 0.2)" : "1px solid hsl(0 0% 90%)",
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-sm">{f.emoji}</span>
+                <span className="text-xs font-semibold" style={{ color: f.me ? "hsl(11 82% 54%)" : "hsl(0 0% 14%)" }}>
+                  {f.name}
+                </span>
+              </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold tabular-nums" style={{ color: "hsl(0 0% 14%)" }}>{s.rate}%</span>
-                <span className="text-[10px] font-semibold" style={{ color: "hsl(142 72% 40%)" }}>+{s.change}%</span>
+                <div className="h-1.5 rounded-full" style={{ width: `${(f.count / 45) * 60}px`, background: f.me ? "hsl(11 82% 54%)" : "hsl(0 0% 75%)" }} />
+                <span className="text-[11px] font-bold tabular-nums" style={{ color: f.me ? "hsl(11 82% 54%)" : "hsl(0 0% 14%)" }}>
+                  {f.count}문제
+                </span>
               </div>
             </div>
-            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "hsl(0 0% 88%)" }}>
-              <div className="h-full rounded-full" style={{ width: s.barWidth, background: "#EA5027" }} />
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
