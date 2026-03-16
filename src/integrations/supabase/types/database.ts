@@ -52,6 +52,7 @@ export interface Question {
   is_essential: boolean;
   exam_year: string | null;
   question_type: QuestionType;
+  topic: string | null;
   created_at: string;
 }
 
