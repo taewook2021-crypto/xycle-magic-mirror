@@ -36,6 +36,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
   const [questions, setQuestions] = useState<QuestionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("all");
+  const [essentialOnly, setEssentialOnly] = useState(false);
 
   // Fetch chapters list
   useEffect(() => {
@@ -132,7 +133,11 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     { key: "practice", label: "실전" },
   ];
 
-  const filtered = questions.filter((q) => sectionFilter === "all" || q.questionType === sectionFilter);
+  const filtered = questions.filter((q) => {
+    if (sectionFilter !== "all" && q.questionType !== sectionFilter) return false;
+    if (essentialOnly && !q.isEssential) return false;
+    return true;
+  });
 
   // Group by type for section headers
   const groupedByType = () => {
@@ -174,7 +179,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
       />
 
       {/* Section filter pills */}
-      <div className="flex gap-1.5">
+      <div className="flex items-center gap-1.5">
         {sectionFilters.map((f) => (
           <button
             key={f.key}
@@ -186,9 +191,21 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                 : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
             )}
           >
-            {f.label}
+          {f.label}
           </button>
         ))}
+        <div className="w-px h-4 bg-border mx-1" />
+        <button
+          onClick={() => setEssentialOnly((v) => !v)}
+          className={cn(
+            "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border",
+            essentialOnly
+              ? "bg-primary text-primary-foreground border-primary"
+              : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
+          )}
+        >
+          ★ 필수
+        </button>
       </div>
 
       {/* Spreadsheet table */}
@@ -242,7 +259,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                             <span className="text-[9px] text-muted-foreground">
                               {q.questionType === "past_exam" && (
                                 <span className="text-primary/70 font-semibold">
-                                  기출{q.examYear ? ` '${q.examYear.slice(-2)}` : ""}
+                                  {q.examYear ? `${q.examYear.slice(-2)}기출` : "기출"}
                                 </span>
                               )}
                               {q.questionType === "practice" && <span className="font-semibold">실전</span>}
