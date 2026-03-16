@@ -44,6 +44,8 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
   const [loading, setLoading] = useState(!singleChapter);
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("all");
   const [essentialOnly, setEssentialOnly] = useState(false);
+  const [memoOnly, setMemoOnly] = useState(false);
+  const [wrongCountFilter, setWrongCountFilter] = useState<number>(0); // 0 = off, 1+ = at least N wrong
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
   const [skippedSet, setSkippedSet] = useState<Set<string>>(new Set());
   const [memos, setMemos] = useState<Record<string, string>>({});
@@ -52,6 +54,11 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
   const filtered = questions.filter((q) => {
     if (sectionFilter !== "all" && q.questionType !== sectionFilter) return false;
     if (essentialOnly && !q.isEssential) return false;
+    if (memoOnly && !(memos[q.questionId]?.trim())) return false;
+    if (wrongCountFilter > 0) {
+      const wrongCount = q.rounds.filter((r) => r.result === "wrong").length;
+      if (wrongCount < wrongCountFilter) return false;
+    }
     return true;
   });
 
