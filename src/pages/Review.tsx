@@ -7,6 +7,16 @@ import AddBookSheet from "@/components/review/AddBookSheet";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, BookOpen, Plus, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface UserBook {
   id: string;
