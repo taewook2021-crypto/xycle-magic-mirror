@@ -409,8 +409,8 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
         </button>
       </div>
 
-      {/* Input guide - show when no cell is active */}
-      {!activeCell && !readOnly && <InputGuide />}
+      {/* Floating input guide button */}
+      {!readOnly && <InputGuide />}
 
       {/* Table */}
       {filtered.length === 0 ? (
