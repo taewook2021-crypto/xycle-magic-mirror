@@ -35,7 +35,7 @@ export default function ReviewCell({ result, date, realtimeMode, readOnly, onCha
   }, [result, realtimeMode, onChange]);
 
   const handlePointerDown = useCallback(() => {
-    if (!realtimeMode) return;
+    if (readOnly || !realtimeMode) return;
     didLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
       didLongPress.current = true;
