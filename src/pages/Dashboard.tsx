@@ -2,7 +2,7 @@ import AppShell from "@/components/layout/AppShell";
 import PeerComparisonCard from "@/components/dashboard/PeerComparisonCard";
 import TodayStatsCard from "@/components/dashboard/TodayStatsCard";
 import LiveFeed, { type BookFeedItem } from "@/components/dashboard/LiveFeed";
-import ActivityStream, { type ActivityItem } from "@/components/dashboard/ActivityStream";
+import ActivityStream, { type ActivityItem, type PeerAvgProgress } from "@/components/dashboard/ActivityStream";
 import DashboardHero from "@/components/dashboard/DashboardHero";
 import NicknameSetup from "@/components/NicknameSetup";
 import { useAuth } from "@/hooks/useAuth";
