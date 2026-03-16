@@ -671,8 +671,8 @@ export default function StudentLogin() {
                     letterSpacing: "-0.04em",
                     transition: "color 0.8s ease"
                   }}>
-                    종이가 절대 못 하는 것.<br />
-                    <span style={{ color: "#EA5027", transition: "color 0.8s ease" }}>이것만 살아남아야 해요</span>
+                    내가 푼 이 단원,<br />
+                    <span style={{ color: "#EA5027", transition: "color 0.8s ease" }}>나는 전국에서 몇 등일까?</span>
                   </h3>
                   <p style={{ color: isLightMode ? "rgba(51,51,51,0.55)" : "rgba(236,236,236,0.6)", fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", fontWeight: 400, lineHeight: 1.7, letterSpacing: "-0.025em", fontFamily: "'Pretendard Variable', Pretendard, sans-serif", transition: "color 0.8s ease" }}>
                     여러 교재를 횡단해서 취약 단원을 보는 것, 동차생과 풀이량을 비교하는 것, 2번 틀린 문제만 골라보는 것. <strong style={{ fontWeight: 700, color: "#EA5027" }}>종이로는 절대 안 됩니다.</strong>
