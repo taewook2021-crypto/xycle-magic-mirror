@@ -14,9 +14,9 @@ import CookieConsent from "@/components/CookieConsent";
 import AppMockup from "@/components/AppMockup";
 
 const reviewCardsData = [
-  { num: "01", title: "망각 곡선 기반", desc: "에빙하우스 망각 곡선에 따라\n최적 타이밍에 복습을 제안합니다" },
-  { num: "02", title: "개인 맞춤 난이도", desc: "틀린 횟수·정답률을 반영해\n취약 문항을 우선 선별합니다" },
-  { num: "03", title: "핵심만 모아보기", desc: "시험 직전, 상위 30% 취약 문항만\n골라 집중 복습할 수 있습니다" },
+  { num: "01", title: "오답만 모아보기", desc: "틀린 문제만 골라서\n한 번에 복습할 수 있습니다" },
+  { num: "02", title: "주제별 크로스 필터", desc: "교재가 달라도 같은 주제에서\n틀린 문제를 전부 볼 수 있습니다" },
+  { num: "03", title: "회차별·횟수별 정렬", desc: "원하는 회차만, 자주 틀리는 순으로\n추려서 확인할 수 있습니다" },
 ];
 
 function ReviewCardItem({ item, i, isLightMode, monoFont }: { item: typeof reviewCardsData[0]; i: number; isLightMode: boolean; monoFont: string }) {
