@@ -72,9 +72,19 @@ export default function PeerProfileSheet({
           </SheetHeader>
 
           {!peer.isPublic ? (
-            <div className="text-center py-10">
-              <p className="text-sm text-muted-foreground">이 수험생은 프로필을 비공개로 설정했습니다.</p>
-              <p className="text-xs text-muted-foreground mt-1">풀이량만 확인할 수 있습니다.</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: "오늘", value: `${peer.todaySolved}문제` },
+                  { label: "이번 주", value: `${peer.weeklySolved}문제` },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-lg bg-muted/50 p-3 text-center">
+                    <p className="text-[10px] text-muted-foreground">{s.label}</p>
+                    <p className="text-sm font-bold text-foreground mt-0.5">{s.value}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground text-center">이 수험생은 프로필을 비공개로 설정했습니다.</p>
             </div>
           ) : (
             <div className="space-y-5">
