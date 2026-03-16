@@ -71,7 +71,7 @@ export default function ActivityStream({ activities, onUserClick }: ActivityStre
                         {a.userName}
                       </button>
                       <span className="text-muted-foreground">
-                        이 {a.bookTitle}
+                        이 {a.bookTitle}{a.chapterTitle && ` ${a.chapterTitle}`}
                         {a.questionCount && <span className="font-semibold text-foreground"> {a.questionCount}문제</span>}
                         {" "}완료
                       </span>
