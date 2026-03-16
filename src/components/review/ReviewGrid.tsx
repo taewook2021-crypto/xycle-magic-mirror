@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import ReviewCell, { type CellResult } from "./ReviewCell";
@@ -53,8 +53,24 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
     return true;
   });
 
-  // Build flat list of visible cells for navigation
-  const filteredGlobalIndices = filtered.map((q) => questions.indexOf(q));
+  // Build visual order: grouped by type (example → past_exam → practice), matching render order
+  const visualOrder = useMemo(() => {
+    const order: number[] = [];
+    if (sectionFilter !== "all") {
+      for (const q of filtered) order.push(questions.indexOf(q));
+    } else {
+      const typeOrder: QuestionType[] = ["example", "past_exam", "practice"];
+      for (const t of typeOrder) {
+        for (const q of filtered) {
+          if (q.questionType === t) order.push(questions.indexOf(q));
+        }
+      }
+    }
+    return order;
+  }, [filtered, questions, sectionFilter]);
+
+  // Keep filteredGlobalIndices as alias for backward compat
+  const filteredGlobalIndices = visualOrder;
 
   // Fetch chapters (skip if singleChapter mode)
   useEffect(() => {
@@ -195,34 +211,17 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
         ).then();
       }
 
-      // Auto-advance: next visible non-skipped row
-      const visibleOrder: number[] = [];
-      const groups = sectionFilter !== "all"
-        ? [{ rows: filtered }]
-        : (() => {
-            const typeOrder: QuestionType[] = ["example", "past_exam", "practice"];
-            const g: { rows: QuestionRow[] }[] = [];
-            for (const t of typeOrder) {
-              const rows = filtered.filter((q) => q.questionType === t);
-              if (rows.length > 0) g.push({ rows });
-            }
-            return g;
-          })();
-      for (const group of groups) {
-        for (const row of group.rows) {
-          visibleOrder.push(questions.indexOf(row));
-        }
-      }
-      const currentVisualIdx = visibleOrder.indexOf(qIdx);
-      for (let i = currentVisualIdx + 1; i < visibleOrder.length; i++) {
-        const nextIdx = visibleOrder[i];
+      // Auto-advance: next visible non-skipped row (using visualOrder)
+      const currentVisualIdx = visualOrder.indexOf(qIdx);
+      for (let i = currentVisualIdx + 1; i < visualOrder.length; i++) {
+        const nextIdx = visualOrder[i];
         if (!skippedSet.has(questions[nextIdx].questionId)) {
           setActiveCell({ qIdx: nextIdx, rIdx });
           break;
         }
       }
     },
-    [activeCell, user, questions, filtered, sectionFilter, skippedSet, filteredGlobalIndices]
+    [activeCell, user, questions, visualOrder, skippedSet]
   );
 
   const clearAndMoveUp = useCallback(() => {
