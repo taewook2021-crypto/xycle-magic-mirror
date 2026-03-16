@@ -883,55 +883,8 @@ export default function StudentLogin() {
                       maxWidth: "400px",
                       transition: "color 0.8s ease"
                     }}>
-                      <span style={{ fontWeight: 700, color: "#EA5027" }}>대한민국 회계학, 세법 1타 강사</span> <span style={{ fontWeight: 700 }}>오정화 선생님</span>의 검증된 교재들이 Xycle에 등록되어 있습니다. 동일한 교재를 푸는 수험생들과 나를 비교하고 부족한 부분을 점검하세요.
+                      Xycle에 등록된 교재들은 <span style={{ fontWeight: 700, color: "#EA5027" }}>주제가 서로 연결</span>되어 있습니다. 교재가 달라도 같은 주제에서 틀린 문제를 한 번에 모아볼 수 있습니다.
                     </p>
-                    <div
-                      className="inline-flex items-center gap-3 px-5 py-3 group/free cursor-pointer"
-                      style={{
-                        background: isLightMode ? "rgba(234,80,39,0.08)" : "rgba(234,80,39,0.15)",
-                        border: `1px solid ${isLightMode ? "rgba(234,80,39,0.2)" : "rgba(234,80,39,0.3)"}`,
-                        transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-                        borderRadius: "9999px",
-                      }}
-                      onMouseEnter={(e) => {
-                        const el = e.currentTarget;
-                        el.style.background = "rgba(234,80,39,1)";
-                        el.style.borderColor = "rgba(234,80,39,1)";
-                        el.style.boxShadow = "0 0 24px rgba(234,80,39,0.4), 0 0 48px rgba(234,80,39,0.15)";
-                        el.style.transform = "translateY(-1px)";
-                        const spans = el.querySelectorAll("span");
-                        spans.forEach(s => (s as HTMLElement).style.color = "#FFFFFF");
-                      }}
-                      onMouseLeave={(e) => {
-                        const el = e.currentTarget;
-                        el.style.background = isLightMode ? "rgba(234,80,39,0.08)" : "rgba(234,80,39,0.15)";
-                        el.style.borderColor = isLightMode ? "rgba(234,80,39,0.2)" : "rgba(234,80,39,0.3)";
-                        el.style.boxShadow = "none";
-                        el.style.transform = "translateY(0)";
-                        const spans = el.querySelectorAll("span");
-                        (spans[0] as HTMLElement).style.color = "#EA5027";
-                        (spans[1] as HTMLElement).style.color = isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.7)";
-                      }}>
-                      <span style={{
-                        color: "#EA5027",
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        letterSpacing: "0.1em",
-                        fontFamily: monoFont,
-                        transition: "color 0.5s cubic-bezier(0.4, 0, 0.2, 1)"
-                      }}>
-                        FREE
-                      </span>
-                      <span style={{
-                        color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.7)",
-                        fontSize: "12px",
-                        fontWeight: 400,
-                        fontFamily: monoFont,
-                        transition: "color 0.5s cubic-bezier(0.4, 0, 0.2, 1)"
-                      }}>
-                        오정화 강사 수강생 전원 무료 이용
-                      </span>
-                    </div>
                   </div>
                 </motion.div>
 
