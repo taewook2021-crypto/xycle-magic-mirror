@@ -1224,8 +1224,8 @@ export default function StudentLogin() {
                       marginTop: "32px",
                       maxWidth: "420px"
                     }}>
-                    종이 회독표 대신 Xycle로 기록하고,<br className="sm:hidden" />
-                    동차생들과 비교하세요.
+                    종이가 절대 못 하는 세 가지,<br className="sm:hidden" />
+                    Xycle은 됩니다.
                   </motion.p>
 
                   <motion.button
