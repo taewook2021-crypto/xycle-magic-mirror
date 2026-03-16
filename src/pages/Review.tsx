@@ -296,16 +296,8 @@ export default function Review() {
               ))
             )}
 
-            {/* Remove book button */}
-            <div className="pt-3">
-              <button
-                onClick={() => { handleRemoveBook(view.bookId); setView({ step: "books" }); }}
-                className="flex items-center gap-1.5 text-xs text-destructive hover:text-destructive/80 transition-colors mx-auto"
-              >
-                <Trash2 className="h-3 w-3" />
-                교재 삭제
-              </button>
-            </div>
+            {/* Remove book button with confirmation */}
+            <RemoveBookButton onConfirm={() => { handleRemoveBook(view.bookId); setView({ step: "books" }); }} />
           </div>
         )}
 
