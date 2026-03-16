@@ -644,8 +644,8 @@ export default function StudentLogin() {
                     letterSpacing: "-0.04em",
                     transition: "color 0.8s ease"
                   }}>
-                    혼자 풀던 교재,<br />
-                    <span style={{ color: "#EA5027", transition: "color 0.8s ease" }}>Xycle로 같이</span>
+                    종이 회독표는 이제 그만.<br />
+                    <span style={{ color: "#EA5027", transition: "color 0.8s ease" }}>Xycle로 기록하세요</span>
                   </h3>
                   <p style={{ color: isLightMode ? "rgba(51,51,51,0.55)" : "rgba(236,236,236,0.6)", fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", fontWeight: 400, lineHeight: 1.7, letterSpacing: "-0.025em", fontFamily: "'Pretendard Variable', Pretendard, sans-serif", transition: "color 0.8s ease" }}>
                     같은 교재를 푸는 학생들과 경쟁하고, 내 <strong style={{ fontWeight: 700, color: "#EA5027" }}>현재 등수</strong>를 확인하세요. Xycle이 성적을 분석해서 <strong style={{ fontWeight: 700, color: "#EA5027" }}>부족한 부분</strong>이 어디인지, 어떤 문제들로 그것을 극복해낼 수 있는지 모든 방법을 알려드릴게요.
