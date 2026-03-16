@@ -1,3 +1,4 @@
+import { useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import PeerComparisonCard from "@/components/dashboard/PeerComparisonCard";
 import TodayStatsCard from "@/components/dashboard/TodayStatsCard";
@@ -6,6 +7,8 @@ import ActivityStream, { type ActivityItem, type PeerAvgProgress } from "@/compo
 import DashboardHero from "@/components/dashboard/DashboardHero";
 import NicknameSetup from "@/components/NicknameSetup";
 import { useAuth } from "@/hooks/useAuth";
+import { Switch } from "@/components/ui/switch";
+import { type ChapterData } from "@/components/review/ReviewGrid";
 
 const mockHero = {
   displayName: "수험생",
@@ -48,6 +51,33 @@ const mockPeerAvgProgress: PeerAvgProgress[] = [
   { bookTitle: "재무관리", avgChapter: 2, totalChapters: 9, avgChapterTitle: "Ch.2 자본예산" },
 ];
 
+const makeMockChapters = (): ChapterData[] => [
+  {
+    chapterId: "c1",
+    chapterTitle: "Ch.1 재무보고와 국제회계기준",
+    questions: Array.from({ length: 8 }, (_, i) => ({
+      questionNumber: i + 1,
+      rounds: [
+        { result: (["correct", "wrong", "half", null] as const)[Math.floor(Math.random() * 4)], date: "3/12" },
+        { result: (["correct", "wrong", null] as const)[Math.floor(Math.random() * 3)], date: "3/14" },
+        { result: null as const },
+      ],
+    })),
+  },
+  {
+    chapterId: "c2",
+    chapterTitle: "Ch.2 재무제표",
+    questions: Array.from({ length: 10 }, (_, i) => ({
+      questionNumber: i + 1,
+      rounds: [
+        { result: (["correct", "wrong", "half"] as const)[Math.floor(Math.random() * 3)], date: "3/10" },
+        { result: null as const },
+        { result: null as const },
+      ],
+    })),
+  },
+];
+
 const mockBooks: BookFeedItem[] = [
   {
     bookTitle: "중급회계 연습서",
@@ -75,8 +105,11 @@ const mockBooks: BookFeedItem[] = [
 
 export default function Dashboard() {
   const { user, profile, setProfile } = useAuth();
+  const [isMePublic, setIsMePublic] = useState(true);
 
   const needsNickname = user && profile && !profile.display_name;
+
+  const handleGoPublic = () => setIsMePublic(true);
 
   return (
     <AppShell>
@@ -88,10 +121,20 @@ export default function Dashboard() {
       )}
       <div className="px-4 pt-5 pb-8 space-y-4">
         <DashboardHero {...mockHero} />
+
+        {/* Public toggle */}
+        <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
+          <div>
+            <p className="text-xs font-medium text-foreground">내 학습 공개</p>
+            <p className="text-[10px] text-muted-foreground">공개하면 다른 수험생의 회독표를 열람할 수 있어요</p>
+          </div>
+          <Switch checked={isMePublic} onCheckedChange={setIsMePublic} />
+        </div>
+
         <ActivityStream activities={mockActivities} peerAvgProgress={mockPeerAvgProgress} />
         <TodayStatsCard stats={mockStats} />
         <PeerComparisonCard weekData={mockWeekData} />
-        <LiveFeed books={mockBooks} />
+        <LiveFeed books={mockBooks} isMePublic={isMePublic} onGoPublic={handleGoPublic} />
       </div>
     </AppShell>
   );
