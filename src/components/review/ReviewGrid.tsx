@@ -28,6 +28,8 @@ interface ReviewGridProps {
   bookId: string;
   roundCount?: number;
   readOnly?: boolean;
+  initialChapterId?: string;
+  singleChapter?: boolean;
 }
 
 type SectionFilter = "all" | "example" | "past_exam" | "practice";
