@@ -896,7 +896,7 @@ export default function StudentLogin() {
                       letterSpacing: "-0.03em",
                       transition: "color 0.8s ease"
                     }}>
-                      같은 교재를 푸는 <span style={{ color: "#EA5027" }}>동차생들</span> 사이,{'\n'}<br />나는 몇 문제?
+                      교재와 상관없이,<br /><span style={{ color: "#EA5027" }}>재고자산</span>에서 푼 문제 목록만 추려보세요.
                     </h3>
                   </div>
                   <div className="space-y-4 lg:pt-[calc(11px*1.5+1rem)]">
