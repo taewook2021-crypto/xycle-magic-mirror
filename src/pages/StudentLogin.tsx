@@ -443,7 +443,7 @@ export default function StudentLogin() {
                     transition={{ delay: 0.7, duration: 0.5 }}
                     className="flex flex-col gap-6 -mt-4 sm:-mt-6">
                     <p style={{ color: "rgba(236,236,236,0.55)", fontSize: "15px", fontWeight: 400, fontFamily: "'Pretendard Variable', Pretendard, sans-serif", letterSpacing: "-0.03em", lineHeight: 1.6 }}>
-                      당신의 현재 위치를 분석해서<br className="sm:hidden" /> 더 똑똑한 공부 패턴을 만들어 드릴게요
+                      같은 교재를 푸는 수험생들과<br className="sm:hidden" /> 나의 풀이량을 비교하세요
                     </p>
                     <motion.button
                       onClick={handleGoogleLogin}
