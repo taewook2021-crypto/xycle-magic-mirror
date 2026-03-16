@@ -116,6 +116,7 @@ const mockBooks: BookFeedItem[] = [
 export default function Dashboard() {
   const { user, profile, setProfile } = useAuth();
   const [isMePublic, setIsMePublic] = useState(true);
+  const referral = useReferral();
 
   const needsNickname = user && profile && !profile.display_name;
 
