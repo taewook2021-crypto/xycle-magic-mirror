@@ -4,6 +4,8 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import PeerProfileSheet, { type PeerProfile } from "./PeerProfileSheet";
+import { type CellResult } from "@/components/review/ReviewCell";
+import { type PeerBook } from "./PeerReviewSheet";
 
 export interface BookFeedItem {
   bookTitle: string;
