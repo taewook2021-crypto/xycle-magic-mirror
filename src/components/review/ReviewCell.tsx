@@ -1,4 +1,3 @@
-import { useCallback, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 export type CellResult = "correct" | "wrong" | "half" | null;
@@ -7,7 +6,9 @@ interface ReviewCellProps {
   result: CellResult;
   date?: string;
   readOnly?: boolean;
+  isActive?: boolean;
   onChange: (result: CellResult) => void;
+  onSelect?: () => void;
 }
 
 const resultStyles: Record<string, { label: string; bg: string; text: string }> = {
@@ -16,50 +17,20 @@ const resultStyles: Record<string, { label: string; bg: string; text: string }> 
   half: { label: "△", bg: "bg-warning/20", text: "text-warning" },
 };
 
-const cycleOrder: CellResult[] = [null, "correct", "wrong", "half"];
-
-export default function ReviewCell({ result, date, readOnly, onChange }: ReviewCellProps) {
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const didLongPress = useRef(false);
-
-  const handleClick = useCallback(() => {
-    if (readOnly || didLongPress.current) {
-      didLongPress.current = false;
-      return;
-    }
-    const idx = cycleOrder.indexOf(result);
-    onChange(cycleOrder[(idx + 1) % cycleOrder.length]);
-  }, [result, readOnly, onChange]);
-
-  const handlePointerDown = useCallback(() => {
-    if (readOnly) return;
-    didLongPress.current = false;
-    longPressTimer.current = setTimeout(() => {
-      didLongPress.current = true;
-      onChange("half");
-    }, 500);
-  }, [readOnly, onChange]);
-
-  const handlePointerUp = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  }, []);
-
+export default function ReviewCell({ result, date, readOnly, isActive, onSelect }: ReviewCellProps) {
   const style = result ? resultStyles[result] : null;
 
   return (
     <button
-      onClick={handleClick}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
+      onClick={() => {
+        if (!readOnly && onSelect) onSelect();
+      }}
       className={cn(
-        "w-full h-8 flex items-center justify-center text-xs font-semibold select-none touch-manipulation transition-colors",
+        "w-full h-8 flex items-center justify-center text-xs font-semibold select-none touch-manipulation transition-all",
         style ? `${style.bg} ${style.text}` : "text-muted-foreground/20",
-        !readOnly && "hover:bg-accent/40 active:scale-95 cursor-pointer",
-        readOnly && "cursor-default"
+        !readOnly && "hover:bg-accent/40 cursor-pointer",
+        readOnly && "cursor-default",
+        isActive && "ring-2 ring-primary ring-inset bg-primary/10"
       )}
       title={date}
     >

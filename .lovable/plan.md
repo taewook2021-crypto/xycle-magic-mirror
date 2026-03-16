@@ -1,58 +1,31 @@
 
 
-## 모바일 초고속 입력 UX — 기획 제안
+## 문제 원인
 
-### 현재 문제
-셀을 탭할 때마다 null→O→X→△→null 순환. X를 입력하려면 2번 탭, △는 3번 탭 또는 롱프레스. 하루 10문제라도 매번 원하는 상태까지 반복 탭해야 해서 답답함.
+`seed_financial_management.sql`이 `INSERT INTO public.questions ...`를 실행하려 하지만, **테이블 자체가 아직 생성되지 않았습니다.** 프로젝트에 `CREATE TABLE` SQL이 전혀 없습니다. 즉, Supabase에 `subjects`, `books`, `chapters`, `questions` 등의 테이블이 만들어진 적이 없습니다.
 
----
+## 해결 계획
 
-### 제안 A: 스와이프 셀 (추천)
+**Migration 도구를 사용하여 테이블을 생성합니다.** 그 후 seed 데이터를 Insert 도구로 적재합니다.
 
-셀 위에서 **방향으로 스와이프**하면 결과가 즉시 입력됨.
+### Step 1 — 테이블 생성 (Migration)
 
-- **오른쪽 스와이프** → O (맞음)
-- **왼쪽 스와이프** → X (틀림)
-- **위로 스와이프** → △ (애매)
-- **탭** → 지우기 (초기화)
+다음 테이블들을 순서대로 생성:
 
-엄지 하나로 1초 안에 입력 완료. 별도 UI 없이 셀 자체가 입력 장치가 됨. Tinder 스와이프처럼 직관적.
+1. `subjects` (id, name, display_order, created_at)
+2. `topics` (id, subject_id FK, name, display_order, created_at)
+3. `sub_topics` (id, topic_id FK, name, display_order, created_at)
+4. `books` (id, subject_id FK, title, author, display_order, created_at)
+5. `chapters` (id, book_id FK, title, chapter_number, display_order, created_at)
+6. `questions` (id, chapter_id FK, sub_topic_id FK nullable, question_number, correct_answer nullable, is_essential boolean, exam_year text nullable, created_at)
+7. `attempts` (id, user_id FK, question_id FK, student_answer, is_correct, attempted_at)
+8. `user_roles` (id, user_id FK, role app_role enum)
 
----
+각 테이블에 RLS를 활성화하고 기본 정책을 설정합니다.
 
-### 제안 B: 하단 고정 입력 바 + 자동 다음 이동
+### Step 2 — Seed 데이터 삽입 (Insert 도구)
 
-1. 셀을 탭하면 해당 행이 하이라이트됨
-2. 화면 하단에 O / △ / X 세 개 큰 버튼이 뜸 (엄지가 닿는 영역)
-3. 버튼 누르면 즉시 기록 → **다음 빈 셀로 자동 이동**
-4. 연속 입력: 탭 한 번 → O → O → X → △ ... 흐름이 끊기지 않음
+`seed_financial_management.sql`의 내용을 Insert 도구로 실행하여 재무관리 과목, 교재, 챕터, 문항 데이터를 적재합니다.
 
-장점: 한 손으로 연속 입력 가능. 단점: 화면 하단을 바가 차지함 (BottomNav와 겹칠 수 있음).
-
----
-
-### 제안 C: 셀 탭 시 팝업 (가장 단순)
-
-셀을 탭하면 셀 바로 위에 작은 말풍선이 뜨고 O / △ / X 세 버튼이 나옴. 하나를 누르면 바로 닫힘.
-
-장점: 구현 단순, 기존 레이아웃 변경 없음. 단점: 매 문제마다 2탭 필요 (셀 탭 + 버튼 탭). 연속 입력엔 B보다 느림.
-
----
-
-### 비교 정리
-
-| | 1문제 입력 | 10문제 연속 | 학습곡선 | 오입력 위험 |
-|---|---|---|---|---|
-| **A. 스와이프** | 1동작 | 매우 빠름 | 중간 (방향 외워야 함) | 중간 |
-| **B. 입력 바** | 2동작 (최초 셀탭+버튼) | 빠름 (자동이동) | 낮음 | 낮음 |
-| **C. 팝업** | 2동작 | 보통 | 매우 낮음 | 낮음 |
-
-### 내 추천
-
-**B안을 기본으로 하되, A안의 스와이프를 보조로 함께 넣는 것.** 이유:
-- 처음 쓰는 사람은 B의 버튼이 명확해서 바로 사용 가능
-- 익숙해지면 스와이프로 더 빠르게 전환
-- 자동 다음 이동이 있어야 "10문제 연속 채점" 시나리오에서 흐름이 끊기지 않음
-
-어떤 방향이 마음에 드는지 알려주면 그에 맞춰 설계할게.
+기존 `seed.sql`의 중급회계 데이터도 함께 삽입합니다.
 
