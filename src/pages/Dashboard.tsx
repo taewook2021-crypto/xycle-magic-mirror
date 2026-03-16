@@ -41,6 +41,13 @@ const mockActivities: ActivityItem[] = [
   { id: "a7", userName: "김O현", bookTitle: "원가관리회계", chapterTitle: "Ch.6 표준원가", questionCount: 30, minutesAgo: 45, isLive: false },
 ];
 
+const mockPeerAvgProgress: PeerAvgProgress[] = [
+  { bookTitle: "중급회계 연습서", avgChapter: 5, totalChapters: 12, avgChapterTitle: "Ch.5 유가증권" },
+  { bookTitle: "세법개론", avgChapter: 3, totalChapters: 10, avgChapterTitle: "Ch.3 부가가치세" },
+  { bookTitle: "원가관리회계", avgChapter: 4, totalChapters: 8, avgChapterTitle: "Ch.4 종합원가" },
+  { bookTitle: "재무관리", avgChapter: 2, totalChapters: 9, avgChapterTitle: "Ch.2 자본예산" },
+];
+
 const mockBooks: BookFeedItem[] = [
   {
     bookTitle: "중급회계 연습서",
