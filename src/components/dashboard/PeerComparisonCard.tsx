@@ -1,82 +1,62 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp } from "lucide-react";
 
-interface PeerComparisonData {
-  percentile: number;
-  myCount: number;
-  avgCount: number;
-  weekLabel: string;
+interface WeekDay {
+  day: string;
+  me: number;
+  avg: number;
 }
 
 interface PeerComparisonCardProps {
-  data?: PeerComparisonData | null;
+  weekData?: WeekDay[];
 }
 
-const barMax = 50;
+const maxVal = 45;
 
-export default function PeerComparisonCard({ data }: PeerComparisonCardProps) {
-  if (!data) {
+export default function PeerComparisonCard({ weekData = [] }: PeerComparisonCardProps) {
+  if (weekData.length === 0) {
     return (
-      <Card className="border-none shadow-md bg-primary text-primary-foreground overflow-hidden">
-        <CardContent className="p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-xs font-medium opacity-80">이번 주 풀이량</p>
-              <p className="text-lg font-bold mt-0.5 opacity-60">데이터 없음</p>
-            </div>
-            <div className="h-10 w-10 rounded-full bg-primary-foreground/15 flex items-center justify-center">
-              <TrendingUp className="h-5 w-5" />
-            </div>
-          </div>
-          <p className="text-xs opacity-60">문제를 풀면 동차생 대비 내 위치를 확인할 수 있어요.</p>
+      <Card className="border-border shadow-sm">
+        <CardContent className="p-4">
+          <p className="text-xs text-muted-foreground text-center py-4">
+            문제를 풀면 주간 비교 차트가 나타납니다.
+          </p>
         </CardContent>
       </Card>
     );
   }
 
-  const { percentile, myCount, avgCount, weekLabel } = data;
-
   return (
-    <Card className="border-none shadow-md bg-primary text-primary-foreground overflow-hidden">
-      <CardContent className="p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-xs font-medium opacity-80">{weekLabel} 풀이량</p>
-            <p className="text-2xl font-bold mt-0.5">
-              상위 {percentile}%
-            </p>
-          </div>
-          <div className="h-10 w-10 rounded-full bg-primary-foreground/15 flex items-center justify-center">
-            <TrendingUp className="h-5 w-5" />
+    <Card className="border-border shadow-sm">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-medium text-muted-foreground">주간 풀이량</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm bg-foreground" />
+              <span className="text-[9px] text-muted-foreground">나</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-sm bg-border" />
+              <span className="text-[9px] text-muted-foreground">동차생 평균</span>
+            </div>
           </div>
         </div>
-
-        <div className="space-y-2.5">
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs">
-              <span className="font-medium">나</span>
-              <span className="font-bold">{myCount}문제</span>
+        <div className="flex items-end gap-1.5" style={{ height: 64 }}>
+          {weekData.map((d) => (
+            <div key={d.day} className="flex-1 flex flex-col items-center gap-0.5">
+              <div className="w-full flex items-end gap-px" style={{ height: 52 }}>
+                <div
+                  className="flex-1 rounded-t-sm bg-foreground transition-all duration-500"
+                  style={{ height: `${(d.me / maxVal) * 100}%` }}
+                />
+                <div
+                  className="flex-1 rounded-t-sm bg-border transition-all duration-500"
+                  style={{ height: `${(d.avg / maxVal) * 100}%` }}
+                />
+              </div>
+              <span className="text-[8px] font-medium text-muted-foreground">{d.day}</span>
             </div>
-            <div className="h-2.5 rounded-full bg-primary-foreground/20 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-primary-foreground transition-all duration-700"
-                style={{ width: `${(myCount / barMax) * 100}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs opacity-70">
-              <span>동차생 평균</span>
-              <span>{avgCount}문제</span>
-            </div>
-            <div className="h-2.5 rounded-full bg-primary-foreground/20 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-primary-foreground/50 transition-all duration-700"
-                style={{ width: `${(avgCount / barMax) * 100}%` }}
-              />
-            </div>
-          </div>
+          ))}
         </div>
       </CardContent>
     </Card>

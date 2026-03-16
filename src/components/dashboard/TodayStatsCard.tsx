@@ -1,38 +1,41 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Flame, Target, BookOpen } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { PenLine, BarChart3, Flame, TrendingUp } from "lucide-react";
 
-interface TodayStats {
-  solved: number;
-  accuracy: number;
+interface StatsData {
+  todaySolved: number;
+  weeklySolved: number;
   streak: number;
+  accuracyTrend: number;
 }
 
 interface TodayStatsCardProps {
-  stats?: TodayStats | null;
+  stats?: StatsData | null;
 }
 
-export default function TodayStatsCard({ stats }: TodayStatsCardProps) {
-  const { solved = 0, accuracy = 0, streak = 0 } = stats ?? {};
+const items: { key: keyof StatsData; label: string; suffix: string; prefix?: string; icon: typeof PenLine }[] = [
+  { key: "todaySolved", label: "오늘 풀이", suffix: "문제", icon: PenLine },
+  { key: "weeklySolved", label: "이번 주", suffix: "문제", icon: BarChart3 },
+  { key: "streak", label: "연속 학습", suffix: "일", icon: Flame },
+  { key: "accuracyTrend", label: "정답률 추이", prefix: "↑ ", suffix: "%p", icon: TrendingUp },
+];
 
-  const items = [
-    { icon: BookOpen, label: "오늘 풀이", value: `${solved}문제`, color: "text-primary" },
-    { icon: Target, label: "정답률", value: `${accuracy}%`, color: "text-success" },
-    { icon: Flame, label: "연속", value: `${streak}일`, color: "text-warning" },
-  ];
+export default function TodayStatsCard({ stats }: TodayStatsCardProps) {
+  const data = stats ?? { todaySolved: 0, weeklySolved: 0, streak: 0, accuracyTrend: 0 };
 
   return (
-    <Card className="border border-border shadow-sm">
-      <CardContent className="p-4">
-        <div className="grid grid-cols-3 divide-x divide-border">
-          {items.map(({ icon: Icon, label, value, color }) => (
-            <div key={label} className="flex flex-col items-center gap-1 px-2">
-              <Icon className={`h-4 w-4 ${color}`} />
-              <span className="text-lg font-bold text-foreground">{value}</span>
-              <span className="text-[10px] text-muted-foreground">{label}</span>
-            </div>
-          ))}
+    <div className="grid grid-cols-2 gap-px rounded-lg overflow-hidden border border-border bg-border">
+      {items.map(({ key, label, suffix, prefix, icon: Icon }) => (
+        <div key={key} className="p-3 bg-card">
+          <div className="flex items-center gap-1 mb-0.5">
+            <Icon className="h-3 w-3 text-muted-foreground" />
+            <span className="text-[10px] font-medium text-muted-foreground">{label}</span>
+          </div>
+          <div className="text-base font-bold text-foreground">
+            {prefix}{data[key]}
+            <span className="text-[10px] font-normal text-muted-foreground ml-0.5">{suffix}</span>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      ))}
+    </div>
   );
 }

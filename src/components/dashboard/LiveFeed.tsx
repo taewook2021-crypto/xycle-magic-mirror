@@ -1,94 +1,90 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Flame, Lock } from "lucide-react";
+import { Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface FeedItem {
   id: string;
-  examType: string;
-  subject: string;
-  book: string;
-  chapter: string;
+  name: string;
   count: number;
-  accuracy: number;
-  timeAgo: string;
-  reactions: number;
+  emoji: string;
+  isMe?: boolean;
 }
 
 interface LiveFeedProps {
   items?: FeedItem[];
 }
 
-function FeedCard({ item }: { item: FeedItem }) {
-  const [reacted, setReacted] = useState(false);
-  const [count, setCount] = useState(item.reactions);
+const maxCount = 50;
 
-  const handleReaction = () => {
-    if (reacted) {
-      setCount((c) => c - 1);
-    } else {
-      setCount((c) => c + 1);
-    }
-    setReacted(!reacted);
-  };
+function FeedRow({ item }: { item: FeedItem }) {
+  const [reacted, setReacted] = useState(false);
 
   return (
-    <Card className="border border-border shadow-none">
-      <CardContent className="p-3.5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
-                {item.examType}
-              </span>
-              <span className="text-[10px] text-muted-foreground">{item.timeAgo}</span>
-            </div>
-            <p className="text-sm font-medium text-foreground truncate">
-              {item.subject} · {item.book}
-            </p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {item.chapter} · {item.count}문제
-              <span className="inline-flex items-center ml-2 text-muted-foreground/50">
-                <Lock className="h-3 w-3 mr-0.5" />
-                <span className="blur-[4px] select-none">{item.accuracy}%</span>
-              </span>
-            </p>
-          </div>
-
-          <button
-            onClick={handleReaction}
-            className={cn(
-              "flex items-center gap-1 px-2 py-1 rounded-full text-xs transition-all border",
-              reacted
-                ? "bg-primary/10 border-primary/30 text-primary"
-                : "bg-secondary border-border text-muted-foreground hover:bg-accent"
-            )}
-          >
-            <Flame className="h-3.5 w-3.5" />
-            <span className="font-medium">{count}</span>
-          </button>
-        </div>
-      </CardContent>
-    </Card>
+    <div
+      className={cn(
+        "flex items-center justify-between rounded-lg px-3 py-2.5 border transition-colors",
+        item.isMe
+          ? "bg-primary/5 border-primary/20"
+          : "bg-card border-border hover:bg-accent"
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <span className="text-sm">{item.emoji}</span>
+        <span
+          className={cn(
+            "text-xs font-semibold",
+            item.isMe ? "text-primary" : "text-foreground"
+          )}
+        >
+          {item.name}
+        </span>
+      </div>
+      <div className="flex items-center gap-2">
+        <div
+          className={cn("h-1.5 rounded-full transition-all duration-500", item.isMe ? "bg-primary" : "bg-border")}
+          style={{ width: `${(item.count / maxCount) * 64}px` }}
+        />
+        <span
+          className={cn(
+            "text-[11px] font-bold tabular-nums min-w-[40px] text-right",
+            item.isMe ? "text-primary" : "text-foreground"
+          )}
+        >
+          {item.count}문제
+        </span>
+        <button
+          onClick={() => setReacted(!reacted)}
+          className={cn(
+            "p-1 rounded-full transition-colors",
+            reacted ? "text-primary" : "text-muted-foreground hover:text-primary/60"
+          )}
+        >
+          <Flame className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
   );
 }
 
 export default function LiveFeed({ items = [] }: LiveFeedProps) {
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-foreground">실시간 학습 피드</h3>
-        <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
-      </div>
-      {items.length === 0 ? (
-        <p className="text-xs text-muted-foreground text-center py-6">아직 학습 피드가 없습니다.</p>
-      ) : (
-        <div className="space-y-2">
-          {items.map((item) => (
-            <FeedCard key={item.id} item={item} />
-          ))}
+    <Card className="border-border shadow-sm">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-medium text-muted-foreground">오늘의 동차생 풀이량</span>
+          <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
         </div>
-      )}
-    </div>
+        {items.length === 0 ? (
+          <p className="text-xs text-muted-foreground text-center py-6">아직 학습 피드가 없습니다.</p>
+        ) : (
+          <div className="space-y-1.5">
+            {items.map((item) => (
+              <FeedRow key={item.id} item={item} />
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
