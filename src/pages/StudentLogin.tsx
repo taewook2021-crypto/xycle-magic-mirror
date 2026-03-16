@@ -433,7 +433,7 @@ export default function StudentLogin() {
                       fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
                       letterSpacing: "-0.04em",
                     }}>
-                      같은 문제를 푸는 학생들 중<br />나, <span className="text-primary">몇 등</span>일까요?
+                      오늘 동차생 평균 18문제.<br />나는<span className="text-primary">?</span>
                     </h2>
                   </motion.div>
 
