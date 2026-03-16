@@ -406,10 +406,19 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                     {group.rows.map((q) => {
                       const globalIdx = questions.indexOf(q);
                       const isActiveRow = activeCell?.qIdx === globalIdx;
+                      const isSkipped = skippedSet.has(q.questionId);
                       return (
-                        <tr key={q.questionId} className={cn("transition-colors", isActiveRow ? "bg-primary/5" : "hover:bg-accent/20")}>
-                          <td className={cn("sticky left-0 z-10 w-10 px-2 py-0 text-center border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
-                            <span className={cn("font-medium text-xs", q.isEssential ? "text-primary font-bold" : "text-foreground")}>
+                        <tr key={q.questionId} className={cn("transition-colors", isSkipped && "opacity-40", isActiveRow ? "bg-primary/5" : "hover:bg-accent/20")}>
+                          <td
+                            className={cn("sticky left-0 z-10 w-10 px-2 py-0 text-center border-b border-r border-border cursor-pointer select-none", isActiveRow ? "bg-primary/5" : "bg-card")}
+                            onClick={() => toggleSkip(q.questionId)}
+                          >
+                            <span className={cn(
+                              "font-medium text-xs transition-all",
+                              isSkipped && "line-through decoration-2 text-muted-foreground",
+                              !isSkipped && q.isEssential ? "text-primary font-bold" : !isSkipped ? "text-foreground" : "",
+                              !isSkipped && "hover:text-muted-foreground/70"
+                            )}>
                               {q.questionNumber}
                             </span>
                           </td>
@@ -430,14 +439,13 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                               <ReviewCell
                                 result={round.result}
                                 date={round.date}
-                                readOnly={readOnly}
-                                isActive={activeCell?.qIdx === globalIdx && activeCell?.rIdx === rIdx}
-                                onChange={(result) => {
-                                  // Direct change (legacy)
-                                }}
-                                onSelect={() => setActiveCell({ qIdx: globalIdx, rIdx })}
+                                readOnly={readOnly || isSkipped}
+                                isActive={!isSkipped && activeCell?.qIdx === globalIdx && activeCell?.rIdx === rIdx}
+                                onChange={() => {}}
+                                onSelect={() => { if (!isSkipped) setActiveCell({ qIdx: globalIdx, rIdx }); }}
                               />
                             </td>
+                          ))}
                           ))}
                         </tr>
                       );
