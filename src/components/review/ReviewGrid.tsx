@@ -53,8 +53,24 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
     return true;
   });
 
-  // Build flat list of visible cells for navigation
-  const filteredGlobalIndices = filtered.map((q) => questions.indexOf(q));
+  // Build visual order: grouped by type (example → past_exam → practice), matching render order
+  const visualOrder = useMemo(() => {
+    const order: number[] = [];
+    if (sectionFilter !== "all") {
+      for (const q of filtered) order.push(questions.indexOf(q));
+    } else {
+      const typeOrder: QuestionType[] = ["example", "past_exam", "practice"];
+      for (const t of typeOrder) {
+        for (const q of filtered) {
+          if (q.questionType === t) order.push(questions.indexOf(q));
+        }
+      }
+    }
+    return order;
+  }, [filtered, questions, sectionFilter]);
+
+  // Keep filteredGlobalIndices as alias for backward compat
+  const filteredGlobalIndices = visualOrder;
 
   // Fetch chapters (skip if singleChapter mode)
   useEffect(() => {
