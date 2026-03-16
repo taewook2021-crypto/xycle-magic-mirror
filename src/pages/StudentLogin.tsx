@@ -14,9 +14,9 @@ import CookieConsent from "@/components/CookieConsent";
 import AppMockup from "@/components/AppMockup";
 
 const reviewCardsData = [
-  { num: "01", title: "오답만 모아보기", desc: "틀린 문제만 골라서\n한 번에 복습할 수 있습니다" },
-  { num: "02", title: "주제별 크로스 필터", desc: "교재가 달라도 같은 주제에서\n틀린 문제를 전부 볼 수 있습니다" },
-  { num: "03", title: "회차별·횟수별 정렬", desc: "원하는 회차만, 자주 틀리는 순으로\n추려서 확인할 수 있습니다" },
+  { num: "01", title: "교재 횡단 취약 단원", desc: "김기동 연습서 → 파이널,\n교재가 달라도 같은 단원에서\n틀린 문제를 전부 모아봅니다" },
+  { num: "02", title: "동차생 대비 내 풀이량", desc: "종이는 혼자입니다.\n동차생·3유예 평균과\n내 풀이량을 실시간 비교합니다" },
+  { num: "03", title: "N번 틀린 것만 필터", desc: "종이는 전체를 훑어야 합니다.\n2번 이상 틀린 문제만\n터치 한 번으로 추려냅니다" },
 ];
 
 function ReviewCardItem({ item, i, isLightMode, monoFont }: { item: typeof reviewCardsData[0]; i: number; isLightMode: boolean; monoFont: string }) {
@@ -644,11 +644,11 @@ export default function StudentLogin() {
                     letterSpacing: "-0.04em",
                     transition: "color 0.8s ease"
                   }}>
-                    종이 회독표는 이제 그만.<br />
-                    <span style={{ color: "#EA5027", transition: "color 0.8s ease" }}>Xycle로 기록하세요</span>
+                    종이가 절대 못 하는 것.<br />
+                    <span style={{ color: "#EA5027", transition: "color 0.8s ease" }}>이것만 살아남아야 해요</span>
                   </h3>
                   <p style={{ color: isLightMode ? "rgba(51,51,51,0.55)" : "rgba(236,236,236,0.6)", fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", fontWeight: 400, lineHeight: 1.7, letterSpacing: "-0.025em", fontFamily: "'Pretendard Variable', Pretendard, sans-serif", transition: "color 0.8s ease" }}>
-                    종이 회독표에선 틀린 문제만 골라보거나, 특정 회차만 따로 확인할 수 없습니다. Xycle은 <strong style={{ fontWeight: 700, color: "#EA5027" }}>오답만, 주제별, 회차별</strong>로 원하는 기준대로 바로 추려볼 수 있습니다.
+                    여러 교재를 횡단해서 취약 단원을 보는 것, 동차생과 풀이량을 비교하는 것, 2번 틀린 문제만 골라보는 것. <strong style={{ fontWeight: 700, color: "#EA5027" }}>종이로는 절대 안 됩니다.</strong>
                   </p>
                 </motion.div>
 
@@ -974,9 +974,9 @@ export default function StudentLogin() {
                 <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
                   <div className="space-y-0">
                     {[
-                      { num: "01", title: "동차생 비교", desc: "같은 교재를 푸는 동차생들과 오늘의 풀이량을 비교하세요.", mockupIdx: 0 },
-                      { num: "02", title: "주제별 오답 모아보기", desc: "교재가 달라도 같은 주제에서 틀린 문제를 전부 모아볼 수 있습니다.", mockupIdx: 1 },
-                      { num: "03", title: "디지털 회독표", desc: "오답만·회차별·틀린 횟수순으로 자유롭게 추려볼 수 있습니다.", mockupIdx: 2 },
+                      { num: "01", title: "교재 횡단 취약 단원", desc: "연습서 → 파이널, 교재가 달라도 같은 단원에서 틀린 문제를 전부 모아봅니다.", mockupIdx: 0 },
+                      { num: "02", title: "동차생 풀이량 비교", desc: "종이는 혼자입니다. 동차생·3유예 평균과 내 풀이량을 실시간으로 비교하세요.", mockupIdx: 1 },
+                      { num: "03", title: "N번 틀린 것만 필터", desc: "종이는 전체를 훑어야 합니다. 2번 이상 틀린 문제만 터치 한 번으로 추려냅니다.", mockupIdx: 2 },
                       { num: "04", title: "풀이 기록 추적", desc: "매일 몇 문제를 풀었는지, 정답률은 어떤지 한눈에 확인하세요.", mockupIdx: 3 },
                       { num: "05", title: "간편 채점", desc: "답을 입력하면 채점부터 기록까지 한번에 끝납니다.", mockupIdx: 4 },
                     ].map((feature, i) => (
@@ -1076,9 +1076,8 @@ export default function StudentLogin() {
                     letterSpacing: "-0.03em",
                     transition: "color 0.8s ease"
                   }}>
-                    종이 회독표에선{' '}<br />
-                    <span style={{ color: "#EA5027" }}>못 하는 것,</span><br />
-                    Xycle은 됩니다
+                    종이는{' '}<br />
+                    <span style={{ color: "#EA5027" }}>절대 못 합니다</span>
                   </h3>
                   <p style={{
                     color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.6)",
@@ -1091,11 +1090,11 @@ export default function StudentLogin() {
                     maxWidth: "520px",
                     transition: "color 0.8s ease"
                   }}>
-                    오답만 모아보기, 특정 주제에서 교재 상관없이 틀린 문제 전부 보기, 회차별 필터.<br />
+                    교재를 넘나들며 취약 단원을 찾고, 동차생과 풀이량을 비교하고, 2번 이상 틀린 문제만 골라보는 것.<br />
                     <strong style={{ fontWeight: 700, color: isLightMode ? "#222222" : "#ECECEC" }}>
-                      종이에선 불가능한 선별
+                      종이 위에선 불가능한 세 가지
                     </strong>
-                    이 Xycle에선 터치 한 번이면 됩니다.
+                    를 Xycle은 터치 한 번으로 해냅니다.
                   </p>
                 </motion.div>
 
@@ -1225,8 +1224,8 @@ export default function StudentLogin() {
                       marginTop: "32px",
                       maxWidth: "420px"
                     }}>
-                    종이 회독표 대신 Xycle로 기록하고,<br className="sm:hidden" />
-                    동차생들과 비교하세요.
+                    종이가 절대 못 하는 세 가지,<br className="sm:hidden" />
+                    Xycle은 됩니다.
                   </motion.p>
 
                   <motion.button
