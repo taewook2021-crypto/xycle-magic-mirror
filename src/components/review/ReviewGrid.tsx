@@ -152,11 +152,13 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     [user, skippedSet]
   );
 
-  // Apply result to active cell + auto-advance
+  // Apply result to active cell + auto-advance + persist
   const applyResult = useCallback(
     (result: CellResult) => {
-      if (!activeCell) return;
+      if (!activeCell || !user) return;
       const { qIdx, rIdx } = activeCell;
+      const questionId = questions[qIdx]?.questionId;
+      if (!questionId) return;
 
       setQuestions((prev) => {
         const next = [...prev];
@@ -171,8 +173,22 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         return next;
       });
 
-      // Auto-advance: next visible row in same column (follows visual order, not global index)
-      // Build visual order from grouped rows
+      // Persist to Supabase
+      if (result) {
+        supabase.from("attempts").upsert(
+          {
+            user_id: user.id,
+            question_id: questionId,
+            round: rIdx + 1,
+            result,
+            is_correct: result === "correct",
+            student_answer: 0,
+          },
+          { onConflict: "user_id,question_id,round" }
+        ).then();
+      }
+
+      // Auto-advance: next visible non-skipped row
       const visibleOrder: number[] = [];
       const groups = sectionFilter !== "all"
         ? [{ rows: filtered }]
@@ -191,7 +207,6 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         }
       }
       const currentVisualIdx = visibleOrder.indexOf(qIdx);
-      // Find next non-skipped row
       for (let i = currentVisualIdx + 1; i < visibleOrder.length; i++) {
         const nextIdx = visibleOrder[i];
         if (!skippedSet.has(questions[nextIdx].questionId)) {
@@ -200,7 +215,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         }
       }
     },
-    [activeCell, filteredGlobalIndices]
+    [activeCell, user, questions, filtered, sectionFilter, skippedSet, filteredGlobalIndices]
   );
 
   const clearAndMoveUp = useCallback(() => {
