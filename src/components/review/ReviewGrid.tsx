@@ -46,6 +46,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
   const [essentialOnly, setEssentialOnly] = useState(false);
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
   const [skippedSet, setSkippedSet] = useState<Set<string>>(new Set());
+  const [memos, setMemos] = useState<Record<string, string>>({});
 
   // Filtered indices mapping
   const filtered = questions.filter((q) => {
