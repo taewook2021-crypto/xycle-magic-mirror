@@ -460,19 +460,21 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
           📝 메모
         </button>
         <div className="w-px h-4 bg-border mx-1" />
-        <select
-          value={wrongCountFilter}
-          onChange={(e) => { setWrongCountFilter(Number(e.target.value)); setActiveCell(null); }}
-          className={cn(
-            "px-2 py-1 rounded-md text-[11px] font-medium transition-all border bg-secondary text-secondary-foreground border-border hover:bg-accent appearance-none cursor-pointer",
-            wrongCountFilter > 0 && "bg-destructive/15 text-destructive border-destructive/30"
-          )}
-        >
-          <option value={0}>오답 필터</option>
-          <option value={1}>오답 ≥1</option>
-          <option value={2}>오답 ≥2</option>
-          <option value={3}>오답 ≥3</option>
-        </select>
+        <span className="text-[11px] text-muted-foreground font-medium">오답횟수:</span>
+        {[{ value: 1, label: "1회" }, { value: 2, label: "2회" }, { value: 3, label: "3회 이상" }].map((item) => (
+          <button
+            key={item.value}
+            onClick={() => { setWrongCountFilter((v) => v === item.value ? 0 : item.value); setActiveCell(null); }}
+            className={cn(
+              "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border",
+              wrongCountFilter === item.value
+                ? "bg-destructive/15 text-destructive border-destructive/30"
+                : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
+            )}
+          >
+            {item.label}
+          </button>
+        ))}
       </div>
 
       {/* Floating input guide button */}
