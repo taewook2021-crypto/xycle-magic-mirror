@@ -229,7 +229,7 @@ export default function StudentLogin() {
   }, [phase]);
 
   useEffect(() => {
-    if (user) navigate("/", { replace: true });
+    if (user) navigate("/dashboard", { replace: true });
   }, [user, navigate]);
 
   useEffect(() => {

@@ -5,7 +5,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
+import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import StudentLogin from "./pages/StudentLogin";
+import Dashboard from "./pages/Dashboard";
+import Review from "./pages/Review";
+import Grading from "./pages/Grading";
+import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,7 +25,10 @@ const App = () => (
           <AuthProvider>
             <Routes>
               <Route path="/" element={<StudentLogin />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/review" element={<ProtectedRoute><Review /></ProtectedRoute>} />
+              <Route path="/grading" element={<ProtectedRoute><Grading /></ProtectedRoute>} />
+              <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AuthProvider>
