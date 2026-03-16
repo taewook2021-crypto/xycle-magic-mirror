@@ -89,10 +89,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         const [{ data: aData }, { data: skipData }] = await Promise.all([
           supabase
             .from("attempts")
-            .select("question_id, is_correct, attempted_at")
+            .select("question_id, result, round, attempted_at")
             .eq("user_id", user.id)
             .in("question_id", qIds)
-            .order("attempted_at"),
+            .order("round"),
           supabase
             .from("user_question_skips")
             .select("question_id")
@@ -102,10 +102,15 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         if (aData) {
           for (const a of aData as any[]) {
             if (!attemptsMap[a.question_id]) attemptsMap[a.question_id] = [];
-            attemptsMap[a.question_id].push({
-              result: a.is_correct ? "correct" : "wrong",
+            const roundIdx = (a.round ?? 1) - 1;
+            // Ensure array is long enough
+            while (attemptsMap[a.question_id].length <= roundIdx) {
+              attemptsMap[a.question_id].push({ result: null });
+            }
+            attemptsMap[a.question_id][roundIdx] = {
+              result: a.result as CellResult,
               date: new Date(a.attempted_at).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
-            });
+            };
           }
         }
         setSkippedSet(new Set((skipData ?? []).map((s: any) => s.question_id)));
@@ -147,11 +152,13 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
     [user, skippedSet]
   );
 
-  // Apply result to active cell + auto-advance
+  // Apply result to active cell + auto-advance + persist
   const applyResult = useCallback(
     (result: CellResult) => {
-      if (!activeCell) return;
+      if (!activeCell || !user) return;
       const { qIdx, rIdx } = activeCell;
+      const questionId = questions[qIdx]?.questionId;
+      if (!questionId) return;
 
       setQuestions((prev) => {
         const next = [...prev];
@@ -166,8 +173,22 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         return next;
       });
 
-      // Auto-advance: next visible row in same column (follows visual order, not global index)
-      // Build visual order from grouped rows
+      // Persist to Supabase
+      if (result) {
+        supabase.from("attempts").upsert(
+          {
+            user_id: user.id,
+            question_id: questionId,
+            round: rIdx + 1,
+            result,
+            is_correct: result === "correct",
+            student_answer: 0,
+          },
+          { onConflict: "user_id,question_id,round" }
+        ).then();
+      }
+
+      // Auto-advance: next visible non-skipped row
       const visibleOrder: number[] = [];
       const groups = sectionFilter !== "all"
         ? [{ rows: filtered }]
@@ -186,7 +207,6 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         }
       }
       const currentVisualIdx = visibleOrder.indexOf(qIdx);
-      // Find next non-skipped row
       for (let i = currentVisualIdx + 1; i < visibleOrder.length; i++) {
         const nextIdx = visibleOrder[i];
         if (!skippedSet.has(questions[nextIdx].questionId)) {
@@ -195,12 +215,14 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         }
       }
     },
-    [activeCell, filteredGlobalIndices]
+    [activeCell, user, questions, filtered, sectionFilter, skippedSet, filteredGlobalIndices]
   );
 
   const clearAndMoveUp = useCallback(() => {
-    if (!activeCell) return;
+    if (!activeCell || !user) return;
     const { qIdx, rIdx } = activeCell;
+    const questionId = questions[qIdx]?.questionId;
+
     // Clear the cell
     setQuestions((prev) => {
       const next = [...prev];
@@ -211,12 +233,21 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
       next[qIdx] = q;
       return next;
     });
+
+    // Delete from Supabase
+    if (questionId) {
+      supabase.from("attempts").delete()
+        .eq("user_id", user.id)
+        .eq("question_id", questionId)
+        .eq("round", rIdx + 1)
+        .then();
+    }
     // Move up
     const fIdx = filteredGlobalIndices.indexOf(qIdx);
     if (fIdx > 0) {
       setActiveCell({ qIdx: filteredGlobalIndices[fIdx - 1], rIdx });
     }
-  }, [activeCell, filteredGlobalIndices]);
+  }, [activeCell, user, questions, filteredGlobalIndices]);
 
   // Keyboard navigation
   useEffect(() => {
