@@ -188,6 +188,28 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
     [user, skippedSet]
   );
 
+  // Save memo
+  const saveMemo = useCallback(
+    async (questionId: string, content: string) => {
+      if (!user) return;
+      setMemos((prev) => {
+        const next = { ...prev };
+        if (content) next[questionId] = content;
+        else delete next[questionId];
+        return next;
+      });
+      if (content) {
+        await supabase.from("user_question_memos" as any).upsert(
+          { user_id: user.id, question_id: questionId, content, updated_at: new Date().toISOString() },
+          { onConflict: "user_id,question_id" }
+        );
+      } else {
+        await supabase.from("user_question_memos" as any).delete().eq("user_id", user.id).eq("question_id", questionId);
+      }
+    },
+    [user]
+  );
+
   // Apply result to active cell + auto-advance + persist
   const applyResult = useCallback(
     (result: CellResult) => {
