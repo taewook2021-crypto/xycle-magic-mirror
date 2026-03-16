@@ -271,6 +271,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                               {q.questionType === "example" && <span className="font-semibold">예제</span>}
                             </span>
                           </td>
+                          <td className="sticky left-[88px] z-10 bg-card min-w-[120px] px-2 py-0 text-left border-b border-r border-border">
+                            <span className="text-[10px] text-muted-foreground truncate block max-w-[160px]">
+                              {q.topic || "–"}
+                            </span>
                           {q.rounds.map((round, rIdx) => (
                             <td key={rIdx} className="p-0 border-b border-r border-border last:border-r-0">
                               <ReviewCell
