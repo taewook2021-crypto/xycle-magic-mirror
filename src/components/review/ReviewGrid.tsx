@@ -138,10 +138,28 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
         return next;
       });
 
-      // Auto-advance to next row in same column
-      const currentFilteredIdx = filteredGlobalIndices.indexOf(qIdx);
-      if (currentFilteredIdx < filteredGlobalIndices.length - 1) {
-        setActiveCell({ qIdx: filteredGlobalIndices[currentFilteredIdx + 1], rIdx });
+      // Auto-advance: next visible row in same column (follows visual order, not global index)
+      // Build visual order from grouped rows
+      const visibleOrder: number[] = [];
+      const groups = sectionFilter !== "all"
+        ? [{ rows: filtered }]
+        : (() => {
+            const typeOrder: QuestionType[] = ["example", "past_exam", "practice"];
+            const g: { rows: QuestionRow[] }[] = [];
+            for (const t of typeOrder) {
+              const rows = filtered.filter((q) => q.questionType === t);
+              if (rows.length > 0) g.push({ rows });
+            }
+            return g;
+          })();
+      for (const group of groups) {
+        for (const row of group.rows) {
+          visibleOrder.push(questions.indexOf(row));
+        }
+      }
+      const currentVisualIdx = visibleOrder.indexOf(qIdx);
+      if (currentVisualIdx < visibleOrder.length - 1) {
+        setActiveCell({ qIdx: visibleOrder[currentVisualIdx + 1], rIdx });
       }
     },
     [activeCell, filteredGlobalIndices]
