@@ -1076,9 +1076,8 @@ export default function StudentLogin() {
                     letterSpacing: "-0.03em",
                     transition: "color 0.8s ease"
                   }}>
-                    종이 회독표에선{' '}<br />
-                    <span style={{ color: "#EA5027" }}>못 하는 것,</span><br />
-                    Xycle은 됩니다
+                    종이는{' '}<br />
+                    <span style={{ color: "#EA5027" }}>절대 못 합니다</span>
                   </h3>
                   <p style={{
                     color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.6)",
@@ -1091,11 +1090,11 @@ export default function StudentLogin() {
                     maxWidth: "520px",
                     transition: "color 0.8s ease"
                   }}>
-                    오답만 모아보기, 특정 주제에서 교재 상관없이 틀린 문제 전부 보기, 회차별 필터.<br />
+                    교재를 넘나들며 취약 단원을 찾고, 동차생과 풀이량을 비교하고, 2번 이상 틀린 문제만 골라보는 것.<br />
                     <strong style={{ fontWeight: 700, color: isLightMode ? "#222222" : "#ECECEC" }}>
-                      종이에선 불가능한 선별
+                      종이 위에선 불가능한 세 가지
                     </strong>
-                    이 Xycle에선 터치 한 번이면 됩니다.
+                    를 Xycle은 터치 한 번으로 해냅니다.
                   </p>
                 </motion.div>
 
