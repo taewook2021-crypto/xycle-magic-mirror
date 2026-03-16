@@ -61,7 +61,8 @@ export default function ReviewCell({ result, date, realtimeMode, readOnly, onCha
       className={cn(
         "w-full h-full min-h-[44px] flex flex-col items-center justify-center rounded border text-xs font-semibold transition-all select-none touch-manipulation",
         display ? display.className : "bg-muted/30 border-border/50 text-muted-foreground/30",
-        realtimeMode && "active:scale-95 cursor-pointer"
+        realtimeMode && !readOnly && "active:scale-95 cursor-pointer",
+        readOnly && "cursor-default"
       )}
     >
       {display ? (
