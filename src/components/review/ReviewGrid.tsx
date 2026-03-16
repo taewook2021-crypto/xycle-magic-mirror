@@ -298,7 +298,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false }:
                           {typeLabel && (
                             <span className={cn(
                               "text-[8px] font-bold",
-                              q.questionType === "past_exam" ? "text-blue-500" : "text-orange-500"
+                              q.questionType === "past_exam" ? "text-primary/70" : "text-accent-foreground"
                             )}>
                               {typeLabel}
                             </span>
