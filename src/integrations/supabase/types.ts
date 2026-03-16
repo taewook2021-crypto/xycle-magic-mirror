@@ -20,7 +20,9 @@ export type Database = {
           id: string
           is_correct: boolean
           question_id: string
-          student_answer: number
+          result: string
+          round: number
+          student_answer: number | null
           user_id: string
         }
         Insert: {
@@ -28,7 +30,9 @@ export type Database = {
           id?: string
           is_correct: boolean
           question_id: string
-          student_answer: number
+          result?: string
+          round?: number
+          student_answer?: number | null
           user_id: string
         }
         Update: {
@@ -36,7 +40,9 @@ export type Database = {
           id?: string
           is_correct?: boolean
           question_id?: string
-          student_answer?: number
+          result?: string
+          round?: number
+          student_answer?: number | null
           user_id?: string
         }
         Relationships: [
