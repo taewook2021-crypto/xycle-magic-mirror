@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Review from "./pages/Review";
 import Grading from "./pages/Grading";
 import Analytics from "./pages/Analytics";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
