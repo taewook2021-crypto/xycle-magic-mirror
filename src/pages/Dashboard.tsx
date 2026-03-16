@@ -32,13 +32,13 @@ const mockWeekData = [
 ];
 
 const mockActivities: ActivityItem[] = [
-  { id: "a1", userName: "김O현", bookTitle: "세법개론", minutesAgo: 2, isLive: true },
-  { id: "a2", userName: "박O수", bookTitle: "중급회계 연습서", minutesAgo: 5, isLive: true },
-  { id: "a3", userName: "최O영", bookTitle: "원가관리회계", minutesAgo: 8, isLive: true },
-  { id: "a4", userName: "이O준", bookTitle: "세법개론", questionCount: 15, minutesAgo: 12, isLive: false },
-  { id: "a5", userName: "정O민", bookTitle: "중급회계 연습서", questionCount: 22, minutesAgo: 18, isLive: false },
-  { id: "a6", userName: "한O서", bookTitle: "재무관리", questionCount: 8, minutesAgo: 25, isLive: false },
-  { id: "a7", userName: "김O현", bookTitle: "원가관리회계", questionCount: 30, minutesAgo: 45, isLive: false },
+  { id: "a1", userName: "김O현", bookTitle: "세법개론", chapterTitle: "Ch.3 부가가치세", minutesAgo: 2, isLive: true },
+  { id: "a2", userName: "박O수", bookTitle: "중급회계 연습서", chapterTitle: "Ch.7 유형자산", minutesAgo: 5, isLive: true },
+  { id: "a3", userName: "최O영", bookTitle: "원가관리회계", chapterTitle: "Ch.2 개별원가", minutesAgo: 8, isLive: true },
+  { id: "a4", userName: "이O준", bookTitle: "세법개론", chapterTitle: "Ch.5 소득세", questionCount: 15, minutesAgo: 12, isLive: false },
+  { id: "a5", userName: "정O민", bookTitle: "중급회계 연습서", chapterTitle: "Ch.4 금융자산", questionCount: 22, minutesAgo: 18, isLive: false },
+  { id: "a6", userName: "한O서", bookTitle: "재무관리", chapterTitle: "Ch.1 화폐의 시간가치", questionCount: 8, minutesAgo: 25, isLive: false },
+  { id: "a7", userName: "김O현", bookTitle: "원가관리회계", chapterTitle: "Ch.6 표준원가", questionCount: 30, minutesAgo: 45, isLive: false },
 ];
 
 const mockBooks: BookFeedItem[] = [

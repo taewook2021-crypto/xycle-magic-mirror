@@ -5,9 +5,10 @@ export interface ActivityItem {
   id: string;
   userName: string;
   bookTitle: string;
+  chapterTitle?: string;
   questionCount?: number;
   minutesAgo: number;
-  isLive: boolean; // still studying vs completed
+  isLive: boolean;
 }
 
 interface ActivityStreamProps {
@@ -43,7 +44,7 @@ export default function ActivityStream({ activities, onUserClick }: ActivityStre
                     {a.userName}
                   </button>
                   <span className="text-muted-foreground">—</span>
-                  <span className="text-muted-foreground truncate flex-1">{a.bookTitle} 풀이 중</span>
+                  <span className="text-muted-foreground truncate flex-1">{a.bookTitle}{a.chapterTitle && <span className="text-foreground font-medium"> {a.chapterTitle}</span>} 풀이 중</span>
                   <span className="text-[10px] text-muted-foreground whitespace-nowrap">{a.minutesAgo}분 전</span>
                 </div>
               ))}
@@ -70,7 +71,7 @@ export default function ActivityStream({ activities, onUserClick }: ActivityStre
                         {a.userName}
                       </button>
                       <span className="text-muted-foreground">
-                        이 {a.bookTitle}
+                        이 {a.bookTitle}{a.chapterTitle && ` ${a.chapterTitle}`}
                         {a.questionCount && <span className="font-semibold text-foreground"> {a.questionCount}문제</span>}
                         {" "}완료
                       </span>
