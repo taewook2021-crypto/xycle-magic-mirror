@@ -24,7 +24,7 @@ export default function ReviewCell({ result, date, realtimeMode, readOnly, onCha
   const didLongPress = useRef(false);
 
   const handleClick = useCallback(() => {
-    if (!realtimeMode || didLongPress.current) {
+    if (readOnly || !realtimeMode || didLongPress.current) {
       didLongPress.current = false;
       return;
     }
