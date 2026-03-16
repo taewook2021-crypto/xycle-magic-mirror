@@ -475,78 +475,105 @@ export default function StudentLogin() {
                 <div className="px-5 sm:px-10 pt-2 sm:pt-12 flex flex-col gap-1.5 sm:gap-3">
                   {[
                     {
-                      id: "rank",
-                      label: "내 등수",
-                      content: (
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="flex items-baseline gap-1.5">
-                              <span style={{ fontSize: "36px", fontWeight: 800, color: "#ECECEC", fontFamily: "'Pretendard Variable', Pretendard, sans-serif", lineHeight: 1, letterSpacing: "-0.04em" }}>
-                                16
-                              </span>
-                              <span style={{ fontSize: "16px", fontWeight: 400, color: "rgba(236,236,236,0.35)", fontFamily: monoFont }}>/</span>
-                              <span style={{ fontSize: "18px", fontWeight: 500, color: "rgba(236,236,236,0.5)", fontFamily: monoFont }}>132</span>
-                            </div>
-                            <div className="flex items-center gap-3 mt-2">
-                              <span style={{ fontSize: "14px", color: "rgba(236,236,236,0.6)", fontFamily: monoFont, fontVariantNumeric: "tabular-nums" }}>38점</span>
-                              <span style={{ fontSize: "14px", color: "#EA5027", fontWeight: 600, fontFamily: monoFont }}>상위 12%</span>
-                            </div>
-                          </div>
-                          <div className="flex flex-col items-end gap-1">
-                            <span style={{ fontSize: "13px", color: "#4ade80", fontWeight: 600, fontFamily: monoFont }}>▲ +5점</span>
-                            <span style={{ fontSize: "11px", color: "#4ade80", fontFamily: monoFont, background: "rgba(74,222,128,0.08)", padding: "2px 8px", borderRadius: "9999px", border: "1px solid rgba(74,222,128,0.15)" }}>성장 중! 🔥</span>
-                          </div>
-                        </div>
-                      ),
-                    },
-                    {
-                      id: "ranking",
-                      label: "실시간 랭킹",
-                      content: (
-                        <div className="space-y-1">
-                          {[
-                            { rank: 1, name: "김○현", score: "47/50", pct: "상위 2%" },
-                            { rank: 2, name: "이○준", score: "45/50", pct: "상위 5%" },
-                          ].map((r) => (
-                            <div key={r.rank} className="flex items-center gap-3" style={{ padding: "5px 10px", borderRadius: "8px", background: r.rank === 1 ? "rgba(234,80,39,0.08)" : "transparent", border: r.rank === 1 ? "1px solid rgba(234,80,39,0.2)" : "1px solid transparent" }}>
-                              <span style={{ fontSize: "13px", fontWeight: 700, color: r.rank === 1 ? "#EA5027" : "rgba(236,236,236,0.4)", fontFamily: monoFont, minWidth: "16px", fontVariantNumeric: "tabular-nums" }}>{r.rank}</span>
-                              <span style={{ fontSize: "14px", color: "#ECECEC", fontWeight: 500, flex: 1 }}>{r.name}</span>
-                              <span style={{ fontSize: "13px", color: "rgba(236,236,236,0.5)", fontFamily: monoFont, fontVariantNumeric: "tabular-nums" }}>{r.score}</span>
-                              <span style={{ fontSize: "11px", color: "rgba(236,236,236,0.3)", fontFamily: monoFont }}>{r.pct}</span>
-                            </div>
-                          ))}
-                          <div className="flex items-center gap-3" style={{ padding: "5px 10px", borderRadius: "8px", background: "rgba(234,80,39,0.04)", border: "1px solid rgba(234,80,39,0.12)" }}>
-                            <span style={{ fontSize: "13px", fontWeight: 700, color: "#EA5027", fontFamily: monoFont, minWidth: "16px", fontVariantNumeric: "tabular-nums" }}>16</span>
-                            <span style={{ fontSize: "14px", color: "#EA5027", fontWeight: 600, flex: 1 }}>나</span>
-                            <span style={{ fontSize: "13px", color: "rgba(234,80,39,0.7)", fontFamily: monoFont, fontVariantNumeric: "tabular-nums" }}>38/50</span>
-                            <span style={{ fontSize: "11px", color: "rgba(234,80,39,0.5)", fontFamily: monoFont }}>상위 12%</span>
-                          </div>
-                        </div>
-                      ),
-                    },
-                    {
-                      id: "accuracy",
-                      label: "정답률 분석",
+                      id: "crossbook",
+                      label: "교재 횡단 취약 단원",
                       content: (
                         <div className="space-y-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span style={{ fontSize: "10px", fontWeight: 700, color: "#ECECEC", background: "rgba(236,236,236,0.1)", padding: "3px 10px", borderRadius: "9999px", border: "1px solid rgba(236,236,236,0.15)" }}>
+                              김기동 연습서
+                            </span>
+                            <span style={{ fontSize: "14px", color: "rgba(236,236,236,0.3)" }}>→</span>
+                            <span style={{ fontSize: "10px", fontWeight: 700, color: "#ECECEC", background: "rgba(236,236,236,0.1)", padding: "3px 10px", borderRadius: "9999px", border: "1px solid rgba(236,236,236,0.15)" }}>
+                              2026 파이널
+                            </span>
+                          </div>
                           {[
-                            { subject: "민법총칙", accuracy: 85, change: 12 },
-                            { subject: "물권법", accuracy: 72, change: 8 },
-                            { subject: "채권법", accuracy: 64, change: 15 },
-                          ].map((s) => (
-                            <div key={s.subject} className="space-y-1">
+                            { topic: "유형자산 감가상각", rate: 38, tag: "🔥 최약" },
+                            { topic: "수익인식", rate: 52, tag: null },
+                            { topic: "재고자산", rate: 61, tag: null },
+                          ].map((t) => (
+                            <div key={t.topic} className="space-y-1">
                               <div className="flex items-center justify-between">
-                                <span style={{ fontSize: "13px", color: "rgba(236,236,236,0.7)" }}>{s.subject}</span>
                                 <div className="flex items-center gap-2">
-                                  <span style={{ fontSize: "13px", color: "#ECECEC", fontWeight: 600, fontFamily: monoFont, fontVariantNumeric: "tabular-nums" }}>{s.accuracy}%</span>
-                                  <span style={{ fontSize: "11px", color: "#4ade80", fontFamily: monoFont }}>+{s.change}%</span>
+                                  {t.tag && <span style={{ fontSize: "9px", fontWeight: 700, color: "#EA5027", background: "rgba(234,80,39,0.1)", padding: "2px 6px", borderRadius: "4px" }}>{t.tag}</span>}
+                                  <span style={{ fontSize: "13px", color: "rgba(236,236,236,0.8)", fontWeight: 500 }}>{t.topic}</span>
                                 </div>
+                                <span style={{ fontSize: "14px", color: t.rate < 50 ? "#EA5027" : "#ECECEC", fontWeight: 700, fontFamily: monoFont, fontVariantNumeric: "tabular-nums" }}>{t.rate}%</span>
                               </div>
                               <div style={{ height: "3px", borderRadius: "2px", background: "rgba(236,236,236,0.08)", overflow: "hidden" }}>
-                                <div style={{ height: "100%", width: `${s.accuracy}%`, borderRadius: "2px", background: "linear-gradient(90deg, #EA5027, #EA5027cc)" }} />
+                                <div style={{ height: "100%", width: `${t.rate}%`, borderRadius: "2px", background: t.rate < 50 ? "linear-gradient(90deg, #EA5027, #EA5027cc)" : "linear-gradient(90deg, rgba(236,236,236,0.5), rgba(236,236,236,0.3))" }} />
                               </div>
                             </div>
                           ))}
+                        </div>
+                      ),
+                    },
+                    {
+                      id: "peer",
+                      label: "동차생 풀이량 비교",
+                      content: (
+                        <div className="space-y-2">
+                          <div className="flex items-end justify-between">
+                            <div className="flex items-baseline gap-1.5">
+                              <span style={{ fontSize: "32px", fontWeight: 800, color: "#ECECEC", fontFamily: "'Pretendard Variable', Pretendard, sans-serif", lineHeight: 1, letterSpacing: "-0.04em" }}>32</span>
+                              <span style={{ fontSize: "14px", fontWeight: 400, color: "rgba(236,236,236,0.4)" }}>문제</span>
+                            </div>
+                            <span style={{ fontSize: "11px", fontWeight: 600, color: "#4ade80", fontFamily: monoFont }}>▲ 평균보다 14문제 더</span>
+                          </div>
+                          <div className="flex items-end gap-1" style={{ height: "40px" }}>
+                            {[28, 35, 18, 32, 40, 22, 32].map((v, i) => (
+                              <div key={i} className="flex-1 flex gap-px items-end" style={{ height: "100%" }}>
+                                <div style={{ flex: 1, height: `${(v / 45) * 100}%`, background: "#ECECEC", borderRadius: "2px 2px 0 0" }} />
+                                <div style={{ flex: 1, height: `${([22, 20, 24, 19, 25, 18, 18][i] / 45) * 100}%`, background: "rgba(236,236,236,0.15)", borderRadius: "2px 2px 0 0" }} />
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1.5">
+                              <div style={{ width: "8px", height: "8px", borderRadius: "2px", background: "#ECECEC" }} />
+                              <span style={{ fontSize: "10px", color: "rgba(236,236,236,0.4)", fontFamily: monoFont }}>나</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <div style={{ width: "8px", height: "8px", borderRadius: "2px", background: "rgba(236,236,236,0.15)" }} />
+                              <span style={{ fontSize: "10px", color: "rgba(236,236,236,0.4)", fontFamily: monoFont }}>동차생 평균</span>
+                            </div>
+                          </div>
+                        </div>
+                      ),
+                    },
+                    {
+                      id: "filter",
+                      label: "2번 이상 틀린 것만",
+                      content: (
+                        <div className="space-y-2">
+                          <div className="flex gap-1.5">
+                            {["전체", "1번↑", "2번↑", "3번↑"].map((f, i) => (
+                              <span key={f} style={{ fontSize: "10px", fontWeight: i === 2 ? 700 : 500, color: i === 2 ? "#111" : "rgba(236,236,236,0.4)", background: i === 2 ? "#ECECEC" : "rgba(236,236,236,0.06)", padding: "3px 10px", borderRadius: "9999px", border: i === 2 ? "none" : "1px solid rgba(236,236,236,0.1)" }}>
+                                {f}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="space-y-0.5">
+                            {[
+                              { num: 5, subject: "국징", cnt: 3 },
+                              { num: 15, subject: "소득", cnt: 2 },
+                              { num: 8, subject: "소득", cnt: 3 },
+                            ].map((q) => (
+                              <div key={`${q.num}-${q.subject}`} className="flex items-center justify-between" style={{ padding: "4px 8px", borderRadius: "6px", background: q.cnt >= 3 ? "rgba(234,80,39,0.06)" : "transparent" }}>
+                                <div className="flex items-center gap-2">
+                                  <span style={{ fontSize: "12px", fontWeight: 600, color: "rgba(236,236,236,0.5)", fontFamily: monoFont, fontVariantNumeric: "tabular-nums", minWidth: "20px" }}>{q.num}</span>
+                                  <span style={{ fontSize: "12px", color: "rgba(236,236,236,0.6)" }}>{q.subject}</span>
+                                </div>
+                                <span style={{ fontSize: "11px", fontWeight: 700, color: q.cnt >= 3 ? "#EA5027" : "#f59e0b", fontFamily: monoFont, background: q.cnt >= 3 ? "rgba(234,80,39,0.1)" : "rgba(245,158,11,0.1)", padding: "2px 8px", borderRadius: "4px" }}>
+                                  {q.cnt}회 오답
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                          <p style={{ fontSize: "10px", color: "rgba(236,236,236,0.3)", textAlign: "center", fontFamily: monoFont }}>
+                            종이는 전체를 훑어야 합니다. <span style={{ color: "#ECECEC", fontWeight: 600 }}>Xycle은 터치 한 번.</span>
+                          </p>
                         </div>
                       ),
                     },
