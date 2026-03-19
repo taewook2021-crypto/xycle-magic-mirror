@@ -39,10 +39,11 @@ interface ReviewGridProps {
 type SectionFilter = "all" | "example" | "past_exam" | "practice";
 type ActiveCell = { qIdx: number; rIdx: number } | null;
 
-export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, initialChapterId, singleChapter = false, userId }: ReviewGridProps) {
+export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyProp = false, initialChapterId, singleChapter = false, userId }: ReviewGridProps) {
   const isMobile = useIsMobile();
   const { user } = useAuth();
   const targetUserId = userId ?? user?.id;
+  const readOnly = readOnlyProp || !!userId;
   const [chapters, setChapters] = useState<ChapterInfo[]>([]);
   const [selectedChapterId, setSelectedChapterId] = useState<string | null>(initialChapterId ?? null);
   const [questions, setQuestions] = useState<QuestionRow[]>([]);

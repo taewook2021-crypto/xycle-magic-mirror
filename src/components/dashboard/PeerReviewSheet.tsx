@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
@@ -8,28 +8,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { type CellResult } from "@/components/review/ReviewCell";
+import { supabase } from "@/integrations/supabase/client";
+import ReviewGrid from "@/components/review/ReviewGrid";
 
-export interface PeerChapter {
-  chapterId: string;
-  chapterTitle: string;
-  questions: {
-    questionNumber: number;
-    rounds: { result: CellResult; date?: string }[];
-  }[];
-}
-
-export interface PeerBook {
+interface PeerBook {
   id: string;
   title: string;
-  chapters: PeerChapter[];
 }
 
 interface PeerReviewSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   peerName: string;
-  peerBooks: PeerBook[];
+  peerId: string;
   isMePublic: boolean;
   onGoPublic?: () => void;
 }
@@ -38,12 +29,40 @@ export default function PeerReviewSheet({
   open,
   onOpenChange,
   peerName,
-  peerBooks,
+  peerId,
   isMePublic,
   onGoPublic,
 }: PeerReviewSheetProps) {
-  const [selectedBookId, setSelectedBookId] = useState<string>(peerBooks[0]?.id ?? "");
-  const selectedBook = peerBooks.find((b) => b.id === selectedBookId);
+  const [peerBooks, setPeerBooks] = useState<PeerBook[]>([]);
+  const [selectedBookId, setSelectedBookId] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open || !isMePublic || !peerId) return;
+    setLoading(true);
+    const fetch = async () => {
+      const { data: userBooks } = await supabase
+        .from("user_books")
+        .select("book_id")
+        .eq("user_id", peerId);
+      if (!userBooks?.length) {
+        setPeerBooks([]);
+        setLoading(false);
+        return;
+      }
+      const bookIds = userBooks.map((ub) => ub.book_id);
+      const { data: books } = await supabase
+        .from("books")
+        .select("id, title")
+        .in("id", bookIds)
+        .order("display_order");
+      const result = books ?? [];
+      setPeerBooks(result);
+      setSelectedBookId(result[0]?.id ?? "");
+      setLoading(false);
+    };
+    fetch();
+  }, [open, isMePublic, peerId]);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -66,6 +85,12 @@ export default function PeerReviewSheet({
               공개로 전환하기
             </Button>
           </div>
+        ) : loading ? (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          </div>
+        ) : peerBooks.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-12">등록된 교재가 없습니다.</p>
         ) : (
           <>
             {peerBooks.length > 1 && (
@@ -88,12 +113,14 @@ export default function PeerReviewSheet({
             )}
 
             <div className="flex-1 overflow-y-auto">
-              {selectedBook ? (
-                <p className="text-sm text-muted-foreground text-center py-12">
-                  동차생 회독표 열람 기능 준비 중
-                </p>
+              {selectedBookId ? (
+                <ReviewGrid
+                  bookId={selectedBookId}
+                  userId={peerId}
+                  readOnly
+                />
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-12">교재 데이터가 없습니다.</p>
+                <p className="text-sm text-muted-foreground text-center py-12">교재를 선택하세요.</p>
               )}
             </div>
           </>
