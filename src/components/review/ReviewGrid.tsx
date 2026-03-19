@@ -563,6 +563,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                                 )}
                               </div>
                             </td>
+                          )}
                           {q.rounds.map((round, rIdx) => (
                             <td key={rIdx} className="p-0 border-b border-r border-border last:border-r-0">
                               <ReviewCell
