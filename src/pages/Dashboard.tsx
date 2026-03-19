@@ -3,22 +3,14 @@ import DashboardHeader, { getDDay } from "@/components/dashboard/DashboardHeader
 import SubjectProgressCard from "@/components/dashboard/SubjectProgressCard";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Clock } from "lucide-react";
+import { BookOpen, Plus, Check } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-function ResultBadge({ result }: { result: string }) {
-  const map: Record<string, { label: string; cls: string }> = {
-    correct: { label: "O", cls: "text-emerald-600" },
-    half: { label: "△", cls: "text-amber-500" },
-    wrong: { label: "X", cls: "text-destructive" },
-  };
-  const r = map[result] || map.wrong;
-  return <span className={`text-sm font-bold ${r.cls}`}>{r.label}</span>;
-}
-
 export default function Dashboard() {
-  const { subjectProgress, recentAttempts, userBooks, allBooks, totalAttempts, loading, addBook } =
+  const { subjectProgress, userBooks, allBooks, totalAttempts, loading, addBook } =
     useDashboardData();
+
+  const userBookIds = new Set(userBooks.map((b) => b.bookId));
 
   return (
     <AppShell>
@@ -27,7 +19,7 @@ export default function Dashboard() {
       <Tabs defaultValue="subjects" className="px-4 pt-3 pb-8">
         <TabsList className="w-full">
           <TabsTrigger value="subjects" className="flex-1">과목</TabsTrigger>
-          <TabsTrigger value="recent" className="flex-1">최근활동</TabsTrigger>
+          <TabsTrigger value="addbooks" className="flex-1">교재추가</TabsTrigger>
         </TabsList>
 
         {/* 과목별 진도 */}
@@ -62,42 +54,64 @@ export default function Dashboard() {
           )}
         </TabsContent>
 
-        {/* 최근 활동 */}
-        <TabsContent value="recent" className="mt-3 space-y-1">
+        {/* 교재추가 */}
+        <TabsContent value="addbooks" className="mt-3 space-y-1">
           {loading ? (
-            Array.from({ length: 4 }).map((_, i) => (
+            Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className="h-14 w-full rounded-xl" />
             ))
-          ) : recentAttempts.length === 0 ? (
+          ) : allBooks.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground text-sm">
-              풀이 기록이 없습니다
+              등록 가능한 교재가 없습니다
             </div>
           ) : (
-            recentAttempts.map((a) => (
-              <div
-                key={a.id}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-accent/40 transition-colors"
-              >
-                <ResultBadge result={a.result} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-foreground truncate">
-                    {a.bookTitle} · {a.chapterTitle}
+            (() => {
+              // Group by subject
+              const subjectMap = new Map(subjectProgress.map((s) => [s.id, s.name]));
+              const grouped = new Map<string, typeof allBooks>();
+              allBooks.forEach((b) => {
+                if (!grouped.has(b.subjectId)) grouped.set(b.subjectId, []);
+                grouped.get(b.subjectId)!.push(b);
+              });
+
+              return Array.from(grouped.entries()).map(([subjectId, books]) => (
+                <div key={subjectId} className="space-y-1">
+                  <p className="text-[11px] font-medium text-muted-foreground px-1 pt-2">
+                    {subjectMap.get(subjectId) || "기타"}
                   </p>
-                  <p className="text-[11px] text-muted-foreground">
-                    {a.questionNumber}번
-                  </p>
-                </div>
-                <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                  <Clock className="h-3 w-3" />
-                  {new Date(a.attemptedAt).toLocaleDateString("ko-KR", {
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
+                  {books.map((book) => {
+                    const registered = userBookIds.has(book.id);
+                    return (
+                      <button
+                        key={book.id}
+                        onClick={() => !registered && addBook(book.id)}
+                        disabled={registered}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-left hover:bg-accent/40 transition-colors disabled:opacity-70 disabled:cursor-default"
+                      >
+                        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                          {registered ? (
+                            <Check className="h-4 w-4 text-primary" />
+                          ) : (
+                            <BookOpen className="h-4 w-4 text-primary" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">
+                            {book.title}
+                          </p>
+                          {book.author && (
+                            <p className="text-[11px] text-muted-foreground">{book.author}</p>
+                          )}
+                        </div>
+                        {!registered && (
+                          <Plus className="h-4 w-4 text-muted-foreground shrink-0" />
+                        )}
+                      </button>
+                    );
                   })}
                 </div>
-              </div>
-            ))
+              ));
+            })()
           )}
         </TabsContent>
       </Tabs>
