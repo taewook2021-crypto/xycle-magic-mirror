@@ -22,7 +22,6 @@ export interface PeerProfile {
   streak: number;
   books: { title: string; progress: number; total: number }[];
   heatmap: HeatmapDay[];
-  reviewBooks?: PeerBook[];
 }
 
 interface PeerProfileSheetProps {
