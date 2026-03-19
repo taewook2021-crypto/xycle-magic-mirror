@@ -564,7 +564,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                           <td className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-border", !isMobile && "sticky left-9 w-10", isActiveRow ? "bg-primary/5" : "bg-card")}>
                             <span className="text-[9px] text-muted-foreground">
                               {q.questionType === "past_exam" && (
-                                <span className="text-primary/70 font-semibold">{q.examYear ? `${q.examYear.slice(-2)}기` : "기출"}</span>
+                                <span className="text-primary/70 font-semibold">{q.examYear || "기출"}</span>
                               )}
                               {q.questionType === "practice" && <span className="font-semibold">실전</span>}
                               {q.questionType === "example" && <span className="font-semibold">예제</span>}
