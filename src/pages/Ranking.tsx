@@ -562,30 +562,44 @@ export default function Ranking() {
               </div>
 
               {!isMe && (
-                <Button
-                  variant={isFollowing ? "outline" : "default"}
-                  className="w-full"
-                  onClick={() => {
-                    if (isFollowing) {
-                      unfollowMutation.mutate(selectedUserId!);
-                    } else {
-                      followMutation.mutate(selectedUserId!);
-                    }
-                  }}
-                  disabled={followMutation.isPending || unfollowMutation.isPending}
-                >
-                  {isFollowing ? (
-                    <>
-                      <UserMinus className="h-4 w-4 mr-2" />
-                      언팔로우
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      팔로우
-                    </>
-                  )}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant={isFollowing ? "outline" : "default"}
+                    className="flex-1"
+                    onClick={() => {
+                      if (isFollowing) {
+                        unfollowMutation.mutate(selectedUserId!);
+                      } else {
+                        followMutation.mutate(selectedUserId!);
+                      }
+                    }}
+                    disabled={followMutation.isPending || unfollowMutation.isPending}
+                  >
+                    {isFollowing ? (
+                      <>
+                        <UserMinus className="h-4 w-4 mr-2" />
+                        언팔로우
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        팔로우
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setPeerReviewUserId(selectedUserId!);
+                      setPeerReviewName(selectedProfile?.display_name ?? "");
+                      setPeerReviewOpen(true);
+                      setSelectedUserId(null);
+                    }}
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
+                    회독표
+                  </Button>
+                </div>
               )}
             </div>
           )}
