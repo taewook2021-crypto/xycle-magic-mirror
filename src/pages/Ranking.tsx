@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,9 +8,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus, Target, Hash, CheckCircle, Calendar } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus, Target, Hash, CheckCircle, Calendar, Search, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import PeerReviewSheet from "@/components/dashboard/PeerReviewSheet";
 
 const EXAM_GROUPS = [
   { value: "all", label: "전체" },
@@ -34,6 +36,10 @@ export default function Ranking() {
   const [sortBy, setSortBy] = useState("today-count");
   const [selectedBook, setSelectedBook] = useState<string>("all");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [peerReviewOpen, setPeerReviewOpen] = useState(false);
+  const [peerReviewUserId, setPeerReviewUserId] = useState<string>("");
+  const [peerReviewName, setPeerReviewName] = useState("");
 
   // Fetch public profiles
   const { data: profiles } = useQuery({
@@ -204,6 +210,18 @@ export default function Ranking() {
     profiles?.forEach((p) => m.set(p.id, p));
     return m;
   }, [profiles]);
+
+  // Search results
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim() || !profiles) return [];
+    const q = searchQuery.trim().toLowerCase();
+    return profiles
+      .filter((p) => p.display_name.toLowerCase().includes(q) && p.id !== user?.id)
+      .slice(0, 8);
+  }, [searchQuery, profiles, user]);
+
+  const { profile } = useAuth();
+  const isMePublic = profile?.is_public ?? false;
 
   // Unified ranking based on sortBy
   const generalRanking = useMemo(() => {
@@ -396,6 +414,43 @@ export default function Ranking() {
           </Select>
         </div>
 
+        {/* User search */}
+        <div className="relative">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="닉네임으로 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-9 text-sm"
+            />
+          </div>
+          {searchResults.length > 0 && (
+            <div className="absolute z-20 top-full mt-1 w-full bg-popover border border-border rounded-lg shadow-lg overflow-hidden">
+              {searchResults.map((p) => (
+                <button
+                  key={p.id}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-accent transition-colors"
+                  onClick={() => {
+                    setSelectedUserId(p.id);
+                    setSearchQuery("");
+                  }}
+                >
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <User className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{p.display_name}</p>
+                    {p.exam_status && (
+                      <p className="text-[10px] text-muted-foreground">{p.exam_status}</p>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         <Tabs defaultValue="today">
           <TabsList className="w-full">
             <TabsTrigger value="today" className="flex-1 text-xs gap-1">
@@ -507,35 +562,58 @@ export default function Ranking() {
               </div>
 
               {!isMe && (
-                <Button
-                  variant={isFollowing ? "outline" : "default"}
-                  className="w-full"
-                  onClick={() => {
-                    if (isFollowing) {
-                      unfollowMutation.mutate(selectedUserId!);
-                    } else {
-                      followMutation.mutate(selectedUserId!);
-                    }
-                  }}
-                  disabled={followMutation.isPending || unfollowMutation.isPending}
-                >
-                  {isFollowing ? (
-                    <>
-                      <UserMinus className="h-4 w-4 mr-2" />
-                      언팔로우
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      팔로우
-                    </>
-                  )}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant={isFollowing ? "outline" : "default"}
+                    className="flex-1"
+                    onClick={() => {
+                      if (isFollowing) {
+                        unfollowMutation.mutate(selectedUserId!);
+                      } else {
+                        followMutation.mutate(selectedUserId!);
+                      }
+                    }}
+                    disabled={followMutation.isPending || unfollowMutation.isPending}
+                  >
+                    {isFollowing ? (
+                      <>
+                        <UserMinus className="h-4 w-4 mr-2" />
+                        언팔로우
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        팔로우
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setPeerReviewUserId(selectedUserId!);
+                      setPeerReviewName(selectedProfile?.display_name ?? "");
+                      setPeerReviewOpen(true);
+                      setSelectedUserId(null);
+                    }}
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
+                    회독표
+                  </Button>
+                </div>
               )}
             </div>
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Peer review sheet */}
+      <PeerReviewSheet
+        open={peerReviewOpen}
+        onOpenChange={setPeerReviewOpen}
+        peerName={peerReviewName}
+        peerId={peerReviewUserId}
+        isMePublic={isMePublic}
+      />
     </AppShell>
   );
 }

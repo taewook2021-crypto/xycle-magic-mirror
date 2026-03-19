@@ -33,14 +33,17 @@ interface ReviewGridProps {
   readOnly?: boolean;
   initialChapterId?: string;
   singleChapter?: boolean;
+  userId?: string; // view another user's data (read-only)
 }
 
 type SectionFilter = "all" | "example" | "past_exam" | "practice";
 type ActiveCell = { qIdx: number; rIdx: number } | null;
 
-export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, initialChapterId, singleChapter = false }: ReviewGridProps) {
+export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyProp = false, initialChapterId, singleChapter = false, userId }: ReviewGridProps) {
   const isMobile = useIsMobile();
   const { user } = useAuth();
+  const targetUserId = userId ?? user?.id;
+  const readOnly = readOnlyProp || !!userId;
   const [chapters, setChapters] = useState<ChapterInfo[]>([]);
   const [selectedChapterId, setSelectedChapterId] = useState<string | null>(initialChapterId ?? null);
   const [questions, setQuestions] = useState<QuestionRow[]>([]);
@@ -107,12 +110,12 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
 
       // Find the chapter with the most recent attempt
       let targetChapterId = mapped[0]?.id ?? null;
-      if (user && mapped.length > 0) {
+      if (targetUserId && mapped.length > 0) {
         const chapterIds = mapped.map((c) => c.id);
         const { data: recentAttempt } = await supabase
           .from("attempts")
           .select("question_id, attempted_at, questions!inner(chapter_id)")
-          .eq("user_id", user.id)
+          .eq("user_id", targetUserId)
           .in("questions.chapter_id", chapterIds)
           .order("attempted_at", { ascending: false })
           .limit(1);
@@ -143,25 +146,30 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
       if (qErr || !qData) return;
 
       let attemptsMap: Record<string, { result: CellResult; date?: string }[]> = {};
-      if (user && qData.length > 0) {
+      if (targetUserId && qData.length > 0) {
         const qIds = qData.map((q: any) => q.id);
+        const isViewingOther = !!userId;
         const [{ data: aData }, { data: skipData }, { data: memoData }] = await Promise.all([
           supabase
             .from("attempts")
             .select("question_id, result, round, attempted_at")
-            .eq("user_id", user.id)
+            .eq("user_id", targetUserId)
             .in("question_id", qIds)
             .order("round"),
-          supabase
-            .from("user_question_skips")
-            .select("question_id")
-            .eq("user_id", user.id)
-            .in("question_id", qIds),
-          supabase
-            .from("user_question_memos" as any)
-            .select("question_id, content")
-            .eq("user_id", user.id)
-            .in("question_id", qIds),
+          isViewingOther
+            ? Promise.resolve({ data: [] })
+            : supabase
+                .from("user_question_skips")
+                .select("question_id")
+                .eq("user_id", targetUserId)
+                .in("question_id", qIds),
+          isViewingOther
+            ? Promise.resolve({ data: [] })
+            : supabase
+                .from("user_question_memos" as any)
+                .select("question_id, content")
+                .eq("user_id", targetUserId)
+                .in("question_id", qIds),
         ]);
         if (aData) {
           for (const a of aData as any[]) {
@@ -204,7 +212,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
     };
     fetchQuestions();
     setActiveCell(null);
-  }, [selectedChapterId, user, roundCount]);
+  }, [selectedChapterId, targetUserId, roundCount]);
 
   // Toggle skip
   const toggleSkip = useCallback(
