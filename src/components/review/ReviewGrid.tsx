@@ -544,7 +544,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
               <tbody>
                 {groupedByType().map((group) => (
                   <>
-                    {sectionFilter === "all" && wrongCountFilter === 0 && (
+                    {sectionFilter === "all" && resultFilter === "off" && (
                       <tr key={`header-${group.type}`}>
                         <td colSpan={(isMobile ? 2 : 3) + roundCount} className="px-2 py-1 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider">
                           {typeLabels[group.type]} ({group.rows.length})
