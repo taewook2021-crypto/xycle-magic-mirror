@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus } from "lucide-react";
+import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus, Target, Hash, CheckCircle, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
@@ -20,10 +20,18 @@ const EXAM_GROUPS = [
   { value: "N시생", label: "N시생" },
 ];
 
+const SORT_OPTIONS = [
+  { value: "today-count", label: "오늘 풀이 수", icon: Hash },
+  { value: "total-count", label: "누적 풀이 수", icon: Target },
+  { value: "today-correct", label: "오늘 정답률", icon: CheckCircle },
+  { value: "streak", label: "연속 학습일", icon: Calendar },
+];
+
 export default function Ranking() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [group, setGroup] = useState("all");
+  const [sortBy, setSortBy] = useState("today-count");
   const [selectedBook, setSelectedBook] = useState<string>("all");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
@@ -96,7 +104,7 @@ export default function Ranking() {
     queryFn: async () => {
       const { data } = await supabase
         .from("attempts")
-        .select("user_id, question_id")
+        .select("user_id, question_id, result")
         .gte("attempted_at", todayStart);
       return data ?? [];
     },
@@ -127,7 +135,7 @@ export default function Ranking() {
     queryFn: async () => {
       const { data } = await supabase
         .from("attempts")
-        .select("user_id, question_id");
+        .select("user_id, question_id, attempted_at");
       return data ?? [];
     },
   });
@@ -197,25 +205,113 @@ export default function Ranking() {
     return m;
   }, [profiles]);
 
-  // Today's ranking
-  const todayRanking = useMemo(() => {
-    if (!todayAttempts) return [];
-    const counts = new Map<string, number>();
-    todayAttempts.forEach((a) => {
-      if (profileMap.has(a.user_id)) {
-        counts.set(a.user_id, (counts.get(a.user_id) ?? 0) + 1);
-      }
-    });
-    return Array.from(counts.entries())
-      .map(([userId, count]) => ({
-        userId,
-        name: profileMap.get(userId)?.display_name ?? "?",
-        examStatus: profileMap.get(userId)?.exam_status ?? "",
-        count,
-        isMe: userId === user?.id,
-      }))
-      .sort((a, b) => b.count - a.count);
-  }, [todayAttempts, profileMap, user]);
+  // Unified ranking based on sortBy
+  const generalRanking = useMemo(() => {
+    if (sortBy === "today-count") {
+      if (!todayAttempts) return [];
+      const counts = new Map<string, number>();
+      todayAttempts.forEach((a) => {
+        if (profileMap.has(a.user_id)) {
+          counts.set(a.user_id, (counts.get(a.user_id) ?? 0) + 1);
+        }
+      });
+      return Array.from(counts.entries())
+        .map(([userId, count]) => ({
+          userId,
+          name: profileMap.get(userId)?.display_name ?? "?",
+          examStatus: profileMap.get(userId)?.exam_status ?? "",
+          value: count,
+          label: `${count}문제`,
+          isMe: userId === user?.id,
+        }))
+        .sort((a, b) => b.value - a.value);
+    }
+
+    if (sortBy === "total-count") {
+      if (!allAttempts) return [];
+      const counts = new Map<string, number>();
+      allAttempts.forEach((a) => {
+        if (profileMap.has(a.user_id)) {
+          counts.set(a.user_id, (counts.get(a.user_id) ?? 0) + 1);
+        }
+      });
+      return Array.from(counts.entries())
+        .map(([userId, count]) => ({
+          userId,
+          name: profileMap.get(userId)?.display_name ?? "?",
+          examStatus: profileMap.get(userId)?.exam_status ?? "",
+          value: count,
+          label: `${count}문제`,
+          isMe: userId === user?.id,
+        }))
+        .sort((a, b) => b.value - a.value);
+    }
+
+    if (sortBy === "today-correct") {
+      if (!todayAttempts) return [];
+      const stats = new Map<string, { correct: number; total: number }>();
+      todayAttempts.forEach((a) => {
+        if (profileMap.has(a.user_id)) {
+          const s = stats.get(a.user_id) ?? { correct: 0, total: 0 };
+          s.total++;
+          if (a.result === "correct") s.correct++;
+          stats.set(a.user_id, s);
+        }
+      });
+      return Array.from(stats.entries())
+        .filter(([, s]) => s.total >= 5)
+        .map(([userId, s]) => {
+          const pct = Math.round((s.correct / s.total) * 100);
+          return {
+            userId,
+            name: profileMap.get(userId)?.display_name ?? "?",
+            examStatus: profileMap.get(userId)?.exam_status ?? "",
+            value: pct,
+            label: `${pct}% (${s.correct}/${s.total})`,
+            isMe: userId === user?.id,
+          };
+        })
+        .sort((a, b) => b.value - a.value);
+    }
+
+    if (sortBy === "streak") {
+      if (!allAttempts) return [];
+      const userDates = new Map<string, Set<string>>();
+      allAttempts.forEach((a) => {
+        if (profileMap.has(a.user_id)) {
+          if (!userDates.has(a.user_id)) userDates.set(a.user_id, new Set());
+          userDates.get(a.user_id)!.add(a.attempted_at.slice(0, 10));
+        }
+      });
+      const today = new Date();
+      return Array.from(userDates.entries())
+        .map(([userId, dates]) => {
+          let streak = 0;
+          const d = new Date(today);
+          while (true) {
+            const key = d.toISOString().slice(0, 10);
+            if (dates.has(key)) {
+              streak++;
+              d.setDate(d.getDate() - 1);
+            } else {
+              break;
+            }
+          }
+          return {
+            userId,
+            name: profileMap.get(userId)?.display_name ?? "?",
+            examStatus: profileMap.get(userId)?.exam_status ?? "",
+            value: streak,
+            label: `${streak}일`,
+            isMe: userId === user?.id,
+          };
+        })
+        .filter((r) => r.value > 0)
+        .sort((a, b) => b.value - a.value);
+    }
+
+    return [];
+  }, [sortBy, todayAttempts, allAttempts, profileMap, user]);
 
   // Book-based ranking
   const bookRanking = useMemo(() => {
@@ -313,10 +409,25 @@ export default function Ranking() {
           </TabsList>
 
           <TabsContent value="today" className="space-y-2 mt-3">
-            {todayRanking.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">아직 오늘 풀이 기록이 없습니다.</p>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="h-8 text-xs w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value} className="text-xs">
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {generalRanking.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                {sortBy === "today-correct" ? "오늘 5문제 이상 푼 사용자가 없습니다." : "풀이 기록이 없습니다."}
+              </p>
             ) : (
-              todayRanking.map((r, i) => (
+              generalRanking.map((r, i) => (
                 <RankCard key={r.userId} userId={r.userId} rank={i} isMe={r.isMe}>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">
@@ -327,7 +438,7 @@ export default function Ranking() {
                       <span className="text-[10px] text-muted-foreground">{r.examStatus}</span>
                     )}
                   </div>
-                  <span className="text-sm font-semibold text-foreground">{r.count}문제</span>
+                  <span className="text-sm font-semibold text-foreground">{r.label}</span>
                 </RankCard>
               ))
             )}
