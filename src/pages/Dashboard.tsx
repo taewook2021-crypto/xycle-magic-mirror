@@ -1,148 +1,134 @@
-import { useState, useEffect, useCallback, useRef } from "react";
 import AppShell from "@/components/layout/AppShell";
-import TimerHeader from "@/components/dashboard/TimerHeader";
-import SubjectTimer, { type StudySubject } from "@/components/dashboard/SubjectTimer";
-import AddSubjectSheet from "@/components/dashboard/AddSubjectSheet";
-import { Plus } from "lucide-react";
+import DashboardHeader, { getDDay } from "@/components/dashboard/DashboardHeader";
+import SubjectProgressCard from "@/components/dashboard/SubjectProgressCard";
+import { useDashboardData } from "@/hooks/useDashboardData";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { BookOpen, Clock } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const STORAGE_KEY = "xycle_timer_v1";
-const D_DAY_TARGET = new Date("2026-11-14"); // CPA 시험일 하드코딩
-
-function getDDay() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const diff = Math.ceil((D_DAY_TARGET.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  return Math.max(0, diff);
-}
-
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-interface SavedState {
-  date: string;
-  subjects: StudySubject[];
-}
-
-function loadState(): StudySubject[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed: SavedState = JSON.parse(raw);
-    if (parsed.date !== todayKey()) {
-      // New day — reset elapsed but keep subjects
-      return parsed.subjects.map((s) => ({ ...s, elapsed: 0 }));
-    }
-    return parsed.subjects;
-  } catch {
-    return [];
-  }
-}
-
-function saveState(subjects: StudySubject[]) {
-  const state: SavedState = { date: todayKey(), subjects };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+function ResultBadge({ result }: { result: string }) {
+  const map: Record<string, { label: string; cls: string }> = {
+    correct: { label: "O", cls: "text-emerald-600" },
+    half: { label: "△", cls: "text-amber-500" },
+    wrong: { label: "X", cls: "text-destructive" },
+  };
+  const r = map[result] || map.wrong;
+  return <span className={`text-sm font-bold ${r.cls}`}>{r.label}</span>;
 }
 
 export default function Dashboard() {
-  const [subjects, setSubjects] = useState<StudySubject[]>(loadState);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Save to localStorage on change
-  useEffect(() => {
-    saveState(subjects);
-  }, [subjects]);
-
-  // Timer tick
-  useEffect(() => {
-    if (activeId) {
-      intervalRef.current = setInterval(() => {
-        setSubjects((prev) =>
-          prev.map((s) => (s.id === activeId ? { ...s, elapsed: s.elapsed + 1 } : s))
-        );
-      }, 1000);
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [activeId]);
-
-  const totalSeconds = subjects.reduce((sum, s) => sum + s.elapsed, 0);
-
-  const handleToggle = useCallback((id: string) => {
-    setActiveId((prev) => (prev === id ? null : id));
-  }, []);
-
-  const handleAdd = useCallback((name: string, color: string) => {
-    setSubjects((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), name, color, elapsed: 0 },
-    ]);
-  }, []);
-
-  const handleDelete = useCallback(
-    (id: string) => {
-      if (activeId === id) setActiveId(null);
-      setSubjects((prev) => prev.filter((s) => s.id !== id));
-    },
-    [activeId]
-  );
+  const { subjectProgress, recentAttempts, userBooks, totalAttempts, loading } =
+    useDashboardData();
 
   return (
     <AppShell>
-      <TimerHeader dDay={getDDay()} totalSeconds={totalSeconds} />
+      <DashboardHeader dDay={getDDay()} totalAttempts={totalAttempts} />
 
-      <Tabs defaultValue="timer" className="px-4 pt-3 pb-8">
+      <Tabs defaultValue="subjects" className="px-4 pt-3 pb-8">
         <TabsList className="w-full">
-          <TabsTrigger value="timer" className="flex-1">타이머</TabsTrigger>
-          <TabsTrigger value="todo" className="flex-1">To-do</TabsTrigger>
+          <TabsTrigger value="subjects" className="flex-1">과목</TabsTrigger>
           <TabsTrigger value="books" className="flex-1">교재</TabsTrigger>
+          <TabsTrigger value="recent" className="flex-1">최근활동</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="timer" className="mt-3 space-y-1">
-          {subjects.map((subject) => (
-            <SubjectTimer
-              key={subject.id}
-              subject={subject}
-              isActive={activeId === subject.id}
-              onToggle={() => handleToggle(subject.id)}
-              onDelete={() => handleDelete(subject.id)}
-              onRename={() => {}}
-            />
-          ))}
-
-          {subjects.length === 0 && (
+        {/* 과목별 진도 */}
+        <TabsContent value="subjects" className="mt-3 space-y-1">
+          {loading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-20 w-full rounded-xl" />
+            ))
+          ) : subjectProgress.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground text-sm">
-              과목을 추가하고 공부를 시작하세요
+              등록된 과목이 없습니다
             </div>
+          ) : (
+            subjectProgress.map((sp, i) => (
+              <SubjectProgressCard
+                key={sp.id}
+                name={sp.name}
+                attempted={sp.attempted}
+                total={sp.totalQuestions}
+                correctRate={
+                  sp.attempted > 0
+                    ? Math.round((sp.correct / sp.attempted) * 100)
+                    : 0
+                }
+                colorIndex={i}
+              />
+            ))
           )}
-
-          <button
-            onClick={() => setSheetOpen(true)}
-            className="flex items-center gap-2 w-full px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-accent/40 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            과목 추가
-          </button>
         </TabsContent>
 
-        <TabsContent value="todo">
-          <div className="text-center py-16 text-muted-foreground text-sm">
-            준비 중입니다
-          </div>
+        {/* 내 교재 */}
+        <TabsContent value="books" className="mt-3 space-y-1">
+          {loading ? (
+            Array.from({ length: 2 }).map((_, i) => (
+              <Skeleton key={i} className="h-16 w-full rounded-xl" />
+            ))
+          ) : userBooks.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground text-sm">
+              추가한 교재가 없습니다
+            </div>
+          ) : (
+            userBooks.map((b) => (
+              <div
+                key={b.id}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-accent/40 transition-colors"
+              >
+                <BookOpen className="h-4 w-4 text-muted-foreground shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {b.title}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {b.subjectName}
+                    {b.author && ` · ${b.author}`}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
         </TabsContent>
 
-        <TabsContent value="books">
-          <div className="text-center py-16 text-muted-foreground text-sm">
-            준비 중입니다
-          </div>
+        {/* 최근 활동 */}
+        <TabsContent value="recent" className="mt-3 space-y-1">
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-14 w-full rounded-xl" />
+            ))
+          ) : recentAttempts.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground text-sm">
+              풀이 기록이 없습니다
+            </div>
+          ) : (
+            recentAttempts.map((a) => (
+              <div
+                key={a.id}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-accent/40 transition-colors"
+              >
+                <ResultBadge result={a.result} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-foreground truncate">
+                    {a.bookTitle} · {a.chapterTitle}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {a.questionNumber}번
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  {new Date(a.attemptedAt).toLocaleDateString("ko-KR", {
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </div>
+              </div>
+            ))
+          )}
         </TabsContent>
       </Tabs>
-
-      <AddSubjectSheet open={sheetOpen} onOpenChange={setSheetOpen} onAdd={handleAdd} />
     </AppShell>
   );
 }
