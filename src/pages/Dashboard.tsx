@@ -1,161 +1,148 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import AppShell from "@/components/layout/AppShell";
-import PeerComparisonCard from "@/components/dashboard/PeerComparisonCard";
-import TodayStatsCard from "@/components/dashboard/TodayStatsCard";
-import LiveFeed, { type BookFeedItem } from "@/components/dashboard/LiveFeed";
-import ActivityStream, { type ActivityItem, type PeerAvgProgress } from "@/components/dashboard/ActivityStream";
-import DashboardHero from "@/components/dashboard/DashboardHero";
-import ReferralBanner from "@/components/dashboard/ReferralBanner";
-import LockedInsight from "@/components/dashboard/LockedInsight";
-import NicknameSetup from "@/components/NicknameSetup";
-import { useAuth } from "@/hooks/useAuth";
-import { useReferral } from "@/hooks/useReferral";
-import { Switch } from "@/components/ui/switch";
-import { type PeerChapter } from "@/components/dashboard/PeerReviewSheet";
+import TimerHeader from "@/components/dashboard/TimerHeader";
+import SubjectTimer, { type StudySubject } from "@/components/dashboard/SubjectTimer";
+import AddSubjectSheet from "@/components/dashboard/AddSubjectSheet";
+import { Plus } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-const mockHero = {
-  displayName: "수험생",
-  todaySolved: 32,
-  streak: 12,
-  avgDiff: 14,
-};
+const STORAGE_KEY = "xycle_timer_v1";
+const D_DAY_TARGET = new Date("2026-11-14"); // CPA 시험일 하드코딩
 
-const mockStats = {
-  todaySolved: 32,
-  weeklySolved: 207,
-  streak: 12,
-  accuracyTrend: 14,
-};
+function getDDay() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diff = Math.ceil((D_DAY_TARGET.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  return Math.max(0, diff);
+}
 
-const mockWeekData = [
-  { day: "월", me: 28, avg: 22 },
-  { day: "화", me: 35, avg: 20 },
-  { day: "수", me: 18, avg: 24 },
-  { day: "목", me: 32, avg: 19 },
-  { day: "금", me: 40, avg: 25 },
-  { day: "토", me: 22, avg: 18 },
-  { day: "일", me: 32, avg: 18 },
-];
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
 
-const mockActivities: ActivityItem[] = [
-  { id: "a1", userName: "김O현", bookTitle: "세법개론", chapterTitle: "Ch.3 부가가치세", minutesAgo: 2, isLive: true },
-  { id: "a2", userName: "박O수", bookTitle: "중급회계 연습서", chapterTitle: "Ch.7 유형자산", minutesAgo: 5, isLive: true },
-  { id: "a3", userName: "최O영", bookTitle: "원가관리회계", chapterTitle: "Ch.2 개별원가", minutesAgo: 8, isLive: true },
-  { id: "a4", userName: "이O준", bookTitle: "세법개론", chapterTitle: "Ch.5 소득세", questionCount: 15, minutesAgo: 12, isLive: false },
-  { id: "a5", userName: "정O민", bookTitle: "중급회계 연습서", chapterTitle: "Ch.4 금융자산", questionCount: 22, minutesAgo: 18, isLive: false },
-  { id: "a6", userName: "한O서", bookTitle: "재무관리", chapterTitle: "Ch.1 화폐의 시간가치", questionCount: 8, minutesAgo: 25, isLive: false },
-  { id: "a7", userName: "김O현", bookTitle: "원가관리회계", chapterTitle: "Ch.6 표준원가", questionCount: 30, minutesAgo: 45, isLive: false },
-];
+interface SavedState {
+  date: string;
+  subjects: StudySubject[];
+}
 
-const mockPeerAvgProgress: PeerAvgProgress[] = [
-  { bookTitle: "중급회계 연습서", avgChapter: 5, totalChapters: 12, avgChapterTitle: "Ch.5 유가증권" },
-  { bookTitle: "세법개론", avgChapter: 3, totalChapters: 10, avgChapterTitle: "Ch.3 부가가치세" },
-  { bookTitle: "원가관리회계", avgChapter: 4, totalChapters: 8, avgChapterTitle: "Ch.4 종합원가" },
-  { bookTitle: "재무관리", avgChapter: 2, totalChapters: 9, avgChapterTitle: "Ch.2 자본예산" },
-];
+function loadState(): StudySubject[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed: SavedState = JSON.parse(raw);
+    if (parsed.date !== todayKey()) {
+      // New day — reset elapsed but keep subjects
+      return parsed.subjects.map((s) => ({ ...s, elapsed: 0 }));
+    }
+    return parsed.subjects;
+  } catch {
+    return [];
+  }
+}
 
-const makeMockChapters = (): PeerChapter[] => [
-  {
-    chapterId: "c1",
-    chapterTitle: "Ch.1 재무보고와 국제회계기준",
-    questions: Array.from({ length: 8 }, (_, i) => {
-      const results = ["correct", "wrong", "half", null] as ("correct" | "wrong" | "half" | null)[];
-      const results2 = ["correct", "wrong", null] as ("correct" | "wrong" | null)[];
-      return {
-        questionNumber: i + 1,
-        rounds: [
-          { result: results[Math.floor(Math.random() * 4)], date: "3/12" },
-          { result: results2[Math.floor(Math.random() * 3)], date: "3/14" },
-          { result: null },
-        ],
-      };
-    }),
-  },
-  {
-    chapterId: "c2",
-    chapterTitle: "Ch.2 재무제표",
-    questions: Array.from({ length: 10 }, (_, i) => {
-      const results = ["correct", "wrong", "half"] as ("correct" | "wrong" | "half")[];
-      return {
-        questionNumber: i + 1,
-        rounds: [
-          { result: results[Math.floor(Math.random() * 3)], date: "3/10" },
-          { result: null },
-          { result: null },
-        ],
-      };
-    }),
-  },
-];
-
-const mockBooks: BookFeedItem[] = [
-  {
-    bookTitle: "중급회계 연습서",
-    myCount: 18,
-    avgCount: 12,
-    peers: [
-      { id: "1", name: "김O현", count: 22, isPublic: true, streak: 15, weeklyCount: 140 },
-      { id: "2", name: "나", count: 18, isMe: true, isPublic: true },
-      { id: "3", name: "박O수", count: 15, isPublic: true, streak: 8, weeklyCount: 95 },
-      { id: "4", name: "이O준", count: 8, isPublic: false, streak: 3, weeklyCount: 42 },
-    ],
-  },
-  {
-    bookTitle: "세법개론",
-    myCount: 14,
-    avgCount: 16,
-    peers: [
-      { id: "5", name: "최O영", count: 25, isPublic: true, streak: 22, weeklyCount: 180 },
-      { id: "6", name: "박O수", count: 18, isPublic: true, streak: 8, weeklyCount: 95 },
-      { id: "7", name: "나", count: 14, isMe: true, isPublic: true },
-      { id: "8", name: "김O현", count: 10, isPublic: true, streak: 15, weeklyCount: 140 },
-    ],
-  },
-];
+function saveState(subjects: StudySubject[]) {
+  const state: SavedState = { date: todayKey(), subjects };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
 
 export default function Dashboard() {
-  const { user, profile, setProfile } = useAuth();
-  const [isMePublic, setIsMePublic] = useState(true);
-  const referral = useReferral();
+  const [subjects, setSubjects] = useState<StudySubject[]>(loadState);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const needsNickname = user && profile && !profile.display_name;
+  // Save to localStorage on change
+  useEffect(() => {
+    saveState(subjects);
+  }, [subjects]);
 
-  const handleGoPublic = () => setIsMePublic(true);
+  // Timer tick
+  useEffect(() => {
+    if (activeId) {
+      intervalRef.current = setInterval(() => {
+        setSubjects((prev) =>
+          prev.map((s) => (s.id === activeId ? { ...s, elapsed: s.elapsed + 1 } : s))
+        );
+      }, 1000);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [activeId]);
+
+  const totalSeconds = subjects.reduce((sum, s) => sum + s.elapsed, 0);
+
+  const handleToggle = useCallback((id: string) => {
+    setActiveId((prev) => (prev === id ? null : id));
+  }, []);
+
+  const handleAdd = useCallback((name: string, color: string) => {
+    setSubjects((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), name, color, elapsed: 0 },
+    ]);
+  }, []);
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      if (activeId === id) setActiveId(null);
+      setSubjects((prev) => prev.filter((s) => s.id !== id));
+    },
+    [activeId]
+  );
 
   return (
     <AppShell>
-      {needsNickname && (
-        <NicknameSetup
-          userId={user.id}
-          onComplete={(name) => setProfile({ ...profile!, display_name: name })}
-        />
-      )}
-      <div className="px-4 pt-5 pb-8 space-y-4">
-        <DashboardHero {...mockHero} />
+      <TimerHeader dDay={getDDay()} totalSeconds={totalSeconds} />
 
-        {/* Public toggle */}
-        <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5">
-          <div>
-            <p className="text-xs font-medium text-foreground">내 학습 공개</p>
-            <p className="text-[10px] text-muted-foreground">공개하면 다른 수험생의 회독표를 열람할 수 있어요</p>
+      <Tabs defaultValue="timer" className="px-4 pt-3 pb-8">
+        <TabsList className="w-full">
+          <TabsTrigger value="timer" className="flex-1">타이머</TabsTrigger>
+          <TabsTrigger value="todo" className="flex-1">To-do</TabsTrigger>
+          <TabsTrigger value="books" className="flex-1">교재</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="timer" className="mt-3 space-y-1">
+          {subjects.map((subject) => (
+            <SubjectTimer
+              key={subject.id}
+              subject={subject}
+              isActive={activeId === subject.id}
+              onToggle={() => handleToggle(subject.id)}
+              onDelete={() => handleDelete(subject.id)}
+              onRename={() => {}}
+            />
+          ))}
+
+          {subjects.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground text-sm">
+              과목을 추가하고 공부를 시작하세요
+            </div>
+          )}
+
+          <button
+            onClick={() => setSheetOpen(true)}
+            className="flex items-center gap-2 w-full px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-accent/40 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            과목 추가
+          </button>
+        </TabsContent>
+
+        <TabsContent value="todo">
+          <div className="text-center py-16 text-muted-foreground text-sm">
+            준비 중입니다
           </div>
-          <Switch checked={isMePublic} onCheckedChange={setIsMePublic} />
-        </div>
+        </TabsContent>
 
-        <ReferralBanner referral={referral} />
-        <ActivityStream activities={mockActivities} peerAvgProgress={mockPeerAvgProgress} />
-        <TodayStatsCard stats={mockStats} />
+        <TabsContent value="books">
+          <div className="text-center py-16 text-muted-foreground text-sm">
+            준비 중입니다
+          </div>
+        </TabsContent>
+      </Tabs>
 
-        {/* Tier 1: 주간 등수 변동 추이 — 1명 초대 필요 */}
-        <LockedInsight requiredTier={1} currentTier={referral.tier} unlockLabel="1명 초대하면 주간 비교 차트 해금">
-          <PeerComparisonCard weekData={mockWeekData} />
-        </LockedInsight>
-
-        {/* Tier 2: 파트별 세부 등수 + 상위권 닉네임 — 2명 초대 필요 */}
-        <LockedInsight requiredTier={2} currentTier={referral.tier} unlockLabel="2명 초대하면 세부 등수 해금">
-          <LiveFeed books={mockBooks} isMePublic={isMePublic} onGoPublic={handleGoPublic} />
-        </LockedInsight>
-      </div>
+      <AddSubjectSheet open={sheetOpen} onOpenChange={setSheetOpen} onAdd={handleAdd} />
     </AppShell>
   );
 }

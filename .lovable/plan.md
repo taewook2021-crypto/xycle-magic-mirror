@@ -1,59 +1,31 @@
 
 
-## 대시보드 → 학습 타이머 앱으로 전면 교체
+## 문제 원인
 
-스크린샷 참고 이미지를 기반으로 대시보드를 과목별 학습 타이머로 완전히 교체합니다.
+`seed_financial_management.sql`이 `INSERT INTO public.questions ...`를 실행하려 하지만, **테이블 자체가 아직 생성되지 않았습니다.** 프로젝트에 `CREATE TABLE` SQL이 전혀 없습니다. 즉, Supabase에 `subjects`, `books`, `chapters`, `questions` 등의 테이블이 만들어진 적이 없습니다.
 
-### UI 구성
+## 해결 계획
 
-```text
-┌─────────────────────────────┐
-│  D-241          통계  플래너  │  ← 다크 헤더 (시험 D-day)
-│        07:43:32             │  ← 오늘 총 학습시간 (큰 모노폰트)
-├─────────────────────────────┤
-│  타이머   To-do   교재       │  ← 탭 (타이머 탭이 메인)
-├─────────────────────────────┤
-│  ▶ 국어         01:14:34  ⋮ │  ← 과목별 타이머 리스트
-│  ▶ 영어         02:42:30  ⋮ │     각 과목 고유 컬러
-│  ▶ 수학         01:45:57  ⋮ │     재생 버튼 토글
-│  ▶ 과학탐구     02:19:32  ⋮ │
-│  ▶ 사회탐구     00:46:55  ⋮ │
-├─────────────────────────────┤
-│  과목 +                     │  ← 과목 추가 버튼
-├─────────────────────────────┤
-│  홈    그룹    더보기        │  ← 하단 네비 (기존 유지)
-└─────────────────────────────┘
-```
+**Migration 도구를 사용하여 테이블을 생성합니다.** 그 후 seed 데이터를 Insert 도구로 적재합니다.
 
-### 수정 파일 및 내용
+### Step 1 — 테이블 생성 (Migration)
 
-**1. `src/pages/Dashboard.tsx`** — 전면 교체
-- 기존 mock 데이터, Hero, Stats, LiveFeed, ActivityStream 등 모두 제거
-- 새로운 타이머 기반 대시보드로 교체
-- State: `subjects` 배열 (이름, 색상, 누적시간), `activeSubjectId`, `dDay` 카운트다운
-- `useEffect` + `setInterval`로 1초마다 활성 과목 시간 업데이트
-- 총 학습시간은 모든 과목 합산
+다음 테이블들을 순서대로 생성:
 
-**2. `src/components/dashboard/TimerHeader.tsx`** — 새 파일
-- 다크 배경 (bg-neutral-900), D-day 표시, 통계/플래너 링크
-- 총 학습시간을 큰 모노스페이스 폰트(IBM Plex Mono)로 표시
-- 주황/오렌지 계열 강조색
+1. `subjects` (id, name, display_order, created_at)
+2. `topics` (id, subject_id FK, name, display_order, created_at)
+3. `sub_topics` (id, topic_id FK, name, display_order, created_at)
+4. `books` (id, subject_id FK, title, author, display_order, created_at)
+5. `chapters` (id, book_id FK, title, chapter_number, display_order, created_at)
+6. `questions` (id, chapter_id FK, sub_topic_id FK nullable, question_number, correct_answer nullable, is_essential boolean, exam_year text nullable, created_at)
+7. `attempts` (id, user_id FK, question_id FK, student_answer, is_correct, attempted_at)
+8. `user_roles` (id, user_id FK, role app_role enum)
 
-**3. `src/components/dashboard/SubjectTimer.tsx`** — 새 파일
-- 과목 행 컴포넌트: 컬러 원형 재생 버튼, 과목명, 경과 시간, 더보기(⋮) 메뉴
-- 재생/일시정지 토글, 활성 시 배경 하이라이트
-- 과목별 고유 색상 (주황, 파랑, 초록, 보라 등)
+각 테이블에 RLS를 활성화하고 기본 정책을 설정합니다.
 
-**4. `src/components/dashboard/AddSubjectSheet.tsx`** — 새 파일
-- "과목 +" 클릭 시 바텀시트로 과목명 입력 + 색상 선택
+### Step 2 — Seed 데이터 삽입 (Insert 도구)
 
-**5. 탭 구조**
-- "타이머" 탭: 과목별 타이머 리스트 (메인)
-- "To-do" / "교재" 탭: 1차에서는 placeholder ("준비 중")
+`seed_financial_management.sql`의 내용을 Insert 도구로 실행하여 재무관리 과목, 교재, 챕터, 문항 데이터를 적재합니다.
 
-### 기술 세부사항
-- 타이머는 로컬 state로 동작 (DB 연동 없이 먼저 구현)
-- `localStorage`에 오늘 날짜 + 과목별 누적시간 저장하여 새로고침 시 복원
-- D-day는 Settings 페이지의 시험일 설정과 연동 가능하도록 설계 (1차에서는 하드코딩)
-- 기존 DashboardHero, TodayStatsCard, LiveFeed, ActivityStream 등 컴포넌트 파일은 삭제하지 않고 import만 제거
+기존 `seed.sql`의 중급회계 데이터도 함께 삽입합니다.
 
