@@ -8,6 +8,7 @@ import FloatingInputBar from "./FloatingInputBar";
 import InputGuide from "./InputGuide";
 import MemoPopover from "./MemoPopover";
 import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { QuestionType } from "@/integrations/supabase/types/database";
 
 interface QuestionRow {
