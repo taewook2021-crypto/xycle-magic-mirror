@@ -1,31 +1,56 @@
 
 
-## 문제 원인
+## 대시보드 전면 교체: 회독표 서비스 대시보드
 
-`seed_financial_management.sql`이 `INSERT INTO public.questions ...`를 실행하려 하지만, **테이블 자체가 아직 생성되지 않았습니다.** 프로젝트에 `CREATE TABLE` SQL이 전혀 없습니다. 즉, Supabase에 `subjects`, `books`, `chapters`, `questions` 등의 테이블이 만들어진 적이 없습니다.
+현재 localStorage 기반 타이머를 제거하고, Supabase에서 실제 학습 데이터를 불러와 과목별 학습 현황을 보여주는 대시보드로 교체합니다.
 
-## 해결 계획
+### UI 구성
 
-**Migration 도구를 사용하여 테이블을 생성합니다.** 그 후 seed 데이터를 Insert 도구로 적재합니다.
+```text
+┌─────────────────────────────┐
+│  D-241          통계  플래너  │  ← 다크 헤더
+│     총 풀이: 342문제         │  ← 오늘/전체 총 풀이 수
+├─────────────────────────────┤
+│  과목    교재    최근활동     │  ← 탭
+├─────────────────────────────┤
+│  ● 재무관리    128/250  51% │  ← 과목별 진도 (attempts/questions)
+│  ● 세법        87/200  44% │     프로그레스 바 + 정답률
+│  ● 회계학     127/300  42% │
+└─────────────────────────────┘
+```
 
-### Step 1 — 테이블 생성 (Migration)
+### 데이터 소스 (전부 Supabase)
 
-다음 테이블들을 순서대로 생성:
+- **과목 목록**: `subjects` 테이블에서 조회
+- **문제 수**: `questions` → `chapters` → `books` → `subjects` 조인으로 과목별 총 문제 수
+- **풀이 현황**: `attempts` 테이블에서 유저의 풀이 기록 집계 (풀이 수, 정답률)
+- **교재 목록**: `user_books` + `books` 조인으로 유저가 추가한 교재
+- **D-day**: 하드코딩 유지 (추후 Settings 연동)
 
-1. `subjects` (id, name, display_order, created_at)
-2. `topics` (id, subject_id FK, name, display_order, created_at)
-3. `sub_topics` (id, topic_id FK, name, display_order, created_at)
-4. `books` (id, subject_id FK, title, author, display_order, created_at)
-5. `chapters` (id, book_id FK, title, chapter_number, display_order, created_at)
-6. `questions` (id, chapter_id FK, sub_topic_id FK nullable, question_number, correct_answer nullable, is_essential boolean, exam_year text nullable, created_at)
-7. `attempts` (id, user_id FK, question_id FK, student_answer, is_correct, attempted_at)
-8. `user_roles` (id, user_id FK, role app_role enum)
+### 수정 파일
 
-각 테이블에 RLS를 활성화하고 기본 정책을 설정합니다.
+**1. `src/pages/Dashboard.tsx`** — 전면 재작성
+- localStorage/timer 로직 전부 제거
+- `useAuth`로 유저 확인 후 Supabase에서 데이터 fetch
+- 과목별 진도율 (풀이 문제 수 / 전체 문제 수), 정답률 표시
+- 탭: "과목" (과목별 진도), "교재" (내 교재 목록), "최근활동" (최근 풀이 기록)
 
-### Step 2 — Seed 데이터 삽입 (Insert 도구)
+**2. `src/components/dashboard/DashboardHeader.tsx`** — TimerHeader 대체
+- D-day + 총 풀이 문제 수 표시 (타이머 시간 대신)
+- 동일한 다크 테마 유지
 
-`seed_financial_management.sql`의 내용을 Insert 도구로 실행하여 재무관리 과목, 교재, 챕터, 문항 데이터를 적재합니다.
+**3. `src/components/dashboard/SubjectProgressCard.tsx`** — SubjectTimer 대체
+- 과목명, 풀이 수/전체 문제 수, 정답률, 프로그레스 바
+- 과목별 고유 색상 (subjects 테이블에 color 컬럼 추가 or 프론트에서 인덱스 기반 할당)
 
-기존 `seed.sql`의 중급회계 데이터도 함께 삽입합니다.
+**4. 기존 타이머 컴포넌트** — import 제거 (파일은 유지)
+- `TimerHeader.tsx`, `SubjectTimer.tsx`, `AddSubjectSheet.tsx`
+
+### DB 변경
+- 없음. 기존 테이블(`subjects`, `questions`, `attempts`, `user_books`, `books`, `chapters`)로 충분
+
+### 쿼리 설계
+- 과목별 총 문제 수: `questions` JOIN `chapters` JOIN `books` → `subject_id` 기준 group by
+- 유저 풀이 현황: `attempts` JOIN `questions` JOIN `chapters` JOIN `books` → `subject_id` 기준 집계
+- 최근 활동: `attempts` 최근 N건 + question/chapter/book 정보 조인
 
