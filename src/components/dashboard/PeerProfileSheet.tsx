@@ -154,7 +154,7 @@ export default function PeerProfileSheet({
         open={reviewOpen}
         onOpenChange={setReviewOpen}
         peerName={peer.name}
-        peerBooks={peer.reviewBooks ?? []}
+        peerId={peer.id}
         isMePublic={isMePublic}
         onGoPublic={onGoPublic}
       />
