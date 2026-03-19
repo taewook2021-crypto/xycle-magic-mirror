@@ -538,7 +538,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                               {q.questionType === "example" && <span className="font-semibold">예제</span>}
                             </span>
                           </td>
-                          <td className={cn("hidden md:table-cell sticky left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
+                          <td className={cn("hidden md:table-cell md:sticky md:left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
                             <div className="flex items-center gap-1">
                               <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{q.topic || "–"}</span>
                               {!readOnly && (
