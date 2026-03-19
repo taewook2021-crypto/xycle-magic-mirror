@@ -18,10 +18,11 @@ export const EXAM_LABEL = "2026 CPA 2차 · 6.27-28";
 
 export default function DashboardHeader({ dDay, totalAttempts }: DashboardHeaderProps) {
   return (
-    <div className="bg-[hsl(0,0%,12%)] text-white px-5 pt-6 pb-8 rounded-b-2xl">
-      <div className="flex items-center justify-between mb-6">
-        <span className="text-sm font-semibold tracking-tight text-white/90">
-          D-{dDay}
+    <div className="bg-primary text-primary-foreground px-5 pt-6 pb-8 rounded-b-2xl">
+      {/* Top row */}
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[11px] font-medium tracking-tight opacity-70">
+          {EXAM_LABEL}
         </span>
         <div className="flex items-center gap-4">
           <button className="flex items-center gap-1 text-xs text-white/60 hover:text-white/90 transition-colors">
