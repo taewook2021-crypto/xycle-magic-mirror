@@ -409,10 +409,25 @@ export default function Ranking() {
           </TabsList>
 
           <TabsContent value="today" className="space-y-2 mt-3">
-            {todayRanking.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">아직 오늘 풀이 기록이 없습니다.</p>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="h-8 text-xs w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value} className="text-xs">
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {generalRanking.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                {sortBy === "today-correct" ? "오늘 5문제 이상 푼 사용자가 없습니다." : "풀이 기록이 없습니다."}
+              </p>
             ) : (
-              todayRanking.map((r, i) => (
+              generalRanking.map((r, i) => (
                 <RankCard key={r.userId} userId={r.userId} rank={i} isMe={r.isMe}>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">
@@ -423,7 +438,7 @@ export default function Ranking() {
                       <span className="text-[10px] text-muted-foreground">{r.examStatus}</span>
                     )}
                   </div>
-                  <span className="text-sm font-semibold text-foreground">{r.count}문제</span>
+                  <span className="text-sm font-semibold text-foreground">{r.label}</span>
                 </RankCard>
               ))
             )}
