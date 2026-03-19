@@ -20,6 +20,13 @@ const EXAM_GROUPS = [
   { value: "N시생", label: "N시생" },
 ];
 
+const SORT_OPTIONS = [
+  { value: "today-count", label: "오늘 풀이 수", icon: Hash },
+  { value: "total-count", label: "누적 풀이 수", icon: Target },
+  { value: "today-correct", label: "오늘 정답률", icon: CheckCircle },
+  { value: "streak", label: "연속 학습일", icon: Calendar },
+];
+
 export default function Ranking() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
