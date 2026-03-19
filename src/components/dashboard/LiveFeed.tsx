@@ -151,7 +151,6 @@ export default function LiveFeed({ books = [], isMePublic = false, onGoPublic }:
         { title: "세법개론", progress: 80, total: 250 },
       ],
       heatmap: mockHeatmap(),
-      reviewBooks: makeMockReviewBooks(),
     });
     setSheetOpen(true);
   };
