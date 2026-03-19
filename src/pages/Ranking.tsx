@@ -1,13 +1,16 @@
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AppShell from "@/components/layout/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trophy, Flame, BookOpen } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 const EXAM_GROUPS = [
   { value: "all", label: "전체" },
@@ -19,8 +22,10 @@ const EXAM_GROUPS = [
 
 export default function Ranking() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [group, setGroup] = useState("all");
   const [selectedBook, setSelectedBook] = useState<string>("all");
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   // Fetch public profiles
   const { data: profiles } = useQuery({
@@ -31,6 +36,51 @@ export default function Ranking() {
         .select("id, display_name, exam_status, is_public")
         .eq("is_public", true);
       return data ?? [];
+    },
+  });
+
+  // Fetch my follows
+  const { data: myFollows } = useQuery({
+    queryKey: ["my-follows", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("follows")
+        .select("following_id")
+        .eq("follower_id", user!.id);
+      return new Set((data ?? []).map((f) => f.following_id));
+    },
+    enabled: !!user,
+  });
+
+  const followMutation = useMutation({
+    mutationFn: async (targetId: string) => {
+      const { error } = await supabase
+        .from("follows")
+        .insert({ follower_id: user!.id, following_id: targetId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["follower-count"] });
+      queryClient.invalidateQueries({ queryKey: ["following-count"] });
+      toast({ title: "팔로우했습니다." });
+    },
+  });
+
+  const unfollowMutation = useMutation({
+    mutationFn: async (targetId: string) => {
+      const { error } = await supabase
+        .from("follows")
+        .delete()
+        .eq("follower_id", user!.id)
+        .eq("following_id", targetId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["follower-count"] });
+      queryClient.invalidateQueries({ queryKey: ["following-count"] });
+      toast({ title: "언팔로우했습니다." });
     },
   });
 
@@ -72,7 +122,6 @@ export default function Ranking() {
     enabled: !!user,
   });
 
-  // Fetch all attempts (for book-based ranking)
   const { data: allAttempts } = useQuery({
     queryKey: ["ranking-all-attempts"],
     queryFn: async () => {
@@ -83,7 +132,6 @@ export default function Ranking() {
     },
   });
 
-  // Fetch questions with chapter→book mapping
   const { data: questions } = useQuery({
     queryKey: ["ranking-questions"],
     queryFn: async () => {
@@ -142,6 +190,13 @@ export default function Ranking() {
     return m;
   }, [filteredProfiles]);
 
+  // All profiles map (unfiltered) for sheet lookup
+  const allProfileMap = useMemo(() => {
+    const m = new Map<string, NonNullable<typeof profiles>[number]>();
+    profiles?.forEach((p) => m.set(p.id, p));
+    return m;
+  }, [profiles]);
+
   // Today's ranking
   const todayRanking = useMemo(() => {
     if (!todayAttempts) return [];
@@ -187,6 +242,45 @@ export default function Ranking() {
       .sort((a, b) => b.pct - a.pct);
   }, [allAttempts, selectedBook, questionToBook, questionsPerBook, profileMap, user]);
 
+  // Selected user for sheet
+  const selectedProfile = selectedUserId ? allProfileMap.get(selectedUserId) : null;
+  const isFollowing = myFollows?.has(selectedUserId ?? "") ?? false;
+  const isMe = selectedUserId === user?.id;
+
+  const handleUserClick = (userId: string) => {
+    if (userId !== user?.id) {
+      setSelectedUserId(userId);
+    }
+  };
+
+  // Rank card renderer
+  const RankCard = ({ userId, rank, isMe: cardIsMe, children }: {
+    userId: string;
+    rank: number;
+    isMe: boolean;
+    children: React.ReactNode;
+  }) => (
+    <Card
+      className={cn(
+        cardIsMe ? "ring-1 ring-primary" : "cursor-pointer hover:bg-accent/30 transition-colors",
+      )}
+      onClick={() => handleUserClick(userId)}
+    >
+      <CardContent className="flex items-center gap-3 py-3 px-4">
+        <span className={cn(
+          "w-6 text-center font-bold text-sm",
+          rank === 0 && "text-yellow-500",
+          rank === 1 && "text-gray-400",
+          rank === 2 && "text-amber-600",
+          rank > 2 && "text-muted-foreground"
+        )}>
+          {rank === 0 ? <Trophy className="h-4 w-4 mx-auto text-yellow-500" /> : rank + 1}
+        </span>
+        {children}
+      </CardContent>
+    </Card>
+  );
+
   return (
     <AppShell>
       <div className="max-w-lg mx-auto px-4 py-5 pb-24 md:pb-6 space-y-4">
@@ -223,29 +317,18 @@ export default function Ranking() {
               <p className="text-sm text-muted-foreground text-center py-8">아직 오늘 풀이 기록이 없습니다.</p>
             ) : (
               todayRanking.map((r, i) => (
-                <Card key={r.userId} className={cn(r.isMe && "ring-1 ring-primary")}>
-                  <CardContent className="flex items-center gap-3 py-3 px-4">
-                    <span className={cn(
-                      "w-6 text-center font-bold text-sm",
-                      i === 0 && "text-yellow-500",
-                      i === 1 && "text-gray-400",
-                      i === 2 && "text-amber-600",
-                      i > 2 && "text-muted-foreground"
-                    )}>
-                      {i === 0 ? <Trophy className="h-4 w-4 mx-auto text-yellow-500" /> : i + 1}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {r.name}
-                        {r.isMe && <span className="text-xs text-primary ml-1">(나)</span>}
-                      </p>
-                      {r.examStatus && (
-                        <span className="text-[10px] text-muted-foreground">{r.examStatus}</span>
-                      )}
-                    </div>
-                    <span className="text-sm font-semibold text-foreground">{r.count}문제</span>
-                  </CardContent>
-                </Card>
+                <RankCard key={r.userId} userId={r.userId} rank={i} isMe={r.isMe}>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {r.name}
+                      {r.isMe && <span className="text-xs text-primary ml-1">(나)</span>}
+                    </p>
+                    {r.examStatus && (
+                      <span className="text-[10px] text-muted-foreground">{r.examStatus}</span>
+                    )}
+                  </div>
+                  <span className="text-sm font-semibold text-foreground">{r.count}문제</span>
+                </RankCard>
               ))
             )}
           </TabsContent>
@@ -269,37 +352,79 @@ export default function Ranking() {
               <p className="text-sm text-muted-foreground text-center py-8">풀이 기록이 없습니다.</p>
             ) : (
               bookRanking.map((r, i) => (
-                <Card key={r.userId} className={cn(r.isMe && "ring-1 ring-primary")}>
-                  <CardContent className="flex items-center gap-3 py-3 px-4">
-                    <span className={cn(
-                      "w-6 text-center font-bold text-sm",
-                      i === 0 && "text-yellow-500",
-                      i === 1 && "text-gray-400",
-                      i === 2 && "text-amber-600",
-                      i > 2 && "text-muted-foreground"
-                    )}>
-                      {i + 1}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {r.name}
-                        {r.isMe && <span className="text-xs text-primary ml-1">(나)</span>}
-                      </p>
-                      {r.examStatus && (
-                        <span className="text-[10px] text-muted-foreground">{r.examStatus}</span>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm font-semibold text-foreground">{r.pct}%</span>
-                      <p className="text-[10px] text-muted-foreground">{r.solved}/{r.total}</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <RankCard key={r.userId} userId={r.userId} rank={i} isMe={r.isMe}>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {r.name}
+                      {r.isMe && <span className="text-xs text-primary ml-1">(나)</span>}
+                    </p>
+                    {r.examStatus && (
+                      <span className="text-[10px] text-muted-foreground">{r.examStatus}</span>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-semibold text-foreground">{r.pct}%</span>
+                    <p className="text-[10px] text-muted-foreground">{r.solved}/{r.total}</p>
+                  </div>
+                </RankCard>
               ))
             )}
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* User profile sheet */}
+      <Sheet open={!!selectedUserId} onOpenChange={(open) => !open && setSelectedUserId(null)}>
+        <SheetContent side="bottom" className="max-h-[50vh]">
+          <SheetHeader>
+            <SheetTitle className="text-sm">프로필</SheetTitle>
+          </SheetHeader>
+          {selectedProfile && (
+            <div className="mt-4 space-y-5">
+              <div className="flex items-center gap-4">
+                <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-7 w-7 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-base font-semibold text-foreground truncate">
+                    {selectedProfile.display_name}
+                  </p>
+                  {selectedProfile.exam_status && (
+                    <p className="text-xs text-muted-foreground">{selectedProfile.exam_status}</p>
+                  )}
+                </div>
+              </div>
+
+              {!isMe && (
+                <Button
+                  variant={isFollowing ? "outline" : "default"}
+                  className="w-full"
+                  onClick={() => {
+                    if (isFollowing) {
+                      unfollowMutation.mutate(selectedUserId!);
+                    } else {
+                      followMutation.mutate(selectedUserId!);
+                    }
+                  }}
+                  disabled={followMutation.isPending || unfollowMutation.isPending}
+                >
+                  {isFollowing ? (
+                    <>
+                      <UserMinus className="h-4 w-4 mr-2" />
+                      언팔로우
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      팔로우
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </AppShell>
   );
 }
