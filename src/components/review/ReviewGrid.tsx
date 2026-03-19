@@ -33,6 +33,7 @@ interface ReviewGridProps {
   readOnly?: boolean;
   initialChapterId?: string;
   singleChapter?: boolean;
+  userId?: string; // view another user's data (read-only)
 }
 
 type SectionFilter = "all" | "example" | "past_exam" | "practice";
