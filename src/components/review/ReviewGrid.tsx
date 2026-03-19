@@ -109,12 +109,12 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
 
       // Find the chapter with the most recent attempt
       let targetChapterId = mapped[0]?.id ?? null;
-      if (user && mapped.length > 0) {
+      if (targetUserId && mapped.length > 0) {
         const chapterIds = mapped.map((c) => c.id);
         const { data: recentAttempt } = await supabase
           .from("attempts")
           .select("question_id, attempted_at, questions!inner(chapter_id)")
-          .eq("user_id", user.id)
+          .eq("user_id", targetUserId)
           .in("questions.chapter_id", chapterIds)
           .order("attempted_at", { ascending: false })
           .limit(1);
