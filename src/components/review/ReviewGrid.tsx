@@ -487,20 +487,25 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
           📝
         </button>
         <div className="w-px h-4 bg-border mx-0.5" />
-        {[{ value: 1, label: "1✕" }, { value: 2, label: "2✕" }, { value: 3, label: "3✕+" }].map((item) => (
-          <button
-            key={item.value}
-            onClick={() => { setWrongCountFilter((v) => v === item.value ? 0 : item.value); setActiveCell(null); }}
-            className={cn(
-              "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
-              wrongCountFilter === item.value
-                ? "bg-destructive/15 text-destructive border-destructive/30"
-                : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
-            )}
-          >
-            {item.label}
-          </button>
-        ))}
+        <Select value={resultFilter} onValueChange={(v) => { setResultFilter(v); setActiveCell(null); }}>
+          <SelectTrigger className={cn(
+            "h-auto px-2 py-1 rounded-md text-[11px] font-medium border whitespace-nowrap w-auto min-w-0 gap-1 [&>svg]:h-3 [&>svg]:w-3",
+            resultFilter !== "off"
+              ? "bg-destructive/15 text-destructive border-destructive/30"
+              : "bg-secondary text-secondary-foreground border-border"
+          )}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="off">필터 없음</SelectItem>
+            <SelectItem value="wrong-1">1✕ 이상</SelectItem>
+            <SelectItem value="wrong-2">2✕ 이상</SelectItem>
+            <SelectItem value="wrong-3">3✕ 이상</SelectItem>
+            <SelectItem value="half-1">1△ 이상</SelectItem>
+            <SelectItem value="half-2">2△ 이상</SelectItem>
+            <SelectItem value="half-3">3△ 이상</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Floating input guide button */}
