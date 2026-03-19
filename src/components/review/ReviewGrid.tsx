@@ -518,7 +518,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                   <>
                     {sectionFilter === "all" && wrongCountFilter === 0 && (
                       <tr key={`header-${group.type}`}>
-                        <td colSpan={3 + roundCount} className="px-2 py-1 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider">
+                        <td colSpan={(isMobile ? 2 : 3) + roundCount} className="px-2 py-1 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider">
                           {typeLabels[group.type]} ({group.rows.length})
                         </td>
                       </tr>
@@ -530,7 +530,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                       return (
                         <tr key={q.questionId} className={cn("transition-colors", isSkipped && "opacity-40", isActiveRow ? "bg-primary/5" : "hover:bg-accent/20")}>
                           <td
-                            className={cn("md:sticky md:left-0 z-10 w-8 md:w-9 px-0.5 md:px-1 py-0 text-center border-b border-r border-border cursor-pointer select-none", isActiveRow ? "bg-primary/5" : "bg-card")}
+                            className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-border cursor-pointer select-none", !isMobile && "sticky left-0 w-9 px-1", isActiveRow ? "bg-primary/5" : "bg-card")}
                             onClick={() => toggleSkip(q.questionId)}
                           >
                             <span className={cn(
@@ -542,7 +542,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                               {q.questionNumber}
                             </span>
                           </td>
-                          <td className={cn("md:sticky md:left-9 z-10 w-9 md:w-10 px-0.5 py-0 text-center border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
+                          <td className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-border", !isMobile && "sticky left-9 w-10", isActiveRow ? "bg-primary/5" : "bg-card")}>
                             <span className="text-[9px] text-muted-foreground">
                               {q.questionType === "past_exam" && (
                                 <span className="text-primary/70 font-semibold">{q.examYear ? `${q.examYear.slice(-2)}기` : "기출"}</span>
@@ -551,17 +551,18 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                               {q.questionType === "example" && <span className="font-semibold">예제</span>}
                             </span>
                           </td>
-                          <td className={cn("hidden md:table-cell md:sticky md:left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{q.topic || "–"}</span>
-                              {!readOnly && (
-                                <MemoPopover
-                                  memo={memos[q.questionId] ?? ""}
-                                  onSave={(content) => saveMemo(q.questionId, content)}
-                                />
-                              )}
-                            </div>
-                          </td>
+                          {!isMobile && (
+                            <td className={cn("sticky left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
+                              <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{q.topic || "–"}</span>
+                                {!readOnly && (
+                                  <MemoPopover
+                                    memo={memos[q.questionId] ?? ""}
+                                    onSave={(content) => saveMemo(q.questionId, content)}
+                                  />
+                                )}
+                              </div>
+                            </td>
                           {q.rounds.map((round, rIdx) => (
                             <td key={rIdx} className="p-0 border-b border-r border-border last:border-r-0">
                               <ReviewCell
