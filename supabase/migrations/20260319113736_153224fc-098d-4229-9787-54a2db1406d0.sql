@@ -1,0 +1,1 @@
+UPDATE public.books SET title = '재무관리연습 8판' WHERE id = 'd1000000-0000-0000-0000-000000000001';
