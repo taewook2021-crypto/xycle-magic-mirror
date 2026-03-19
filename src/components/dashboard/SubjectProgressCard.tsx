@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import { ChevronRight, BookOpen, Plus, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -44,6 +45,7 @@ export default function SubjectProgressCard({
 }: SubjectProgressCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [adding, setAdding] = useState<string | null>(null);
+  const navigate = useNavigate();
   const color = getSubjectColor(colorIndex);
   const progress = total > 0 ? Math.round((attempted / total) * 100) : 0;
 
@@ -104,14 +106,15 @@ export default function SubjectProgressCard({
 
           {/* Registered books */}
           {myBooks.map((b) => (
-            <div
+            <button
               key={b.id}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-accent/30"
+              onClick={() => navigate(`/review/${b.bookId}`)}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-accent/30 w-full text-left hover:bg-accent/60 transition-colors"
             >
               <BookOpen className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
               <span className="text-sm text-foreground truncate flex-1">{b.title}</span>
-              <Check className="h-3.5 w-3.5 text-primary shrink-0" />
-            </div>
+              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+            </button>
           ))}
 
           {/* Unregistered books */}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import AppShell from "@/components/layout/AppShell";
@@ -16,10 +17,11 @@ interface UserBook {
 }
 
 export default function Review() {
+  const { bookId: routeBookId } = useParams<{ bookId?: string }>();
   const { user } = useAuth();
   const [userBooks, setUserBooks] = useState<UserBook[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(routeBookId || null);
   const [availableBooks, setAvailableBooks] = useState<{ id: string; title: string; author: string | null; subject_name: string }[]>([]);
 
   const fetchUserBooks = async () => {
