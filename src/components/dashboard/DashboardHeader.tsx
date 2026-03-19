@@ -47,13 +47,13 @@ export default function DashboardHeader({ dDay, totalAttempts }: DashboardHeader
       </div>
 
       <div className="text-center">
-        <p className="text-[11px] text-white/40 mb-1 tracking-wide">총 풀이</p>
+        <p className="text-[11px] opacity-50 mb-0.5 tracking-wide">총 풀이</p>
         <p
-          className="text-[42px] font-light tracking-[0.04em] leading-none"
+          className="text-lg font-medium tracking-tight leading-none"
           style={{ fontFamily: "'IBM Plex Mono', monospace" }}
         >
           {totalAttempts.toLocaleString()}
-          <span className="text-lg text-white/50 ml-1">문제</span>
+          <span className="text-sm opacity-60 ml-1">문제</span>
         </p>
       </div>
     </div>
