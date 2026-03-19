@@ -5,7 +5,7 @@ interface DashboardHeaderProps {
   totalAttempts: number;
 }
 
-const D_DAY_TARGET = new Date("2026-11-14");
+const D_DAY_TARGET = new Date("2026-06-27");
 
 export function getDDay() {
   const today = new Date();
@@ -14,33 +14,46 @@ export function getDDay() {
   return Math.max(0, diff);
 }
 
+export const EXAM_LABEL = "2026 CPA 2차 · 6.27-28";
+
 export default function DashboardHeader({ dDay, totalAttempts }: DashboardHeaderProps) {
   return (
-    <div className="bg-[hsl(0,0%,12%)] text-white px-5 pt-6 pb-8 rounded-b-2xl">
-      <div className="flex items-center justify-between mb-6">
-        <span className="text-sm font-semibold tracking-tight text-white/90">
-          D-{dDay}
+    <div className="bg-primary text-primary-foreground px-5 pt-6 pb-8 rounded-b-2xl">
+      {/* Top row */}
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[11px] font-medium tracking-tight opacity-70">
+          {EXAM_LABEL}
         </span>
         <div className="flex items-center gap-4">
-          <button className="flex items-center gap-1 text-xs text-white/60 hover:text-white/90 transition-colors">
+          <button className="flex items-center gap-1 text-xs opacity-60 hover:opacity-90 transition-colors">
             <BarChart3 className="h-3.5 w-3.5" />
             통계
           </button>
-          <button className="flex items-center gap-1 text-xs text-white/60 hover:text-white/90 transition-colors">
+          <button className="flex items-center gap-1 text-xs opacity-60 hover:opacity-90 transition-colors">
             <CalendarDays className="h-3.5 w-3.5" />
             플래너
           </button>
         </div>
       </div>
 
-      <div className="text-center">
-        <p className="text-[11px] text-white/40 mb-1 tracking-wide">총 풀이</p>
+      {/* D-day */}
+      <div className="text-center mb-2">
         <p
-          className="text-[42px] font-light tracking-[0.04em] leading-none"
+          className="text-[52px] font-bold tracking-tight leading-none"
+          style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+        >
+          D-{dDay}
+        </p>
+      </div>
+
+      <div className="text-center">
+        <p className="text-[11px] opacity-50 mb-0.5 tracking-wide">총 풀이</p>
+        <p
+          className="text-lg font-medium tracking-tight leading-none"
           style={{ fontFamily: "'IBM Plex Mono', monospace" }}
         >
           {totalAttempts.toLocaleString()}
-          <span className="text-lg text-white/50 ml-1">문제</span>
+          <span className="text-sm opacity-60 ml-1">문제</span>
         </p>
       </div>
     </div>
