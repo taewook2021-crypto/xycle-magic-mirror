@@ -58,9 +58,12 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
     if (sectionFilter !== "all" && q.questionType !== sectionFilter) return false;
     if (essentialOnly && !q.isEssential) return false;
     if (memoOnly && !(memos[q.questionId]?.trim())) return false;
-    if (wrongCountFilter > 0) {
-      const wrongCount = q.rounds.filter((r) => r.result === "wrong").length;
-      if (wrongCount < wrongCountFilter) return false;
+    if (resultFilter !== "off") {
+      const [type, countStr] = resultFilter.split("-");
+      const minCount = parseInt(countStr, 10);
+      const targetResult = type === "wrong" ? "wrong" : "half";
+      const count = q.rounds.filter((r) => r.result === targetResult).length;
+      if (count < minCount) return false;
     }
     return true;
   });
