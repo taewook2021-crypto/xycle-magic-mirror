@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Lock } from "lucide-react";
 import StudyHeatmap, { type HeatmapDay } from "./StudyHeatmap";
-import PeerReviewSheet, { type PeerBook } from "./PeerReviewSheet";
+import PeerReviewSheet from "./PeerReviewSheet";
 import { cn } from "@/lib/utils";
 
 export interface PeerProfile {
