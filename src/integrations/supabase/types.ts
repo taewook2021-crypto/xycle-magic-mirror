@@ -129,18 +129,21 @@ export type Database = {
         Row: {
           created_at: string
           display_name: string
+          exam_status: string | null
           id: string
           is_public: boolean
         }
         Insert: {
           created_at?: string
           display_name?: string
+          exam_status?: string | null
           id: string
           is_public?: boolean
         }
         Update: {
           created_at?: string
           display_name?: string
+          exam_status?: string | null
           id?: string
           is_public?: boolean
         }

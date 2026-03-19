@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN exam_status text DEFAULT NULL;
