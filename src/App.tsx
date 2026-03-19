@@ -28,6 +28,7 @@ const App = () => (
               <Route path="/" element={<StudentLogin />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/review" element={<ProtectedRoute><Review /></ProtectedRoute>} />
+              <Route path="/review/:bookId" element={<ProtectedRoute><Review /></ProtectedRoute>} />
               <Route path="/grading" element={<ProtectedRoute><Grading /></ProtectedRoute>} />
               <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />

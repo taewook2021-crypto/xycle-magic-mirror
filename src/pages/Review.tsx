@@ -17,10 +17,11 @@ interface UserBook {
 }
 
 export default function Review() {
+  const { bookId: routeBookId } = useParams<{ bookId?: string }>();
   const { user } = useAuth();
   const [userBooks, setUserBooks] = useState<UserBook[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(routeBookId || null);
   const [availableBooks, setAvailableBooks] = useState<{ id: string; title: string; author: string | null; subject_name: string }[]>([]);
 
   const fetchUserBooks = async () => {
