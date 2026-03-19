@@ -104,7 +104,7 @@ export default function Ranking() {
     queryFn: async () => {
       const { data } = await supabase
         .from("attempts")
-        .select("user_id, question_id")
+        .select("user_id, question_id, result")
         .gte("attempted_at", todayStart);
       return data ?? [];
     },
