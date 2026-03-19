@@ -486,13 +486,13 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
         <div className="text-center py-8 text-xs text-muted-foreground">해당 유형의 문항이 없습니다.</div>
       ) : (
         <div className={cn("border border-border rounded-lg overflow-hidden bg-card", activeCell && "mb-16")}>
-          <div className="md:overflow-x-auto">
+          <div className="overflow-x-hidden md:overflow-x-auto">
             <table className="w-full border-collapse text-xs table-fixed md:table-auto">
               <thead>
                 <tr className="bg-muted/60">
-                  <th className="sticky left-0 z-10 bg-muted/60 w-8 md:w-9 px-0.5 md:px-1 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border text-[10px]">#</th>
-                  <th className="sticky left-8 md:left-9 z-10 bg-muted/60 w-9 md:w-10 px-0.5 md:px-1 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border text-[10px]">유형</th>
-                  <th className="hidden md:table-cell sticky left-[76px] z-10 bg-muted/60 min-w-[100px] px-2 py-1.5 text-left font-semibold text-muted-foreground border-b border-r border-border text-[10px]">주제</th>
+                  <th className="md:sticky md:left-0 z-10 bg-muted/60 w-8 md:w-9 px-0.5 md:px-1 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border text-[10px]">#</th>
+                  <th className="md:sticky md:left-9 z-10 bg-muted/60 w-9 md:w-10 px-0.5 md:px-1 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border text-[10px]">유형</th>
+                  <th className="hidden md:table-cell md:sticky md:left-[76px] z-10 bg-muted/60 min-w-[100px] px-2 py-1.5 text-left font-semibold text-muted-foreground border-b border-r border-border text-[10px]">주제</th>
                   {Array.from({ length: roundCount }, (_, i) => (
                     <th key={i} className="px-0.5 md:px-1 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border last:border-r-0 text-[10px]">
                       {i + 1}회
