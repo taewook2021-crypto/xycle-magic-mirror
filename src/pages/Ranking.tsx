@@ -211,6 +211,18 @@ export default function Ranking() {
     return m;
   }, [profiles]);
 
+  // Search results
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim() || !profiles) return [];
+    const q = searchQuery.trim().toLowerCase();
+    return profiles
+      .filter((p) => p.display_name.toLowerCase().includes(q) && p.id !== user?.id)
+      .slice(0, 8);
+  }, [searchQuery, profiles, user]);
+
+  const { profile } = useAuth();
+  const isMePublic = profile?.is_public ?? false;
+
   // Unified ranking based on sortBy
   const generalRanking = useMemo(() => {
     if (sortBy === "today-count") {
