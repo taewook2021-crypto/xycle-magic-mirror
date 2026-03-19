@@ -1,7 +1,7 @@
 import { Progress } from "@/components/ui/progress";
 
 const SUBJECT_COLORS = [
-  "11 82% 54%",   // 주황
+  "174 50% 50%",   // 틸
   "217 91% 60%",  // 파랑
   "142 72% 40%",  // 초록
   "270 67% 55%",  // 보라
