@@ -605,6 +605,15 @@ export default function Ranking() {
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Peer review sheet */}
+      <PeerReviewSheet
+        open={peerReviewOpen}
+        onOpenChange={setPeerReviewOpen}
+        peerName={peerReviewName}
+        peerId={peerReviewUserId}
+        isMePublic={isMePublic}
+      />
     </AppShell>
   );
 }
