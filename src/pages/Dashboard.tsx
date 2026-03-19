@@ -7,7 +7,7 @@ import { BookOpen, Plus, Check } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
-  const { subjectProgress, userBooks, allBooks, totalAttempts, loading, addBook } =
+  const { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, loading, addBook } =
     useDashboardData();
 
   const userBookIds = new Set(userBooks.map((b) => b.bookId));
@@ -22,11 +22,10 @@ export default function Dashboard() {
           <TabsTrigger value="addbooks" className="flex-1">교재추가</TabsTrigger>
         </TabsList>
 
-        {/* 과목별 진도 */}
-        <TabsContent value="subjects" className="mt-3 space-y-1">
+        <TabsContent value="subjects" className="mt-3 space-y-2">
           {loading ? (
             Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-20 w-full rounded-xl" />
+              <Skeleton key={i} className="h-24 w-full rounded-xl" />
             ))
           ) : subjectProgress.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground text-sm">
@@ -38,23 +37,14 @@ export default function Dashboard() {
                 key={sp.id}
                 subjectId={sp.id}
                 name={sp.name}
-                attempted={sp.attempted}
-                total={sp.totalQuestions}
-                correctRate={
-                  sp.attempted > 0
-                    ? Math.round((sp.correct / sp.attempted) * 100)
-                    : 0
-                }
                 colorIndex={i}
                 userBooks={userBooks}
-                availableBooks={allBooks}
-                onAddBook={addBook}
+                bookProgress={bookProgress}
               />
             ))
           )}
         </TabsContent>
 
-        {/* 교재추가 */}
         <TabsContent value="addbooks" className="mt-3 space-y-1">
           {loading ? (
             Array.from({ length: 3 }).map((_, i) => (
@@ -66,7 +56,6 @@ export default function Dashboard() {
             </div>
           ) : (
             (() => {
-              // Group by subject
               const subjectMap = new Map(subjectProgress.map((s) => [s.id, s.name]));
               const grouped = new Map<string, typeof allBooks>();
               allBooks.forEach((b) => {
@@ -96,9 +85,7 @@ export default function Dashboard() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">
-                            {book.title}
-                          </p>
+                          <p className="text-sm font-medium text-foreground truncate">{book.title}</p>
                           {book.author && (
                             <p className="text-[11px] text-muted-foreground">{book.author}</p>
                           )}
