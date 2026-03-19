@@ -48,7 +48,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("all");
   const [essentialOnly, setEssentialOnly] = useState(false);
   const [memoOnly, setMemoOnly] = useState(false);
-  const [wrongCountFilter, setWrongCountFilter] = useState<number>(0); // 0 = off, 1+ = at least N wrong
+  const [resultFilter, setResultFilter] = useState<string>("off"); // "off" | "wrong-1" | "wrong-2" | "wrong-3" | "half-1" | "half-2" | "half-3"
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
   const [skippedSet, setSkippedSet] = useState<Set<string>>(new Set());
   const [memos, setMemos] = useState<Record<string, string>>({});
