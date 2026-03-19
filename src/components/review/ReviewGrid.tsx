@@ -417,64 +417,65 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {!singleChapter && <ChapterTabs chapters={chapters} selectedId={selectedChapterId} onSelect={setSelectedChapterId} />}
 
-      {/* Section filter pills */}
-      <div className="flex items-center gap-1.5">
-        {sectionFilters.map((f) => (
+      {/* Section filter pills - horizontally scrollable on mobile */}
+      <div className="overflow-x-auto -mx-2 px-2 scrollbar-hide">
+        <div className="flex items-center gap-1 min-w-max">
+          {sectionFilters.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => { setSectionFilter(f.key); setActiveCell(null); }}
+              className={cn(
+                "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
+                sectionFilter === f.key
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+          <div className="w-px h-4 bg-border mx-0.5" />
           <button
-            key={f.key}
-            onClick={() => { setSectionFilter(f.key); setActiveCell(null); }}
+            onClick={() => { setEssentialOnly((v) => !v); setActiveCell(null); }}
             className={cn(
-              "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border",
-              sectionFilter === f.key
+              "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
+              essentialOnly
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
             )}
           >
-            {f.label}
+            ★ 필수
           </button>
-        ))}
-        <div className="w-px h-4 bg-border mx-1" />
-        <button
-          onClick={() => { setEssentialOnly((v) => !v); setActiveCell(null); }}
-          className={cn(
-            "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border",
-            essentialOnly
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
-          )}
-        >
-          ★ 필수
-        </button>
-        <button
-          onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
-          className={cn(
-            "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border",
-            memoOnly
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
-          )}
-        >
-          📝 메모
-        </button>
-        <div className="w-px h-4 bg-border mx-1" />
-        <span className="text-[11px] text-muted-foreground font-medium">오답횟수:</span>
-        {[{ value: 1, label: "1회" }, { value: 2, label: "2회" }, { value: 3, label: "3회 이상" }].map((item) => (
           <button
-            key={item.value}
-            onClick={() => { setWrongCountFilter((v) => v === item.value ? 0 : item.value); setActiveCell(null); }}
+            onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
             className={cn(
-              "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border",
-              wrongCountFilter === item.value
-                ? "bg-destructive/15 text-destructive border-destructive/30"
+              "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
+              memoOnly
+                ? "bg-primary text-primary-foreground border-primary"
                 : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
             )}
           >
-            {item.label}
+            📝
           </button>
-        ))}
+          <div className="w-px h-4 bg-border mx-0.5" />
+          {[{ value: 1, label: "1✕" }, { value: 2, label: "2✕" }, { value: 3, label: "3✕+" }].map((item) => (
+            <button
+              key={item.value}
+              onClick={() => { setWrongCountFilter((v) => v === item.value ? 0 : item.value); setActiveCell(null); }}
+              className={cn(
+                "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
+                wrongCountFilter === item.value
+                  ? "bg-destructive/15 text-destructive border-destructive/30"
+                  : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
+              )}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Floating input guide button */}
@@ -489,12 +490,12 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
             <table className="w-full border-collapse text-xs">
               <thead>
                 <tr className="bg-muted/60">
-                  <th className="sticky left-0 z-10 bg-muted/60 w-10 px-2 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border">#</th>
-                  <th className="sticky left-10 z-10 bg-muted/60 w-12 px-1 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border">유형</th>
-                  <th className="sticky left-[88px] z-10 bg-muted/60 min-w-[120px] px-2 py-2 text-left font-semibold text-muted-foreground border-b border-r border-border">주제</th>
+                  <th className="sticky left-0 z-10 bg-muted/60 w-9 px-1 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border text-[10px]">#</th>
+                  <th className="sticky left-9 z-10 bg-muted/60 w-10 px-1 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border text-[10px]">유형</th>
+                  <th className="hidden md:table-cell sticky left-[76px] z-10 bg-muted/60 min-w-[100px] px-2 py-1.5 text-left font-semibold text-muted-foreground border-b border-r border-border text-[10px]">주제</th>
                   {Array.from({ length: roundCount }, (_, i) => (
-                    <th key={i} className="px-2 py-2 text-center font-semibold text-muted-foreground border-b border-r border-border last:border-r-0 min-w-[56px]">
-                      {i + 1}회독
+                    <th key={i} className="px-1 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border last:border-r-0 min-w-[44px] text-[10px]">
+                      {i + 1}회
                     </th>
                   ))}
                 </tr>
@@ -504,7 +505,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                   <>
                     {sectionFilter === "all" && wrongCountFilter === 0 && (
                       <tr key={`header-${group.type}`}>
-                        <td colSpan={3 + roundCount} className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider">
+                        <td colSpan={3 + roundCount} className="px-2 py-1 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider">
                           {typeLabels[group.type]} ({group.rows.length})
                         </td>
                       </tr>
@@ -516,11 +517,11 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                       return (
                         <tr key={q.questionId} className={cn("transition-colors", isSkipped && "opacity-40", isActiveRow ? "bg-primary/5" : "hover:bg-accent/20")}>
                           <td
-                            className={cn("sticky left-0 z-10 w-10 px-2 py-0 text-center border-b border-r border-border cursor-pointer select-none", isActiveRow ? "bg-primary/5" : "bg-card")}
+                            className={cn("sticky left-0 z-10 w-9 px-1 py-0 text-center border-b border-r border-border cursor-pointer select-none", isActiveRow ? "bg-primary/5" : "bg-card")}
                             onClick={() => toggleSkip(q.questionId)}
                           >
                             <span className={cn(
-                              "font-medium text-xs transition-all",
+                              "font-medium text-[11px] transition-all",
                               isSkipped && "line-through decoration-2 text-muted-foreground",
                               !isSkipped && q.isEssential ? "text-primary font-bold" : !isSkipped ? "text-foreground" : "",
                               !isSkipped && "hover:text-muted-foreground/70"
@@ -528,18 +529,18 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                               {q.questionNumber}
                             </span>
                           </td>
-                          <td className={cn("sticky left-10 z-10 w-12 px-1 py-0 text-center border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
+                          <td className={cn("sticky left-9 z-10 w-10 px-0.5 py-0 text-center border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
                             <span className="text-[9px] text-muted-foreground">
                               {q.questionType === "past_exam" && (
-                                <span className="text-primary/70 font-semibold">{q.examYear ? `${q.examYear.slice(-2)}기출` : "기출"}</span>
+                                <span className="text-primary/70 font-semibold">{q.examYear ? `${q.examYear.slice(-2)}기` : "기출"}</span>
                               )}
                               {q.questionType === "practice" && <span className="font-semibold">실전</span>}
                               {q.questionType === "example" && <span className="font-semibold">예제</span>}
                             </span>
                           </td>
-                          <td className={cn("sticky left-[88px] z-10 min-w-[120px] px-2 py-0 text-left border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
+                          <td className={cn("hidden md:table-cell sticky left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
                             <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-muted-foreground truncate max-w-[140px]">{q.topic || "–"}</span>
+                              <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{q.topic || "–"}</span>
                               {!readOnly && (
                                 <MemoPopover
                                   memo={memos[q.questionId] ?? ""}

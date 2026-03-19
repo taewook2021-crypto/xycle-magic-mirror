@@ -1,10 +1,9 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Grid3X3, PenLine, BarChart3, Settings } from "lucide-react";
+import { LayoutDashboard, PenLine, BarChart3, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const tabs = [
   { path: "/dashboard", icon: LayoutDashboard, label: "대시보드" },
-  { path: "/review", icon: Grid3X3, label: "회독표" },
   { path: "/grading", icon: PenLine, label: "채점" },
   { path: "/analytics", icon: BarChart3, label: "분석" },
   { path: "/settings", icon: Settings, label: "설정" },
