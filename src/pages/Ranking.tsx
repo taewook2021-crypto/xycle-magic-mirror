@@ -205,25 +205,113 @@ export default function Ranking() {
     return m;
   }, [profiles]);
 
-  // Today's ranking
-  const todayRanking = useMemo(() => {
-    if (!todayAttempts) return [];
-    const counts = new Map<string, number>();
-    todayAttempts.forEach((a) => {
-      if (profileMap.has(a.user_id)) {
-        counts.set(a.user_id, (counts.get(a.user_id) ?? 0) + 1);
-      }
-    });
-    return Array.from(counts.entries())
-      .map(([userId, count]) => ({
-        userId,
-        name: profileMap.get(userId)?.display_name ?? "?",
-        examStatus: profileMap.get(userId)?.exam_status ?? "",
-        count,
-        isMe: userId === user?.id,
-      }))
-      .sort((a, b) => b.count - a.count);
-  }, [todayAttempts, profileMap, user]);
+  // Unified ranking based on sortBy
+  const generalRanking = useMemo(() => {
+    if (sortBy === "today-count") {
+      if (!todayAttempts) return [];
+      const counts = new Map<string, number>();
+      todayAttempts.forEach((a) => {
+        if (profileMap.has(a.user_id)) {
+          counts.set(a.user_id, (counts.get(a.user_id) ?? 0) + 1);
+        }
+      });
+      return Array.from(counts.entries())
+        .map(([userId, count]) => ({
+          userId,
+          name: profileMap.get(userId)?.display_name ?? "?",
+          examStatus: profileMap.get(userId)?.exam_status ?? "",
+          value: count,
+          label: `${count}문제`,
+          isMe: userId === user?.id,
+        }))
+        .sort((a, b) => b.value - a.value);
+    }
+
+    if (sortBy === "total-count") {
+      if (!allAttempts) return [];
+      const counts = new Map<string, number>();
+      allAttempts.forEach((a) => {
+        if (profileMap.has(a.user_id)) {
+          counts.set(a.user_id, (counts.get(a.user_id) ?? 0) + 1);
+        }
+      });
+      return Array.from(counts.entries())
+        .map(([userId, count]) => ({
+          userId,
+          name: profileMap.get(userId)?.display_name ?? "?",
+          examStatus: profileMap.get(userId)?.exam_status ?? "",
+          value: count,
+          label: `${count}문제`,
+          isMe: userId === user?.id,
+        }))
+        .sort((a, b) => b.value - a.value);
+    }
+
+    if (sortBy === "today-correct") {
+      if (!todayAttempts) return [];
+      const stats = new Map<string, { correct: number; total: number }>();
+      todayAttempts.forEach((a) => {
+        if (profileMap.has(a.user_id)) {
+          const s = stats.get(a.user_id) ?? { correct: 0, total: 0 };
+          s.total++;
+          if (a.result === "correct") s.correct++;
+          stats.set(a.user_id, s);
+        }
+      });
+      return Array.from(stats.entries())
+        .filter(([, s]) => s.total >= 5)
+        .map(([userId, s]) => {
+          const pct = Math.round((s.correct / s.total) * 100);
+          return {
+            userId,
+            name: profileMap.get(userId)?.display_name ?? "?",
+            examStatus: profileMap.get(userId)?.exam_status ?? "",
+            value: pct,
+            label: `${pct}% (${s.correct}/${s.total})`,
+            isMe: userId === user?.id,
+          };
+        })
+        .sort((a, b) => b.value - a.value);
+    }
+
+    if (sortBy === "streak") {
+      if (!allAttempts) return [];
+      const userDates = new Map<string, Set<string>>();
+      allAttempts.forEach((a) => {
+        if (profileMap.has(a.user_id)) {
+          if (!userDates.has(a.user_id)) userDates.set(a.user_id, new Set());
+          userDates.get(a.user_id)!.add(a.attempted_at.slice(0, 10));
+        }
+      });
+      const today = new Date();
+      return Array.from(userDates.entries())
+        .map(([userId, dates]) => {
+          let streak = 0;
+          const d = new Date(today);
+          while (true) {
+            const key = d.toISOString().slice(0, 10);
+            if (dates.has(key)) {
+              streak++;
+              d.setDate(d.getDate() - 1);
+            } else {
+              break;
+            }
+          }
+          return {
+            userId,
+            name: profileMap.get(userId)?.display_name ?? "?",
+            examStatus: profileMap.get(userId)?.exam_status ?? "",
+            value: streak,
+            label: `${streak}일`,
+            isMe: userId === user?.id,
+          };
+        })
+        .filter((r) => r.value > 0)
+        .sort((a, b) => b.value - a.value);
+    }
+
+    return [];
+  }, [sortBy, todayAttempts, allAttempts, profileMap, user]);
 
   // Book-based ranking
   const bookRanking = useMemo(() => {
