@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 const COLORS = [
-  { label: "주황", value: "11 82% 54%" },
+  { label: "틸", value: "174 50% 50%" },
   { label: "파랑", value: "217 91% 60%" },
   { label: "초록", value: "142 72% 40%" },
   { label: "보라", value: "270 67% 55%" },
