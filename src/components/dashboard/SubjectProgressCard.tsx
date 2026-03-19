@@ -45,6 +45,7 @@ export default function SubjectProgressCard({
 }: SubjectProgressCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [adding, setAdding] = useState<string | null>(null);
+  const navigate = useNavigate();
   const color = getSubjectColor(colorIndex);
   const progress = total > 0 ? Math.round((attempted / total) * 100) : 0;
 
