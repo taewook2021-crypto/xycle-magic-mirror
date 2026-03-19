@@ -5,7 +5,7 @@ interface DashboardHeaderProps {
   totalAttempts: number;
 }
 
-const D_DAY_TARGET = new Date("2026-11-14");
+const D_DAY_TARGET = new Date("2026-06-27");
 
 export function getDDay() {
   const today = new Date();
@@ -13,6 +13,8 @@ export function getDDay() {
   const diff = Math.ceil((D_DAY_TARGET.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   return Math.max(0, diff);
 }
+
+export const EXAM_LABEL = "2026 CPA 2차 · 6.27-28";
 
 export default function DashboardHeader({ dDay, totalAttempts }: DashboardHeaderProps) {
   return (
