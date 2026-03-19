@@ -413,7 +413,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
 
   // Group by type
   const groupedByType = () => {
-    if (sectionFilter !== "all" || wrongCountFilter > 0) return [{ type: sectionFilter !== "all" ? sectionFilter : "all", rows: filtered }];
+    if (sectionFilter !== "all" || resultFilter !== "off") return [{ type: sectionFilter !== "all" ? sectionFilter : "all", rows: filtered }];
     const groups: { type: string; rows: QuestionRow[] }[] = [];
     const typeOrder: QuestionType[] = ["example", "past_exam", "practice"];
     for (const t of typeOrder) {
