@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsMobile } from "@/hooks/use-mobile";
 import ReviewCell, { type CellResult } from "./ReviewCell";
 import ChapterTabs from "./ChapterTabs";
 import FloatingInputBar from "./FloatingInputBar";
@@ -37,6 +38,7 @@ type SectionFilter = "all" | "example" | "past_exam" | "practice";
 type ActiveCell = { qIdx: number; rIdx: number } | null;
 
 export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, initialChapterId, singleChapter = false }: ReviewGridProps) {
+  const isMobile = useIsMobile();
   const { user } = useAuth();
   const [chapters, setChapters] = useState<ChapterInfo[]>([]);
   const [selectedChapterId, setSelectedChapterId] = useState<string | null>(initialChapterId ?? null);
@@ -486,13 +488,24 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
         <div className="text-center py-8 text-xs text-muted-foreground">해당 유형의 문항이 없습니다.</div>
       ) : (
         <div className={cn("border border-border rounded-lg overflow-hidden bg-card", activeCell && "mb-16")}>
-          <div className="overflow-x-hidden md:overflow-x-auto">
-            <table className="w-full border-collapse text-xs table-fixed md:table-auto">
+          <div className={isMobile ? "overflow-hidden" : "overflow-x-auto"}>
+            <table className={cn("w-full border-collapse text-xs", isMobile && "table-fixed")}>
+              {isMobile && (
+                <colgroup>
+                  <col style={{ width: "15%" }} />
+                  <col style={{ width: "17%" }} />
+                  {Array.from({ length: roundCount }, (_, i) => (
+                    <col key={i} style={{ width: `${Math.floor(68 / roundCount)}%` }} />
+                  ))}
+                </colgroup>
+              )}
               <thead>
                 <tr className="bg-muted/60">
-                  <th className="md:sticky md:left-0 z-10 bg-muted/60 w-8 md:w-9 px-0.5 md:px-1 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border text-[10px]">#</th>
-                  <th className="md:sticky md:left-9 z-10 bg-muted/60 w-9 md:w-10 px-0.5 md:px-1 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border text-[10px]">유형</th>
-                  <th className="hidden md:table-cell md:sticky md:left-[76px] z-10 bg-muted/60 min-w-[100px] px-2 py-1.5 text-left font-semibold text-muted-foreground border-b border-r border-border text-[10px]">주제</th>
+                  <th className={cn("z-10 bg-muted/60 px-0.5 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border text-[10px]", !isMobile && "sticky left-0 w-9 px-1")}>#</th>
+                  <th className={cn("z-10 bg-muted/60 px-0.5 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border text-[10px]", !isMobile && "sticky left-9 w-10 px-1")}>유형</th>
+                  {!isMobile && (
+                    <th className="sticky left-[76px] z-10 bg-muted/60 min-w-[100px] px-2 py-1.5 text-left font-semibold text-muted-foreground border-b border-r border-border text-[10px]">주제</th>
+                  )}
                   {Array.from({ length: roundCount }, (_, i) => (
                     <th key={i} className="px-0.5 md:px-1 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border last:border-r-0 text-[10px]">
                       {i + 1}회
@@ -505,7 +518,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                   <>
                     {sectionFilter === "all" && wrongCountFilter === 0 && (
                       <tr key={`header-${group.type}`}>
-                        <td colSpan={3 + roundCount} className="px-2 py-1 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider">
+                        <td colSpan={(isMobile ? 2 : 3) + roundCount} className="px-2 py-1 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider">
                           {typeLabels[group.type]} ({group.rows.length})
                         </td>
                       </tr>
@@ -517,7 +530,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                       return (
                         <tr key={q.questionId} className={cn("transition-colors", isSkipped && "opacity-40", isActiveRow ? "bg-primary/5" : "hover:bg-accent/20")}>
                           <td
-                            className={cn("md:sticky md:left-0 z-10 w-8 md:w-9 px-0.5 md:px-1 py-0 text-center border-b border-r border-border cursor-pointer select-none", isActiveRow ? "bg-primary/5" : "bg-card")}
+                            className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-border cursor-pointer select-none", !isMobile && "sticky left-0 w-9 px-1", isActiveRow ? "bg-primary/5" : "bg-card")}
                             onClick={() => toggleSkip(q.questionId)}
                           >
                             <span className={cn(
@@ -529,7 +542,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                               {q.questionNumber}
                             </span>
                           </td>
-                          <td className={cn("md:sticky md:left-9 z-10 w-9 md:w-10 px-0.5 py-0 text-center border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
+                          <td className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-border", !isMobile && "sticky left-9 w-10", isActiveRow ? "bg-primary/5" : "bg-card")}>
                             <span className="text-[9px] text-muted-foreground">
                               {q.questionType === "past_exam" && (
                                 <span className="text-primary/70 font-semibold">{q.examYear ? `${q.examYear.slice(-2)}기` : "기출"}</span>
@@ -538,17 +551,19 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
                               {q.questionType === "example" && <span className="font-semibold">예제</span>}
                             </span>
                           </td>
-                          <td className={cn("hidden md:table-cell md:sticky md:left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{q.topic || "–"}</span>
-                              {!readOnly && (
-                                <MemoPopover
-                                  memo={memos[q.questionId] ?? ""}
-                                  onSave={(content) => saveMemo(q.questionId, content)}
-                                />
-                              )}
-                            </div>
-                          </td>
+                          {!isMobile && (
+                            <td className={cn("sticky left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
+                              <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{q.topic || "–"}</span>
+                                {!readOnly && (
+                                  <MemoPopover
+                                    memo={memos[q.questionId] ?? ""}
+                                    onSave={(content) => saveMemo(q.questionId, content)}
+                                  />
+                                )}
+                              </div>
+                            </td>
+                          )}
                           {q.rounds.map((round, rIdx) => (
                             <td key={rIdx} className="p-0 border-b border-r border-border last:border-r-0">
                               <ReviewCell
