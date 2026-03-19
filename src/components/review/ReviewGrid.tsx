@@ -422,62 +422,60 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
     <div className="space-y-2">
       {!singleChapter && <ChapterTabs chapters={chapters} selectedId={selectedChapterId} onSelect={setSelectedChapterId} />}
 
-      {/* Section filter pills - horizontally scrollable on mobile */}
-      <div className="overflow-x-auto -mx-2 px-2 scrollbar-hide">
-        <div className="flex items-center gap-1 min-w-max">
-          {sectionFilters.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => { setSectionFilter(f.key); setActiveCell(null); }}
-              className={cn(
-                "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
-                sectionFilter === f.key
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
-              )}
-            >
-              {f.label}
-            </button>
-          ))}
-          <div className="w-px h-4 bg-border mx-0.5" />
+      {/* Section filters */}
+      <div className="flex flex-wrap items-center gap-1">
+        {sectionFilters.map((f) => (
           <button
-            onClick={() => { setEssentialOnly((v) => !v); setActiveCell(null); }}
+            key={f.key}
+            onClick={() => { setSectionFilter(f.key); setActiveCell(null); }}
             className={cn(
               "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
-              essentialOnly
+              sectionFilter === f.key
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
             )}
           >
-            ★ 필수
+            {f.label}
           </button>
+        ))}
+        <div className="w-px h-4 bg-border mx-0.5" />
+        <button
+          onClick={() => { setEssentialOnly((v) => !v); setActiveCell(null); }}
+          className={cn(
+            "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
+            essentialOnly
+              ? "bg-primary text-primary-foreground border-primary"
+              : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
+          )}
+        >
+          ★ 필수
+        </button>
+        <button
+          onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
+          className={cn(
+            "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
+            memoOnly
+              ? "bg-primary text-primary-foreground border-primary"
+              : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
+          )}
+        >
+          📝
+        </button>
+        <div className="w-px h-4 bg-border mx-0.5" />
+        {[{ value: 1, label: "1✕" }, { value: 2, label: "2✕" }, { value: 3, label: "3✕+" }].map((item) => (
           <button
-            onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
+            key={item.value}
+            onClick={() => { setWrongCountFilter((v) => v === item.value ? 0 : item.value); setActiveCell(null); }}
             className={cn(
               "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
-              memoOnly
-                ? "bg-primary text-primary-foreground border-primary"
+              wrongCountFilter === item.value
+                ? "bg-destructive/15 text-destructive border-destructive/30"
                 : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
             )}
           >
-            📝
+            {item.label}
           </button>
-          <div className="w-px h-4 bg-border mx-0.5" />
-          {[{ value: 1, label: "1✕" }, { value: 2, label: "2✕" }, { value: 3, label: "3✕+" }].map((item) => (
-            <button
-              key={item.value}
-              onClick={() => { setWrongCountFilter((v) => v === item.value ? 0 : item.value); setActiveCell(null); }}
-              className={cn(
-                "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
-                wrongCountFilter === item.value
-                  ? "bg-destructive/15 text-destructive border-destructive/30"
-                  : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
-              )}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
+        ))}
       </div>
 
       {/* Floating input guide button */}
