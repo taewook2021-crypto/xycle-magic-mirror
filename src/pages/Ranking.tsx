@@ -31,6 +31,7 @@ export default function Ranking() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [group, setGroup] = useState("all");
+  const [sortBy, setSortBy] = useState("today-count");
   const [selectedBook, setSelectedBook] = useState<string>("all");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
