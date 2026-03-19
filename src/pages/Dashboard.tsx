@@ -1,7 +1,10 @@
 import AppShell from "@/components/layout/AppShell";
 import DashboardHeader, { getDDay } from "@/components/dashboard/DashboardHeader";
 import SubjectProgressCard from "@/components/dashboard/SubjectProgressCard";
+import ActivityStream from "@/components/dashboard/ActivityStream";
+import LiveFeed from "@/components/dashboard/LiveFeed";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { useSocialFeed } from "@/hooks/useSocialFeed";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BookOpen, Plus, Check } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function Dashboard() {
   const { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, loading, addBook } =
     useDashboardData();
+  const { activities, liveFeedBooks, isMePublic } = useSocialFeed();
 
   const userBookIds = new Set(userBooks.map((b) => b.bookId));
 
@@ -42,6 +46,20 @@ export default function Dashboard() {
                 bookProgress={bookProgress}
               />
             ))
+          )}
+
+          {/* Social activity stream */}
+          {activities.length > 0 && (
+            <div className="pt-2">
+              <ActivityStream activities={activities} />
+            </div>
+          )}
+
+          {/* Live feed - per-book comparison */}
+          {liveFeedBooks.length > 0 && (
+            <div className="pt-1">
+              <LiveFeed books={liveFeedBooks} isMePublic={isMePublic} />
+            </div>
           )}
         </TabsContent>
 
