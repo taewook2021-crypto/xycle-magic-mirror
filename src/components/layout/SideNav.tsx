@@ -1,12 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, PenLine, BarChart3, Settings } from "lucide-react";
+import { LayoutDashboard, Trophy, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const tabs = [
   { path: "/dashboard", icon: LayoutDashboard, label: "대시보드" },
-  { path: "/grading", icon: PenLine, label: "채점" },
-  { path: "/analytics", icon: BarChart3, label: "분석" },
-  { path: "/settings", icon: Settings, label: "설정" },
+  { path: "/ranking", icon: Trophy, label: "랭킹" },
+  { path: "/profile", icon: UserCircle, label: "프로필" },
 ] as const;
 
 export default function SideNav() {
