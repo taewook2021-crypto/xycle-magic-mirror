@@ -211,7 +211,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
     };
     fetchQuestions();
     setActiveCell(null);
-  }, [selectedChapterId, user, roundCount]);
+  }, [selectedChapterId, targetUserId, roundCount]);
 
   // Toggle skip
   const toggleSkip = useCallback(
