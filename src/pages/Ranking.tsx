@@ -52,16 +52,24 @@ export default function Ranking() {
     },
   });
 
-  // Fetch books for book-based ranking
+  // Fetch user's registered books only
   const { data: books } = useQuery({
-    queryKey: ["ranking-books"],
+    queryKey: ["ranking-books", user?.id],
     queryFn: async () => {
+      const { data: userBooks } = await supabase
+        .from("user_books")
+        .select("book_id")
+        .eq("user_id", user!.id);
+      if (!userBooks?.length) return [];
+      const bookIds = userBooks.map((ub) => ub.book_id);
       const { data } = await supabase
         .from("books")
         .select("id, title, subject_id")
+        .in("id", bookIds)
         .order("display_order");
       return data ?? [];
     },
+    enabled: !!user,
   });
 
   // Fetch all attempts (for book-based ranking)
