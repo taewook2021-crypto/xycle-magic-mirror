@@ -90,7 +90,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
       if (initialChapterId) setSelectedChapterId(initialChapterId);
       return;
     }
-    const fetch = async () => {
+    const fetchChapters = async () => {
       setLoading(true);
       const { data, error } = await supabase
         .from("chapters")
@@ -100,10 +100,31 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly = false, i
       if (error || !data) { setLoading(false); return; }
       const mapped = data.map((c: any) => ({ id: c.id, title: c.title, number: c.chapter_number }));
       setChapters(mapped);
-      if (mapped.length > 0) setSelectedChapterId(mapped[0].id);
+
+      // Find the chapter with the most recent attempt
+      let targetChapterId = mapped[0]?.id ?? null;
+      if (user && mapped.length > 0) {
+        const chapterIds = mapped.map((c) => c.id);
+        const { data: recentAttempt } = await supabase
+          .from("attempts")
+          .select("question_id, attempted_at, questions!inner(chapter_id)")
+          .eq("user_id", user.id)
+          .in("questions.chapter_id", chapterIds)
+          .order("attempted_at", { ascending: false })
+          .limit(1);
+
+        if (recentAttempt && recentAttempt.length > 0) {
+          const lastChapterId = (recentAttempt[0] as any).questions?.chapter_id;
+          if (lastChapterId && chapterIds.includes(lastChapterId)) {
+            targetChapterId = lastChapterId;
+          }
+        }
+      }
+
+      setSelectedChapterId(targetChapterId);
       setLoading(false);
     };
-    fetch();
+    fetchChapters();
   }, [bookId, singleChapter, initialChapterId]);
 
   // Fetch questions + skips
