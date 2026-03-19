@@ -36,6 +36,10 @@ export default function Ranking() {
   const [sortBy, setSortBy] = useState("today-count");
   const [selectedBook, setSelectedBook] = useState<string>("all");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [peerReviewOpen, setPeerReviewOpen] = useState(false);
+  const [peerReviewUserId, setPeerReviewUserId] = useState<string>("");
+  const [peerReviewName, setPeerReviewName] = useState("");
 
   // Fetch public profiles
   const { data: profiles } = useQuery({
