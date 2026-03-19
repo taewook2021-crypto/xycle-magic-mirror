@@ -137,47 +137,6 @@ export default function LiveFeed({ books = [], isMePublic = false, onGoPublic }:
   const [selectedPeer, setSelectedPeer] = useState<PeerProfile | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const makeMockReviewBooks = (): PeerBook[] => {
-    const results: CellResult[] = ["correct", "wrong", "half", null];
-    return [
-      {
-        id: "rb1",
-        title: "중급회계 연습서",
-        chapters: [
-          {
-            chapterId: "rc1",
-            chapterTitle: "Ch.1 재무보고",
-            questions: Array.from({ length: 6 }, (_, i) => ({
-              questionNumber: i + 1,
-              rounds: [
-                { result: results[Math.floor(Math.random() * 4)], date: "3/11" },
-                { result: results[Math.floor(Math.random() * 4)] },
-                { result: null },
-              ],
-            })),
-          },
-        ],
-      },
-      {
-        id: "rb2",
-        title: "세법개론",
-        chapters: [
-          {
-            chapterId: "rc2",
-            chapterTitle: "Ch.1 조세총론",
-            questions: Array.from({ length: 5 }, (_, i) => ({
-              questionNumber: i + 1,
-              rounds: [
-                { result: results[Math.floor(Math.random() * 3)], date: "3/9" },
-                { result: null },
-                { result: null },
-              ],
-            })),
-          },
-        ],
-      },
-    ];
-  };
 
   const handlePeerClick = (peer: PeerEntry) => {
     setSelectedPeer({
