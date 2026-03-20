@@ -201,7 +201,7 @@ export default function StudentLogin() {
             <span
               className="text-xs font-bold rounded-full px-2.5 py-0.5"
               style={{
-                background: "hsl(303 55% 85%)",
+                background: "hsl(304 56% 66%)",
                 color: "hsl(0 0% 94%)",
               }}
             >
@@ -257,9 +257,9 @@ export default function StudentLogin() {
             onClick={handleGoogleLogin}
             className="rounded-full text-base font-bold px-8 py-3.5 transition-all hover:opacity-90 active:scale-[0.97] mb-10"
             style={{
-              background: "hsl(303 55% 85%)",
+              background: "hsl(304 56% 66%)",
               color: "hsl(0 0% 94%)",
-              boxShadow: "0 4px 20px hsl(303 55% 85% / 0.3)",
+              boxShadow: "0 4px 20px hsl(304 56% 66% / 0.3)",
             }}
           >
             Google로 시작하기
@@ -403,7 +403,7 @@ export default function StudentLogin() {
                     <button
                       onClick={handleGoogleLogin}
                       className="inline-flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-70"
-                      style={{ color: "hsl(303 55% 85%)" }}
+                      style={{ color: "hsl(304 56% 66%)" }}
                     >
                       시작하기
                       <ChevronRight className="h-4 w-4" />
@@ -484,9 +484,9 @@ export default function StudentLogin() {
               onClick={handleGoogleLogin}
               className="rounded-full text-base font-bold px-10 py-4 transition-all hover:opacity-90 active:scale-[0.97]"
               style={{
-                background: "hsl(303 55% 85%)",
+                background: "hsl(304 56% 66%)",
                 color: "hsl(0 0% 94%)",
-                boxShadow: "0 4px 20px hsl(303 55% 85% / 0.3)",
+                boxShadow: "0 4px 20px hsl(304 56% 66% / 0.3)",
               }}
             >
               시작하기
