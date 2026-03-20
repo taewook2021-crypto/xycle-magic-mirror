@@ -142,6 +142,7 @@ export default function StudentLogin() {
       className="min-h-screen"
       style={{
         fontFamily: "'Airbnb Cereal', 'Pretendard Variable', Pretendard, sans-serif",
+        background: "linear-gradient(180deg, #FFFFFF 0%, #F0C4EC 100%)",
       }}
     >
       {/* ───── Nav ───── */}
