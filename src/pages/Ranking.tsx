@@ -606,7 +606,6 @@ export default function Ranking() {
                         toast({
                           title: "프로필 공개가 필요합니다",
                           description: "회독표를 보려면 내 프로필을 공개로 전환해야 합니다.",
-                          action: <Button size="sm" onClick={handleGoPublic}>공개로 전환</Button>,
                         });
                         return;
                       }
