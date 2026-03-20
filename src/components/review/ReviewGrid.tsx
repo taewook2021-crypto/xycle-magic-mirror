@@ -487,7 +487,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
               : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
           )}
         >
-          ★ 필수
+          ★ 2유
         </button>
         <button
           onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
