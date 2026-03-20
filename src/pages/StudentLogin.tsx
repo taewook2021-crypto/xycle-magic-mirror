@@ -153,10 +153,7 @@ export default function StudentLogin() {
         }}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-14">
-          <div className="flex items-center gap-2.5">
-            <img src={xycleLogomark} alt="Xycle" className="h-7 w-7" />
-            <img src={xycleWordmark} alt="Xycle" className="h-4 hidden sm:block" />
-          </div>
+          <span className="text-lg font-bold tracking-tight" style={{ color: "hsl(0 0% 10%)" }}>폰개장</span>
           <div className="flex items-center gap-3">
             <a
               href="https://melodious-virgo-658.notion.site/Xycle-31e519deaa6280aab38bce598fbfe718"
