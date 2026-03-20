@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus, Target, Hash, CheckCircle, Calendar, Search, Eye } from "lucide-react";
+import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus, Target, Hash, CheckCircle, Calendar, Search, Eye, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import PeerReviewSheet from "@/components/dashboard/PeerReviewSheet";
@@ -220,8 +220,20 @@ export default function Ranking() {
       .slice(0, 8);
   }, [searchQuery, profiles, user]);
 
-  const { profile } = useAuth();
+  const { profile, setProfile } = useAuth();
   const isMePublic = profile?.is_public ?? false;
+
+  const handleGoPublic = async () => {
+    if (!user) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ is_public: true })
+      .eq("id", user.id);
+    if (!error && profile) {
+      setProfile({ ...profile, is_public: true });
+      toast({ title: "프로필이 공개로 전환되었습니다." });
+    }
+  };
 
   // Unified ranking based on sortBy
   const generalRanking = useMemo(() => {
@@ -587,15 +599,23 @@ export default function Ranking() {
                       </>
                     )}
                   </Button>
-                  <Button
+                   <Button
                     variant="outline"
                     onClick={() => {
+                      if (!isMePublic) {
+                        toast({
+                          title: "프로필 공개가 필요합니다",
+                          description: "회독표를 보려면 내 프로필을 공개로 전환해야 합니다.",
+                        });
+                        return;
+                      }
                       setPeerReviewUserId(selectedUserId!);
                       setPeerReviewName(selectedProfile?.display_name ?? "");
                       setPeerReviewOpen(true);
                       setSelectedUserId(null);
                     }}
                   >
+                    {!isMePublic && <Lock className="h-3.5 w-3.5 mr-1" />}
                     <Eye className="h-4 w-4 mr-1" />
                     회독표
                   </Button>
@@ -613,6 +633,7 @@ export default function Ranking() {
         peerName={peerReviewName}
         peerId={peerReviewUserId}
         isMePublic={isMePublic}
+        onGoPublic={handleGoPublic}
       />
     </AppShell>
   );
