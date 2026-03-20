@@ -220,8 +220,20 @@ export default function Ranking() {
       .slice(0, 8);
   }, [searchQuery, profiles, user]);
 
-  const { profile } = useAuth();
+  const { profile, setProfile } = useAuth();
   const isMePublic = profile?.is_public ?? false;
+
+  const handleGoPublic = async () => {
+    if (!user) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ is_public: true })
+      .eq("id", user.id);
+    if (!error && profile) {
+      setProfile({ ...profile, is_public: true });
+      toast({ title: "프로필이 공개로 전환되었습니다." });
+    }
+  };
 
   // Unified ranking based on sortBy
   const generalRanking = useMemo(() => {
