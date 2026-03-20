@@ -15,7 +15,7 @@ export default function SideNav() {
   return (
     <aside className="hidden md:flex flex-col w-56 border-r border-border bg-card h-screen sticky top-0">
       <div className="px-5 py-6">
-        <h1 className="text-lg font-bold text-foreground tracking-tight">Xycle</h1>
+        <h1 className="text-lg font-bold text-foreground tracking-tight">폰개장</h1>
       </div>
       <nav className="flex-1 px-3 space-y-1">
         {tabs.map(({ path, icon: Icon, label }) => {

@@ -276,7 +276,7 @@ export default function GradingDemo() {
                 >
                   <span className="text-primary text-base">✅</span>
                   <span className="text-sm font-medium">
-                    Xycle이 틀린 {CORRECT_ANSWERS.length - score}문제를 복습 리스트에 추가했습니다!
+                    폰개장이 틀린 {CORRECT_ANSWERS.length - score}문제를 복습 리스트에 추가했습니다!
                   </span>
                 </motion.div>
               )}
