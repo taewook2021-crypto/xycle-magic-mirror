@@ -589,8 +589,8 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                               {q.questionType === "past_exam" && (
                                 <span className="text-primary/70 font-semibold">{q.examYear || "기출"}</span>
                               )}
-                              {q.questionType === "practice" && <span className="font-semibold">실전</span>}
-                              {q.questionType === "example" && <span className="font-semibold">예제</span>}
+                              {q.questionType === "practice" && <span className="font-semibold">{hasPastExam ? "실전" : "응용"}</span>}
+                              {q.questionType === "example" && <span className="font-semibold">{hasPastExam ? "예제" : "기본"}</span>}
                             </span>
                           </td>
                           {!isMobile && (
