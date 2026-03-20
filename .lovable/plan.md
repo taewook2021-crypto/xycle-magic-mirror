@@ -1,26 +1,71 @@
 
 
-## 회독표 상호 공개 기능 문제 분석 및 수정 계획
+## 김기동 재무회계연습 교재 데이터 Supabase 저장
 
-### 현재 문제점
+### 데이터 요약
 
-1. **"공개로 전환하기" 버튼이 동작하지 않음**: `Ranking.tsx`에서 `PeerReviewSheet`에 `onGoPublic` 콜백을 전달하지 않아, 비공개 유저가 잠금 화면에서 "공개로 전환하기"를 눌러도 아무 일도 안 일어남
-2. **프로필 시트에 상호주의 안내 부재**: 비공개 유저가 "회독표" 버튼을 누르면 시트가 열린 후에야 잠금 화면이 보임 — 버튼 자체에 잠금 표시가 없음
-3. **공개 전환 후 상태 반영 안 됨**: `onGoPublic`이 호출되더라도 `useAuth`의 profile 상태와 Supabase를 동시에 업데이트하는 로직이 Ranking에 없음
+엑셀에서 파싱한 결과:
 
-### 수정 내용
+```text
+subjects
+├── 중급회계 (기존, id: a0000000-...-001)
+│   └── 재무회계연습 (김기동) ← NEW: Ch.1~19
+│       ├── Ch.1~10 (중급1권) — 기본+응용 합산 ~97문항
+│       └── Ch.11~19 (중급2권) — 기본+응용 합산 ~91문항
+│
+└── 고급회계 ← NEW subject
+    └── 재무회계연습 (김기동) ← NEW: Ch.20~23, ~68문항
+```
 
-**`src/pages/Ranking.tsx`**
-- `onGoPublic` 핸들러 추가: Supabase `profiles.is_public = true` 업데이트 + `setProfile` 호출로 즉시 상태 반영
-- 이 핸들러를 `PeerReviewSheet`에 `onGoPublic` prop으로 전달
-- 프로필 시트의 "회독표" 버튼에 비공개일 때 잠금 아이콘 + 비활성 표시 추가, 또는 클릭 시 바로 공개 전환 유도 모달
+### 문항 매핑 규칙
 
-**`src/components/dashboard/PeerReviewSheet.tsx`**
-- 현재 코드는 이미 `onGoPublic` prop을 받아 잠금 화면에서 사용하도록 되어 있으므로, 변경 불필요
+- 각 챕터 내 **첫 번째 번호 세트** (1번부터 시작) → `question_type = 'example'` (기본)
+- **두 번째 번호 세트** (다시 1번부터 시작) → `question_type = 'practice'` (응용)
+- `topic` 컬럼 ← 주제 열 (예: "재고자산의 Cut-Off")
+- `exam_year` ← 비고 열 값 그대로 저장 (예: "2유"), 없으면 NULL
+- `correct_answer` ← 엑셀에 없으므로 NULL
+- `is_essential` ← false (기본값)
+- **난이도(하/중/상)** → 현재 스키마에 컬럼 없으므로 저장하지 않음 (나중에 추가)
 
-### 구현 순서
+### 구현 방식
 
-1. `Ranking.tsx`에 `handleGoPublic` 함수 작성 (Supabase update + setProfile)
-2. `PeerReviewSheet`에 `onGoPublic={handleGoPublic}` 전달
-3. 프로필 시트 "회독표" 버튼 UX 개선 — 비공개 시 잠금 아이콘과 안내 텍스트 표시
+1. **Python 스크립트**로 엑셀 파싱 → SQL INSERT문 자동 생성
+   - 챕터 타이틀, 문항 번호, 기본/응용 구분, 주제, 비고를 정확히 추출
+   - UUID는 deterministic하게 생성 (충돌 방지)
+
+2. **Supabase migration** 1개 파일로 실행:
+   - `INSERT INTO subjects` — 고급회계 과목 추가
+   - `INSERT INTO books` — 중급회계용 1권 + 고급회계용 1권
+   - `INSERT INTO chapters` — 23개 챕터
+   - `INSERT INTO questions` — ~256문항 (topic, exam_year, question_type 포함)
+
+3. 기존 시드 데이터(중급회계 연습/객관식 재무회계)와 UUID 충돌 없음
+
+### 문항 수 상세 (파싱 기준)
+
+| 챕터 | 기본 | 응용 | 합계 |
+|------|------|------|------|
+| Ch.1 | 3 | 4 | 7 |
+| Ch.2 | 2 | 2 | 4 |
+| Ch.3 | 4 | 7 | 11 |
+| Ch.4 | 6 | 5 | 11 |
+| Ch.5 | 3 | 3 | 6 |
+| Ch.6 | 3 | 3 | 6 |
+| Ch.7 | 3 | 4 | 7 |
+| Ch.8 | 5 | 5 | 10 |
+| Ch.9 | 4 | 3 | 7 |
+| Ch.10 | 5 | 7 | 12 |
+| Ch.11 | 6 | 5 | 11 |
+| Ch.12 | 3 | 4 | 7 |
+| Ch.13 | 5 | 4 | 9 |
+| Ch.14 | 5 | 4 | 9 |
+| Ch.15 | 5 | 4 | 9 |
+| Ch.16 | 4 | 6 | 10 |
+| Ch.17 | 5 | 3 | 8 |
+| Ch.18 | 6 | 4 | 10 |
+| Ch.19 | 1 | 2 | 3 |
+| Ch.20 | 10 | 6 | 16 |
+| Ch.21 | 5 | 6 | 11 |
+| Ch.22 | 4 | 5 | 9 |
+| Ch.23 | 6 | 20 | 26 |
 
