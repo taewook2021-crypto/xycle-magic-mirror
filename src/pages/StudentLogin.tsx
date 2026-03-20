@@ -528,7 +528,6 @@ export default function StudentLogin() {
         </div>
       </footer>
 
-      <CookieConsent />
     </div>
   );
 }
