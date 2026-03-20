@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const COOKIE_KEY = "xycle_cookie_consent";
+const COOKIE_KEY = "phonegaejang_cookie_consent";
 
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
