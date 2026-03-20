@@ -301,7 +301,7 @@ export default function StudentLogin() {
       {/* ───── Features Section (Numbered like Base44) ───── */}
       <section
         className="py-20 sm:py-32"
-        style={{ background: "hsl(0 0% 94%)" }}
+        
       >
         <div className="max-w-6xl mx-auto px-6">
           <motion.h2
@@ -420,7 +420,7 @@ export default function StudentLogin() {
       {/* ───── FAQ Section ───── */}
       <section
         className="py-20 sm:py-32"
-        style={{ background: "hsl(0 0% 94%)" }}
+        
       >
         <div className="max-w-3xl mx-auto px-6">
           <motion.h2
@@ -458,7 +458,7 @@ export default function StudentLogin() {
       {/* ───── Final CTA ───── */}
       <section
         className="py-24 sm:py-40 text-center"
-        style={{ background: "hsl(0 0% 94%)" }}
+        
       >
         <div className="max-w-3xl mx-auto px-6">
           <motion.h2
@@ -500,7 +500,7 @@ export default function StudentLogin() {
       <footer
         className="py-8"
         style={{
-          background: "hsl(0 0% 94%)",
+          background: "transparent",
           borderTop: "1px solid hsl(0 0% 0% / 0.06)",
         }}
       >
