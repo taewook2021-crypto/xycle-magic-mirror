@@ -5,8 +5,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import xycleLogomark from "@/assets/xycle-logomark.svg";
-import xycleWordmark from "@/assets/xycle-wordmark.svg";
 import CookieConsent from "@/components/CookieConsent";
 
 const features = [
