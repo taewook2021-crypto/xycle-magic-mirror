@@ -259,7 +259,7 @@ export default function StudentLogin() {
             style={{
               background: "hsl(303 55% 85%)",
               color: "hsl(0 0% 94%)",
-              boxShadow: "0 4px 20px hsl(14 82% 52% / 0.3)",
+              boxShadow: "0 4px 20px hsl(303 55% 85% / 0.3)",
             }}
           >
             Google로 시작하기
@@ -486,7 +486,7 @@ export default function StudentLogin() {
               style={{
                 background: "hsl(303 55% 85%)",
                 color: "hsl(0 0% 94%)",
-                boxShadow: "0 4px 20px hsl(14 82% 52% / 0.3)",
+                boxShadow: "0 4px 20px hsl(303 55% 85% / 0.3)",
               }}
             >
               시작하기
