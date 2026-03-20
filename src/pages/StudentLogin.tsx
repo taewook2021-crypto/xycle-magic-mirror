@@ -149,7 +149,7 @@ export default function StudentLogin() {
       <nav
         className="sticky top-0 z-50 backdrop-blur-xl"
         style={{
-          background: "hsl(0 0% 94% / 0.85)",
+          background: "hsl(0 0% 100% / 0.75)",
           borderBottom: "1px solid hsl(0 0% 0% / 0.06)",
         }}
       >
