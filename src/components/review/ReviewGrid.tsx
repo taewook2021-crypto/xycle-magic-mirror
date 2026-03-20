@@ -479,10 +479,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
         ))}
         <div className="w-px h-4 bg-border mx-0.5" />
         <button
-          onClick={() => { setEssentialOnly((v) => !v); setActiveCell(null); }}
+          onClick={() => { setExamYearFilter((v) => !v); setActiveCell(null); }}
           className={cn(
             "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
-            essentialOnly
+            examYearFilter
               ? "bg-primary text-primary-foreground border-primary"
               : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
           )}
