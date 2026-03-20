@@ -1,136 +1,117 @@
 import { useNavigate } from "react-router-dom";
-import { MessageCircle, Trophy } from "lucide-react";
+import { ChevronRight, Plus, Minus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import useEmblaCarousel from "embla-carousel-react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import logo from "@/assets/logo.svg";
-import xycleWordmark from "@/assets/xycle-wordmark.svg";
 import xycleLogomark from "@/assets/xycle-logomark.svg";
-import GradingDemo from "@/components/GradingDemo";
+import xycleWordmark from "@/assets/xycle-wordmark.svg";
 import CookieConsent from "@/components/CookieConsent";
-import AppMockup from "@/components/AppMockup";
 
-const reviewCardsData = [
-  { num: "01", title: "교재 횡단 취약 단원", desc: "김기동 연습서 → 파이널,\n교재가 달라도 같은 단원에서\n틀린 문제를 전부 모아봅니다" },
-  { num: "02", title: "동차생 대비 내 풀이량", desc: "종이는 혼자입니다.\n동차생·3유예 평균과\n내 풀이량을 실시간 비교합니다" },
-  { num: "03", title: "N번 틀린 것만 필터", desc: "종이는 전체를 훑어야 합니다.\n2번 이상 틀린 문제만\n터치 한 번으로 추려냅니다" },
+const features = [
+  {
+    num: "01",
+    total: "04",
+    title: "교재를 횡단하는 취약 분석",
+    desc: "연습서에서 틀린 문제, 파이널에서 또 틀린 문제. 교재가 달라도 같은 주제에서 반복되는 약점을 자동으로 찾아 한 번에 보여드립니다.",
+  },
+  {
+    num: "02",
+    total: "04",
+    title: "동차생과 비교하는 실시간 풀이량",
+    desc: "혼자 종이를 풀면 내 위치를 알 수 없습니다. 같은 교재를 푸는 동차생·유예생 평균과 나의 풀이량을 실시간으로 비교하세요.",
+  },
+  {
+    num: "03",
+    total: "04",
+    title: "N번 틀린 문제만 즉시 필터",
+    desc: "종이는 처음부터 끝까지 다시 훑어야 합니다. Xycle은 2번 이상 틀린 문제만 터치 한 번으로 추려냅니다.",
+  },
+  {
+    num: "04",
+    total: "04",
+    title: "입력하면 끝나는 간편 채점",
+    desc: "답을 입력하면 채점, 기록, 오답 분류까지 한 번에 끝납니다. 별도의 채점표가 필요 없습니다.",
+  },
 ];
 
-function ReviewCardItem({ item, i, isLightMode, monoFont }: { item: typeof reviewCardsData[0]; i: number; isLightMode: boolean; monoFont: string }) {
+const faqs = [
+  {
+    q: "Xycle은 어떤 서비스인가요?",
+    a: "Xycle은 세무사·회계사 수험생을 위한 회독 관리 플랫폼입니다. 객관식 교재의 풀이 기록을 디지털화하여, 교재 횡단 취약 분석·동차생 풀이량 비교·오답 필터링 등 종이에서는 불가능한 기능을 제공합니다.",
+  },
+  {
+    q: "어떤 교재가 지원되나요?",
+    a: "현재 이승철 세무회계연습(법인세법, 소득세법, 부가가치세법, 상속증여세법), 세무사 1차 실전모의고사 등이 등록되어 있으며, 지속적으로 교재를 추가하고 있습니다.",
+  },
+  {
+    q: "무료로 사용할 수 있나요?",
+    a: "네. Xycle의 모든 핵심 기능(회독 기록, 채점, 오답 필터, 교재 횡단 분석)은 무료로 제공됩니다.",
+  },
+  {
+    q: "내 풀이 데이터는 안전한가요?",
+    a: "모든 데이터는 업계 표준 암호화를 적용하여 안전하게 관리됩니다. Google 계정 인증을 통해 본인만 데이터에 접근할 수 있습니다.",
+  },
+  {
+    q: "모바일에서도 사용할 수 있나요?",
+    a: "네. Xycle은 모바일 환경에 최적화되어 있어, 스마트폰에서도 편리하게 채점하고 기록을 확인할 수 있습니다.",
+  },
+];
+
+const suggestionChips = [
+  "세무회계연습 법인세법",
+  "세무회계연습 소득세법",
+  "실전 동형모의고사",
+  "세법학개론",
+];
+
+function FAQItem({ item, isOpen, onClick }: { item: typeof faqs[0]; isOpen: boolean; onClick: () => void }) {
   return (
-    <motion.div
-      key={item.num}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: i * 0.15 }}
-      className="rounded-2xl p-6 h-full"
-      style={{
-        backgroundColor: isLightMode ? "rgba(0,0,0,0.04)" : "rgba(255,255,255,0.06)",
-        border: `1px solid ${isLightMode ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.08)"}`,
-        transition: "background-color 0.8s ease, border-color 0.8s ease"
-      }}
+    <div
+      className="border-b"
+      style={{ borderColor: "hsl(0 0% 0% / 0.08)" }}
     >
-      <span style={{
-        fontFamily: monoFont,
-        fontSize: "11px",
-        fontWeight: 500,
-        letterSpacing: "0.15em",
-        color: isLightMode ? "rgba(51,51,51,0.3)" : "rgba(236,236,236,0.3)",
-        transition: "color 0.8s ease"
-      }}>
-        {item.num}
-      </span>
-      <h4 style={{
-        color: isLightMode ? "#222222" : "#ECECEC",
-        fontSize: "1.15rem",
-        fontWeight: 700,
-        marginTop: "14px",
-        letterSpacing: "-0.02em",
-        transition: "color 0.8s ease"
-      }}>
-        {item.title}
-      </h4>
-      <p style={{
-        color: isLightMode ? "rgba(51,51,51,0.65)" : "rgba(236,236,236,0.55)",
-        fontSize: "0.9rem",
-        fontWeight: 300,
-        lineHeight: 1.65,
-        letterSpacing: "-0.02em",
-        marginTop: "10px",
-        whiteSpace: "pre-line" as const,
-        transition: "color 0.8s ease"
-      }}>
-        {item.desc}
-      </p>
-    </motion.div>
-  );
-}
-
-function ReviewCardsSection({ isLightMode, monoFont }: { isLightMode: boolean; monoFont: string }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "start" });
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    emblaApi.on("select", onSelect);
-    return () => { emblaApi.off("select", onSelect); };
-  }, [emblaApi, onSelect]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    const interval = setInterval(() => {
-      if (emblaApi.canScrollNext()) {
-        emblaApi.scrollNext();
-      } else {
-        emblaApi.scrollTo(0);
-      }
-    }, 6000);
-    return () => clearInterval(interval);
-  }, [emblaApi]);
-
-  return (
-    <>
-      <div className="hidden md:grid grid-cols-3 gap-6">
-        {reviewCardsData.map((item, i) => (
-          <ReviewCardItem key={item.num} item={item} i={i} isLightMode={isLightMode} monoFont={monoFont} />
-        ))}
-      </div>
-      <div className="md:hidden">
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex gap-3">
-            {reviewCardsData.map((item, i) => (
-              <div key={item.num} className="flex-[0_0_85%] min-w-0">
-                <ReviewCardItem item={item} i={i} isLightMode={isLightMode} monoFont={monoFont} />
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="flex justify-center gap-2 mt-4">
-          {reviewCardsData.map((_, i) => (
-            <button
-              key={i}
-              className="w-2 h-2 rounded-full transition-all duration-300"
+      <button
+        onClick={onClick}
+        className="w-full flex items-center justify-between py-6 text-left group"
+      >
+        <span
+          className="text-lg font-semibold tracking-tight"
+          style={{
+            fontFamily: "'Airbnb Cereal', 'Pretendard Variable', Pretendard, sans-serif",
+            color: "hsl(0 0% 13%)",
+          }}
+        >
+          {item.q}
+        </span>
+        <span className="ml-4 flex-shrink-0 text-muted-foreground">
+          {isOpen ? <Minus className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+        </span>
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden"
+          >
+            <p
+              className="pb-6 leading-relaxed"
               style={{
-                backgroundColor: selectedIndex === i
-                  ? (isLightMode ? "rgba(51,51,51,0.6)" : "rgba(236,236,236,0.6)")
-                  : (isLightMode ? "rgba(51,51,51,0.15)" : "rgba(236,236,236,0.15)")
+                color: "hsl(0 0% 40%)",
+                fontSize: "0.95rem",
+                fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
               }}
-              onClick={() => emblaApi?.scrollTo(i)}
-            />
-          ))}
-        </div>
-      </div>
-    </>
+            >
+              {item.a}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -138,1157 +119,423 @@ export default function StudentLogin() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
-  const [phase, setPhase] = useState<"loading" | "ready">("loading");
-  const [loadPercent, setLoadPercent] = useState(0);
-  const featuresRef = useRef<HTMLDivElement>(null);
-  const demoRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLElement>(null);
-  const aboutRef = useRef<HTMLElement>(null);
-  const heroRef = useRef<HTMLElement>(null);
-  const [isFeatureInView, setIsFeatureInView] = useState(false);
-  const [isDemoInView, setIsDemoInView] = useState(false);
-  const [isCtaInView, setIsCtaInView] = useState(false);
-  const [hasPassedAbout, setHasPassedAbout] = useState(false);
-  const [isHeroInView, setIsHeroInView] = useState(true);
-  const [activeFeature, setActiveFeature] = useState(0);
-  const [showBgLogo, setShowBgLogo] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {
-    const el = featuresRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsFeatureInView(entry.isIntersecting),
-      { threshold: 0.15 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [phase]);
-
-  useEffect(() => {
-    const el = demoRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsDemoInView(entry.isIntersecting),
-      { threshold: 0.15 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [phase]);
-
-  useEffect(() => {
-    const el = ctaRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsCtaInView(entry.isIntersecting),
-      { threshold: 0.05 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [phase]);
-
-  useEffect(() => {
-    const el = aboutRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {if (entry.isIntersecting) setHasPassedAbout(true);},
-      { threshold: 0.05 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [phase]);
-
-  useEffect(() => {
-    if (phase !== "ready") return;
-    const handleScroll = () => {
-      const aboutEl = aboutRef.current;
-      const ctaEl = ctaRef.current;
-      if (!aboutEl || !ctaEl) return;
-      const scrollY = window.scrollY + window.innerHeight * 0.3;
-      const aboutTop = aboutEl.offsetTop;
-      const ctaTop = ctaEl.offsetTop;
-      setShowBgLogo(scrollY >= aboutTop && scrollY < ctaTop);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [phase]);
-
-  useEffect(() => {
-    const el = heroRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsHeroInView(entry.isIntersecting),
-      { threshold: 0.3 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [phase]);
-
-  useEffect(() => {
     if (user) navigate("/dashboard", { replace: true });
   }, [user, navigate]);
-
-  useEffect(() => {
-    let current = 0;
-    const interval = setInterval(() => {
-      current += Math.random() * 8 + 2;
-      if (current >= 100) {
-        current = 100;
-        clearInterval(interval);
-        setTimeout(() => {window.scrollTo(0, 0);setPhase("ready");}, 400);
-      }
-      setLoadPercent(Math.min(Math.round(current), 100));
-    }, 80);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin }
+      options: { redirectTo: window.location.origin },
     });
     if (error) {
       toast({ title: "로그인 실패", description: error.message, variant: "destructive" });
     }
   };
 
-  const monoFont = "'IBM Plex Mono', 'Pretendard Variable', Pretendard, monospace";
-  const isLightMode = isDemoInView;
-
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: isLightMode ? "#ECECEC" : "#333333", fontFamily: monoFont, transition: "background 0.8s ease" }}>
-      {/* Film grain noise overlay */}
-      <div className="fixed inset-0 z-[60] pointer-events-none" style={{ opacity: 0.25 }}>
-        <svg width="100%" height="100%">
-          <filter id="grain">
-            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch" />
-            <feColorMatrix type="saturate" values="0" />
-          </filter>
-          <rect width="100%" height="100%" filter="url(#grain)" />
-        </svg>
-      </div>
-
-      {/* Fixed Background Logo */}
-      <AnimatePresence>
-        {showBgLogo && (
-          <motion.div
-            key="bg-logo"
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[1] flex items-center justify-center pointer-events-none"
-          >
-            <img
-              src={xycleLogomark}
-              alt=""
+    <div
+      className="min-h-screen"
+      style={{
+        fontFamily: "'Airbnb Cereal', 'Pretendard Variable', Pretendard, sans-serif",
+      }}
+    >
+      {/* ───── Nav ───── */}
+      <nav
+        className="sticky top-0 z-50 backdrop-blur-xl"
+        style={{
+          background: "hsl(0 0% 100% / 0.85)",
+          borderBottom: "1px solid hsl(0 0% 0% / 0.06)",
+        }}
+      >
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-14">
+          <div className="flex items-center gap-2.5">
+            <img src={xycleLogomark} alt="Xycle" className="h-7 w-7" />
+            <img src={xycleWordmark} alt="Xycle" className="h-4 hidden sm:block" />
+          </div>
+          <div className="flex items-center gap-3">
+            <a
+              href="https://melodious-virgo-658.notion.site/Xycle-31e519deaa6280aab38bce598fbfe718"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium transition-colors hover:text-foreground"
+              style={{ color: "hsl(0 0% 40%)" }}
+            >
+              도움말
+            </a>
+            <button
+              onClick={handleGoogleLogin}
+              className="rounded-full text-sm font-semibold px-5 py-2 transition-all hover:opacity-90 active:scale-95"
               style={{
-                width: "min(55vw, 55vh)",
-                height: "auto",
-                opacity: isLightMode ? 0.06 : 0.04,
-                filter: isLightMode
-                  ? "sepia(1) saturate(5) hue-rotate(-10deg) brightness(1.1)"
-                  : "brightness(0) invert(1) opacity(0.5)",
-                transition: "opacity 0.8s ease, filter 0.8s ease",
+                background: "hsl(0 0% 13%)",
+                color: "hsl(0 0% 100%)",
               }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+            >
+              시작하기
+            </button>
+          </div>
+        </div>
+      </nav>
 
-      {/* Preloader */}
-      <AnimatePresence>
-        {phase === "loading" &&
-        <motion.div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-          style={{ background: "#333333" }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}>
-            <div className="absolute top-0 bottom-0 left-1/2 w-px" style={{ background: "rgba(236,236,236,0.12)" }} />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px]">
-              <div className="relative h-px w-full" style={{ background: "rgba(236,236,236,0.15)" }}>
-                <motion.div
-                  className="absolute top-0 left-0 h-full"
-                  style={{ background: "#ECECEC" }}
-                  initial={{ width: "0%" }}
-                  animate={{ width: `${loadPercent}%` }}
-                  transition={{ duration: 0.1 }} />
-              </div>
-              <div className="mt-3 text-center" style={{ color: "#ECECEC", fontSize: "13px", fontWeight: 300, letterSpacing: "0.05em" }}>
-                {loadPercent}%
-              </div>
-            </div>
-            <div className="absolute bottom-32 flex flex-col items-center gap-1">
-              <motion.span
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                style={{ color: "rgba(236,236,236,0.5)", fontSize: "14px", fontWeight: 300, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-                make
-              </motion.span>
-              <motion.span
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                style={{ color: "rgba(236,236,236,0.5)", fontSize: "14px", fontWeight: 300, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-                your
-              </motion.span>
-            </div>
-            <motion.img
-              src={logo}
-              alt="Xycle"
-              className="absolute bottom-12"
-              style={{ height: "28px", opacity: 0.7 }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.7 }}
-              transition={{ delay: 0.8 }} />
-          </motion.div>
-        }
-      </AnimatePresence>
-
-      {/* Main Content */}
-      <AnimatePresence>
-        {phase === "ready" &&
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.2 }}
-          className="min-h-screen relative">
-
-            <div className="fixed top-0 bottom-0 left-1/2 w-px z-10" style={{ background: "rgba(236,236,236,0.08)" }} />
-
-            {/* Hero Section */}
-            <section ref={heroRef} className="min-h-[100svh] relative flex flex-col" style={{ background: "#333333" }}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-                className="flex items-center justify-between px-6 sm:px-10 py-4 relative"
-                style={{ borderBottom: "1px solid rgba(236,236,236,0.08)" }}>
-                <motion.img src={logo} alt="Xycle" style={{ height: "22px", opacity: 0.9 }} />
-                <div className="flex items-center gap-4">
-                  <motion.button
-                    onClick={handleGoogleLogin}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    style={{
-                      color: "#ECECEC",
-                      fontSize: "11px",
-                      fontWeight: 400,
-                      letterSpacing: "0.06em",
-                      textTransform: "uppercase",
-                      fontFamily: monoFont,
-                      background: "none",
-                      border: "1px solid rgba(236,236,236,0.2)",
-                      padding: "6px 16px",
-                      cursor: "pointer",
-                      borderRadius: "9999px",
-                    }}
-                    className="hover:bg-white/10 hover:border-white/40 active:bg-white/20 transition-all duration-200">
-                    로그인
-                  </motion.button>
-                  <motion.a
-                    href="https://melodious-virgo-658.notion.site/Xycle-31e519deaa6280aab38bce598fbfe718?source=copy_link"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.97 }}
-                    style={{
-                      color: "rgba(236,236,236,0.55)",
-                      fontSize: "11px",
-                      fontWeight: 400,
-                      letterSpacing: "0.06em",
-                      textTransform: "uppercase" as const,
-                      fontFamily: monoFont,
-                      background: "none",
-                      border: "1px solid rgba(236,236,236,0.2)",
-                      padding: "6px 16px",
-                      cursor: "pointer",
-                      textDecoration: "none",
-                      borderRadius: "9999px",
-                    }}
-                    className="hover:bg-white/10 hover:border-white/40 active:bg-white/20 transition-all duration-200">
-                    도움말
-                  </motion.a>
-                </div>
-              </motion.div>
-
-              {/* Main Grid Content */}
-              <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_1fr] relative">
-                {/* Left Column */}
-                <div className="px-5 sm:px-10 pt-6 sm:pt-16 flex flex-col gap-6 sm:gap-10">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5, duration: 0.6 }}>
-                    <h2 style={{
-                      color: "#ECECEC",
-                      fontSize: "clamp(1.95rem, 5vw, 3.5rem)",
-                      fontWeight: 800,
-                      lineHeight: 1.1,
-                      fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
-                      letterSpacing: "-0.04em",
-                    }}>
-                      오늘 동차생 평균 18문제.<br />나는<span className="text-primary">?</span>
-                    </h2>
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7, duration: 0.5 }}
-                    className="flex flex-col gap-6 -mt-4 sm:-mt-6">
-                    <p style={{ color: "rgba(236,236,236,0.55)", fontSize: "15px", fontWeight: 400, fontFamily: "'Pretendard Variable', Pretendard, sans-serif", letterSpacing: "-0.03em", lineHeight: 1.6 }}>
-                      같은 교재를 푸는 수험생들과<br className="sm:hidden" /> 나의 풀이량을 비교하세요
-                    </p>
-                    <motion.button
-                      onClick={handleGoogleLogin}
-                      whileHover={{ scaleX: 1.05, scaleY: 0.96 }}
-                      whileTap={{ scale: 0.97 }}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        alignSelf: "flex-start",
-                        gap: "10px",
-                        background: "#ECECEC",
-                        color: "#EA5027",
-                        border: "none",
-                        padding: "12px 28px",
-                        fontSize: "13px",
-                        fontWeight: 700,
-                        letterSpacing: "-0.02em",
-                        fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
-                        cursor: "pointer",
-                        borderRadius: "9999px",
-                      }}>
-                      Google로 시작하기
-                      <span style={{ fontSize: "16px" }}>→</span>
-                    </motion.button>
-                  </motion.div>
-                </div>
-
-                {/* Right Column — Demo Cards */}
-                <div className="px-5 sm:px-10 pt-2 sm:pt-12 flex flex-col gap-1.5 sm:gap-3">
-                  {[
-                    {
-                      id: "crossbook",
-                      label: "교재 횡단 취약 단원",
-                      content: (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span style={{ fontSize: "10px", fontWeight: 700, color: "#ECECEC", background: "rgba(236,236,236,0.1)", padding: "3px 10px", borderRadius: "9999px", border: "1px solid rgba(236,236,236,0.15)" }}>
-                              김기동 연습서
-                            </span>
-                            <span style={{ fontSize: "14px", color: "rgba(236,236,236,0.3)" }}>→</span>
-                            <span style={{ fontSize: "10px", fontWeight: 700, color: "#ECECEC", background: "rgba(236,236,236,0.1)", padding: "3px 10px", borderRadius: "9999px", border: "1px solid rgba(236,236,236,0.15)" }}>
-                              2026 파이널
-                            </span>
-                          </div>
-                          {[
-                            { topic: "유형자산 감가상각", rate: 38, tag: "🔥 최약" },
-                            { topic: "수익인식", rate: 52, tag: null },
-                            { topic: "재고자산", rate: 61, tag: null },
-                          ].map((t) => (
-                            <div key={t.topic} className="space-y-1">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  {t.tag && <span style={{ fontSize: "9px", fontWeight: 700, color: "#EA5027", background: "rgba(234,80,39,0.1)", padding: "2px 6px", borderRadius: "4px" }}>{t.tag}</span>}
-                                  <span style={{ fontSize: "13px", color: "rgba(236,236,236,0.8)", fontWeight: 500 }}>{t.topic}</span>
-                                </div>
-                                <span style={{ fontSize: "14px", color: t.rate < 50 ? "#EA5027" : "#ECECEC", fontWeight: 700, fontFamily: monoFont, fontVariantNumeric: "tabular-nums" }}>{t.rate}%</span>
-                              </div>
-                              <div style={{ height: "3px", borderRadius: "2px", background: "rgba(236,236,236,0.08)", overflow: "hidden" }}>
-                                <div style={{ height: "100%", width: `${t.rate}%`, borderRadius: "2px", background: t.rate < 50 ? "linear-gradient(90deg, #EA5027, #EA5027cc)" : "linear-gradient(90deg, rgba(236,236,236,0.5), rgba(236,236,236,0.3))" }} />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ),
-                    },
-                    {
-                      id: "peer",
-                      label: "동차생 풀이량 비교",
-                      content: (
-                        <div className="space-y-2">
-                          <div className="flex items-end justify-between">
-                            <div className="flex items-baseline gap-1.5">
-                              <span style={{ fontSize: "32px", fontWeight: 800, color: "#ECECEC", fontFamily: "'Pretendard Variable', Pretendard, sans-serif", lineHeight: 1, letterSpacing: "-0.04em" }}>32</span>
-                              <span style={{ fontSize: "14px", fontWeight: 400, color: "rgba(236,236,236,0.4)" }}>문제</span>
-                            </div>
-                            <span style={{ fontSize: "11px", fontWeight: 600, color: "#4ade80", fontFamily: monoFont }}>▲ 평균보다 14문제 더</span>
-                          </div>
-                          <div className="flex items-end gap-1" style={{ height: "40px" }}>
-                            {[28, 35, 18, 32, 40, 22, 32].map((v, i) => (
-                              <div key={i} className="flex-1 flex gap-px items-end" style={{ height: "100%" }}>
-                                <div style={{ flex: 1, height: `${(v / 45) * 100}%`, background: "#ECECEC", borderRadius: "2px 2px 0 0" }} />
-                                <div style={{ flex: 1, height: `${([22, 20, 24, 19, 25, 18, 18][i] / 45) * 100}%`, background: "rgba(236,236,236,0.15)", borderRadius: "2px 2px 0 0" }} />
-                              </div>
-                            ))}
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1.5">
-                              <div style={{ width: "8px", height: "8px", borderRadius: "2px", background: "#ECECEC" }} />
-                              <span style={{ fontSize: "10px", color: "rgba(236,236,236,0.4)", fontFamily: monoFont }}>나</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <div style={{ width: "8px", height: "8px", borderRadius: "2px", background: "rgba(236,236,236,0.15)" }} />
-                              <span style={{ fontSize: "10px", color: "rgba(236,236,236,0.4)", fontFamily: monoFont }}>동차생 평균</span>
-                            </div>
-                          </div>
-                        </div>
-                      ),
-                    },
-                    {
-                      id: "filter",
-                      label: "2번 이상 틀린 것만",
-                      content: (
-                        <div className="space-y-2">
-                          <div className="flex gap-1.5">
-                            {["전체", "1번↑", "2번↑", "3번↑"].map((f, i) => (
-                              <span key={f} style={{ fontSize: "10px", fontWeight: i === 2 ? 700 : 500, color: i === 2 ? "#111" : "rgba(236,236,236,0.4)", background: i === 2 ? "#ECECEC" : "rgba(236,236,236,0.06)", padding: "3px 10px", borderRadius: "9999px", border: i === 2 ? "none" : "1px solid rgba(236,236,236,0.1)" }}>
-                                {f}
-                              </span>
-                            ))}
-                          </div>
-                          <div className="space-y-0.5">
-                            {[
-                              { num: 5, subject: "국징", cnt: 3 },
-                              { num: 15, subject: "소득", cnt: 2 },
-                              { num: 8, subject: "소득", cnt: 3 },
-                            ].map((q) => (
-                              <div key={`${q.num}-${q.subject}`} className="flex items-center justify-between" style={{ padding: "4px 8px", borderRadius: "6px", background: q.cnt >= 3 ? "rgba(234,80,39,0.06)" : "transparent" }}>
-                                <div className="flex items-center gap-2">
-                                  <span style={{ fontSize: "12px", fontWeight: 600, color: "rgba(236,236,236,0.5)", fontFamily: monoFont, fontVariantNumeric: "tabular-nums", minWidth: "20px" }}>{q.num}</span>
-                                  <span style={{ fontSize: "12px", color: "rgba(236,236,236,0.6)" }}>{q.subject}</span>
-                                </div>
-                                <span style={{ fontSize: "11px", fontWeight: 700, color: q.cnt >= 3 ? "#EA5027" : "#f59e0b", fontFamily: monoFont, background: q.cnt >= 3 ? "rgba(234,80,39,0.1)" : "rgba(245,158,11,0.1)", padding: "2px 8px", borderRadius: "4px" }}>
-                                  {q.cnt}회 오답
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                          <p style={{ fontSize: "10px", color: "rgba(236,236,236,0.3)", textAlign: "center", fontFamily: monoFont }}>
-                            종이는 전체를 훑어야 합니다. <span style={{ color: "#ECECEC", fontWeight: 600 }}>Xycle은 터치 한 번.</span>
-                          </p>
-                        </div>
-                      ),
-                    },
-                  ].map((card, i) => (
-                    <motion.div
-                      key={card.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.6 + i * 0.12, duration: 0.5 }}
-                      className="group p-2 px-3 sm:p-3 sm:px-4"
-                      style={{
-                        background: "rgba(236,236,236,0.03)",
-                        border: "1px solid rgba(236,236,236,0.08)",
-                        borderRadius: "14px",
-                        cursor: "default",
-                        transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)",
-                      }}
-                      whileHover={{ scale: 1.02 }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = "rgba(236,236,236,0.06)";
-                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(234,80,39,0.2)";
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = "rgba(236,236,236,0.03)";
-                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(236,236,236,0.08)";
-                      }}
-                    >
-                      <span style={{
-                        fontSize: "10px",
-                        fontWeight: 500,
-                        letterSpacing: "0.15em",
-                        textTransform: "uppercase",
-                        color: "rgba(236,236,236,0.35)",
-                        fontFamily: monoFont,
-                        display: "block",
-                        marginBottom: "10px",
-                      }}>
-                        {card.label}
-                      </span>
-                      {card.content}
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* Vertical divider */}
-                <div className="hidden lg:block absolute top-0 bottom-0 left-1/2 w-px" style={{ background: "rgba(236,236,236,0.08)" }} />
-              </div>
-
-              {/* Large Bottom Logo */}
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="px-5 sm:px-10 pb-4 mt-auto pt-6 sm:pt-0">
-                <img
-                  src={xycleWordmark}
-                  alt="Xycle"
-                  style={{ height: "clamp(3rem, 14vw, 12rem)", width: "auto" }} />
-              </motion.div>
-
-              {/* Bottom Bar */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.5 }}
-                className="flex items-center justify-between px-6 sm:px-10 py-3"
-                style={{ borderTop: "1px solid rgba(236,236,236,0.08)" }}>
-                <span style={{ color: "rgba(236,236,236,0.25)", fontSize: "10px", fontWeight: 400, fontFamily: monoFont, letterSpacing: "0.05em" }}>
-                  rank · review · repeat
-                </span>
-                <span style={{ color: "rgba(236,236,236,0.25)", fontSize: "10px", fontWeight: 400, fontFamily: monoFont, letterSpacing: "0.05em" }}>
-                  © 2026 Xycle
-                </span>
-              </motion.div>
-            </section>
-
-            {/* About Section */}
-            <section ref={aboutRef} className="px-5 sm:px-10 lg:px-20 py-20 sm:py-52 relative">
-              <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.7 }}
-                  className="space-y-6">
-                  <span style={{ color: isLightMode ? "rgba(51,51,51,0.35)" : "rgba(236,236,236,0.3)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: monoFont, transition: "color 0.8s ease" }}>
-                    [ about ]
-                  </span>
-                  <h3 style={{
-                    color: isLightMode ? "#222222" : "#ECECEC",
-                    fontSize: "clamp(2.2rem, 5vw, 3.5rem)",
-                    fontWeight: 800,
-                    lineHeight: 1.1,
-                    fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
-                    letterSpacing: "-0.04em",
-                    transition: "color 0.8s ease",
-                    wordBreak: "keep-all"
-                  }}>
-                    내가 푼 이 단원,<br />
-                    <span style={{ color: "#EA5027", transition: "color 0.8s ease", whiteSpace: "nowrap" }}>나는 전국에서 몇 등일까?</span>
-                  </h3>
-                  <p style={{ color: isLightMode ? "rgba(51,51,51,0.55)" : "rgba(236,236,236,0.6)", fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", fontWeight: 400, lineHeight: 1.7, letterSpacing: "-0.025em", fontFamily: "'Pretendard Variable', Pretendard, sans-serif", transition: "color 0.8s ease" }}>
-                    같은 교재를 푸는 동차생들과 단원별 풀이량을 비교하고, 교재를 횡단해 취약 단원을 찾고, 자주 틀리는 문제만 골라냅니다. <strong style={{ fontWeight: 700, color: "#EA5027" }}>혼자 종이 위에선 절대 알 수 없던 내 위치를, Xycle이 보여줍니다.</strong>
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.7, delay: 0.15 }}
-                  className="space-y-8">
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-80px" }}
-                    transition={{ duration: 0.7, delay: 0.3 }}
-                  >
-                    <div
-                      className="rounded-2xl p-5 sm:p-6"
-                      style={{
-                        backgroundColor: isLightMode ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.06)",
-                        border: `1px solid ${isLightMode ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.1)"}`,
-                        backdropFilter: "blur(20px)",
-                        transition: "all 0.8s ease",
-                      }}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <Trophy className="h-5 w-5 text-primary" />
-                        <span style={{
-                          color: isLightMode ? "#222" : "#ECECEC",
-                          fontSize: "1.1rem",
-                          fontWeight: 700,
-                          letterSpacing: "-0.02em",
-                          transition: "color 0.8s ease",
-                        }}>
-                          실시간 랭킹
-                        </span>
-                      </div>
-                      <p style={{
-                        color: isLightMode ? "rgba(51,51,51,0.5)" : "rgba(236,236,236,0.45)",
-                        fontSize: "0.8rem",
-                        fontWeight: 400,
-                        marginBottom: "16px",
-                        transition: "color 0.8s ease",
-                      }}>
-                        총 128명 중 <span style={{ color: "#EA5027", fontWeight: 700 }}>12등</span>
-                      </p>
-
-                      <div className="space-y-1.5">
-                        {[
-                          { rank: 1, name: "수험생A", score: 38, medal: "🥇" },
-                          { rank: 2, name: "수험생B", score: 37, medal: "🥈" },
-                          { rank: 3, name: "수험생C", score: 36, medal: "🥉" },
-                          { rank: 4, name: "수험생D", score: 35, medal: null },
-                          { rank: 5, name: "수험생E", score: 34, medal: null },
-                        ].map((entry, idx) => (
-                          <motion.div
-                            key={entry.rank}
-                            initial={{ opacity: 0, x: -10 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.3, delay: 0.4 + idx * 0.08 }}
-                            className="flex items-center justify-between rounded-xl px-4 py-2.5"
-                            style={{
-                              backgroundColor: isLightMode ? "rgba(0,0,0,0.03)" : "rgba(255,255,255,0.04)",
-                              transition: "background-color 0.8s ease",
-                            }}
-                          >
-                            <div className="flex items-center gap-3">
-                              <span style={{
-                                width: "28px",
-                                textAlign: "center",
-                                fontWeight: 700,
-                                fontSize: entry.medal ? "1.1rem" : "0.85rem",
-                                color: isLightMode ? "rgba(51,51,51,0.4)" : "rgba(236,236,236,0.4)",
-                                fontVariantNumeric: "tabular-nums",
-                              }}>
-                                {entry.medal || entry.rank}
-                              </span>
-                              <span style={{
-                                fontSize: "0.9rem",
-                                fontWeight: 500,
-                                color: isLightMode ? "#333" : "#ECECEC",
-                                transition: "color 0.8s ease",
-                              }}>
-                                {entry.name}
-                              </span>
-                            </div>
-                            <span style={{
-                              fontSize: "0.85rem",
-                              fontWeight: 600,
-                              color: isLightMode ? "rgba(51,51,51,0.5)" : "rgba(236,236,236,0.45)",
-                              fontVariantNumeric: "tabular-nums",
-                              transition: "color 0.8s ease",
-                            }}>
-                              {entry.score}/40
-                            </span>
-                          </motion.div>
-                        ))}
-
-                        <div className="flex justify-center py-1.5 gap-1">
-                          {[0, 1, 2].map(i => (
-                            <div
-                              key={i}
-                              className="w-1 h-1 rounded-full"
-                              style={{
-                                backgroundColor: isLightMode ? "rgba(51,51,51,0.15)" : "rgba(236,236,236,0.15)",
-                              }}
-                            />
-                          ))}
-                        </div>
-
-                        <motion.div
-                          initial={{ opacity: 0, x: -10 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 0.4, delay: 0.9 }}
-                          className="flex items-center justify-between rounded-xl px-4 py-2.5"
-                          style={{
-                            backgroundColor: isLightMode ? "rgba(234,80,39,0.06)" : "rgba(234,80,39,0.12)",
-                            border: `1px solid ${isLightMode ? "rgba(234,80,39,0.15)" : "rgba(234,80,39,0.25)"}`,
-                            transition: "all 0.8s ease",
-                          }}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span style={{
-                              width: "28px",
-                              textAlign: "center",
-                              fontWeight: 700,
-                              fontSize: "0.85rem",
-                              color: "#EA5027",
-                              fontVariantNumeric: "tabular-nums",
-                            }}>
-                              12
-                            </span>
-                            <span style={{
-                              fontSize: "0.9rem",
-                              fontWeight: 700,
-                              color: isLightMode ? "#222" : "#ECECEC",
-                              transition: "color 0.8s ease",
-                            }}>
-                              나
-                            </span>
-                            <span
-                              className="text-[10px] rounded-full px-2 py-0.5 font-semibold"
-                              style={{
-                                backgroundColor: isLightMode ? "rgba(234,80,39,0.1)" : "rgba(234,80,39,0.2)",
-                                color: "#EA5027",
-                              }}
-                            >
-                              ME
-                            </span>
-                          </div>
-                          <span style={{
-                            fontSize: "0.85rem",
-                            fontWeight: 700,
-                            color: "#EA5027",
-                            fontVariantNumeric: "tabular-nums",
-                          }}>
-                            32/40
-                          </span>
-                        </motion.div>
-                      </div>
-
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: 1.1 }}
-                        className="flex flex-col items-center mt-5 gap-1"
-                      >
-                        <div
-                          className="inline-flex items-center gap-2 text-sm rounded-full px-5 py-2"
-                          style={{
-                            backgroundColor: isLightMode ? "rgba(0,0,0,0.04)" : "rgba(255,255,255,0.06)",
-                            border: `1px solid ${isLightMode ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.08)"}`,
-                            transition: "all 0.8s ease",
-                          }}
-                        >
-                          <Trophy className="h-3.5 w-3.5" style={{ color: isLightMode ? "rgba(51,51,51,0.4)" : "rgba(236,236,236,0.4)" }} />
-                          <span style={{ color: isLightMode ? "rgba(51,51,51,0.5)" : "rgba(236,236,236,0.45)", fontSize: "0.8rem", transition: "color 0.8s ease" }}>전체</span>
-                          <span style={{ color: isLightMode ? "#222" : "#ECECEC", fontWeight: 700, fontSize: "0.8rem", transition: "color 0.8s ease" }}>128명</span>
-                          <span style={{ color: isLightMode ? "rgba(51,51,51,0.5)" : "rgba(236,236,236,0.45)", fontSize: "0.8rem", transition: "color 0.8s ease" }}>중</span>
-                          <span style={{ color: "#EA5027", fontWeight: 700, fontSize: "0.8rem" }}>12등</span>
-                          <span style={{ color: isLightMode ? "rgba(51,51,51,0.15)" : "rgba(236,236,236,0.15)", fontSize: "0.8rem" }}>·</span>
-                          <span style={{ color: isLightMode ? "#222" : "#ECECEC", fontWeight: 600, fontSize: "0.8rem", transition: "color 0.8s ease" }}>상위 9%</span>
-                        </div>
-                        <span style={{
-                          color: isLightMode ? "rgba(51,51,51,0.3)" : "rgba(236,236,236,0.25)",
-                          fontSize: "10px",
-                          transition: "color 0.8s ease",
-                        }}>
-                          샘플 데이터입니다
-                        </span>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              </div>
-            </section>
-
-            {/* Assets Section */}
-            <section className="px-5 sm:px-10 lg:px-20 py-16 sm:py-32 relative" style={{ background: isLightMode ? "#ECECEC" : "#333333", transition: "background 0.8s ease" }}>
-              <div className="max-w-6xl mx-auto">
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-10 mb-20">
-                  <div className="space-y-4">
-                    <span style={{ color: isLightMode ? "rgba(51,51,51,0.35)" : "rgba(236,236,236,0.3)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: monoFont, transition: "color 0.8s ease" }}>
-                      [ assets ]
-                    </span>
-                    <h3 style={{
-                      color: isLightMode ? "#222222" : "#ECECEC",
-                      fontSize: "clamp(1.8rem, 4vw, 3rem)",
-                      fontWeight: 700,
-                      lineHeight: 1.1,
-                      fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
-                      letterSpacing: "-0.03em",
-                      transition: "color 0.8s ease",
-                      wordBreak: "keep-all"
-                    }}>
-                      교재와 상관없이,<br /><span style={{ color: "#EA5027" }}>재고자산</span>에서 푼 문제 목록만 추려보세요.
-                    </h3>
-                  </div>
-                  <div className="space-y-4 lg:pt-[calc(11px*1.5+1rem)]">
-                    <p style={{
-                      color: isLightMode ? "rgba(51,51,51,0.8)" : "hsl(0 0% 100%)",
-                      fontSize: "clamp(0.88rem, 1.5vw, 1.1rem)",
-                      fontWeight: 300,
-                      lineHeight: 1.7,
-                      letterSpacing: "-0.025em",
-                      fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
-                      maxWidth: "400px",
-                      transition: "color 0.8s ease"
-                    }}>
-                      Xycle에 등록된 교재들은 <span style={{ fontWeight: 700, color: "#EA5027" }}>주제가 서로 연결</span>되어 있습니다. 교재가 달라도 같은 주제에서 틀린 문제를 한 번에 모아볼 수 있습니다.
-                    </p>
-                  </div>
-                </motion.div>
-
-                {/* Gallery Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[
-                    { num: "01", title: "2026 회계학 실전 동형모의고사", subject: "회계학", exams: 12, questions: 20 },
-                    { num: "02", title: "2026 세법 실전동형 모의고사", subject: "세법", exams: 12, questions: 20 },
-                    { num: "03", title: "세무사 1차 실전모의고사 세법학개론", subject: "세법", exams: 5, questions: 40 },
-                  ].map((book, i) => (
-                    <motion.div
-                      key={book.num}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-50px" }}
-                      transition={{ duration: 0.6, delay: i * 0.1 }}
-                      className="group relative"
-                      style={{
-                        background: isLightMode ? "#FFFFFF" : "rgba(236,236,236,0.03)",
-                        border: `1px solid ${isLightMode ? "rgba(51,51,51,0.08)" : "rgba(236,236,236,0.08)"}`,
-                        transition: "all 0.4s ease"
-                      }}>
-                      <div
-                        className="px-6 py-4 flex items-center justify-between"
-                        style={{ borderBottom: `1px solid ${isLightMode ? "rgba(51,51,51,0.06)" : "rgba(236,236,236,0.06)"}` }}>
-                        <span style={{ color: isLightMode ? "rgba(51,51,51,0.3)" : "rgba(236,236,236,0.25)", fontSize: "11px", fontWeight: 500, fontFamily: monoFont, letterSpacing: "0.05em" }}>
-                          {book.num}
-                        </span>
-                        <span style={{ color: "#EA5027", fontSize: "10px", fontWeight: 600, fontFamily: monoFont, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                          {book.subject}
-                        </span>
-                      </div>
-                      <div className="px-6 py-8 space-y-6">
-                        <h4 style={{ color: isLightMode ? "#222222" : "#ECECEC", fontSize: "16px", fontWeight: 600, fontFamily: monoFont, lineHeight: 1.4, letterSpacing: "-0.02em", minHeight: "44px", transition: "color 0.4s ease" }}>
-                          {book.title}
-                        </h4>
-                        <div className="flex items-center gap-6">
-                          <div className="space-y-1">
-                            <span style={{ color: isLightMode ? "rgba(51,51,51,0.35)" : "rgba(236,236,236,0.3)", fontSize: "9px", fontWeight: 500, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: monoFont, display: "block" }}>ROUNDS</span>
-                            <span style={{ color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.6)", fontSize: "13px", fontWeight: 500, fontFamily: monoFont }}>{book.exams}회</span>
-                          </div>
-                          <div className="space-y-1">
-                            <span style={{ color: isLightMode ? "rgba(51,51,51,0.35)" : "rgba(236,236,236,0.3)", fontSize: "9px", fontWeight: 500, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: monoFont, display: "block" }}>Q/ROUND</span>
-                            <span style={{ color: isLightMode ? "rgba(51,51,51,0.7)" : "rgba(236,236,236,0.6)", fontSize: "13px", fontWeight: 500, fontFamily: monoFont }}>{book.questions}문항</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="absolute bottom-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: "#EA5027" }} />
-                    </motion.div>
-                  ))}
-                </div>
-
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.3 }}
-                  className="mt-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
-                  style={{ borderTop: `1px solid ${isLightMode ? "rgba(51,51,51,0.08)" : "rgba(236,236,236,0.08)"}`, paddingTop: "24px" }}>
-                  <p style={{ color: isLightMode ? "rgba(51,51,51,0.5)" : "rgba(236,236,236,0.4)", fontSize: "13px", fontWeight: 300, fontFamily: monoFont }}>
-                    더 많은 교재가 곧 추가됩니다
-                  </p>
-                  <span style={{ color: isLightMode ? "rgba(51,51,51,0.35)" : "rgba(236,236,236,0.25)", fontSize: "10px", fontWeight: 500, letterSpacing: "0.15em", textTransform: "uppercase", fontFamily: monoFont }}>
-                    세무사 1차 · 회계학 · 세법
-                  </span>
-                </motion.div>
-              </div>
-            </section>
-
-            {/* Features Section */}
-            <div
-              ref={featuresRef}
-              className="px-5 sm:px-10 lg:px-20 py-16 sm:py-32 relative">
-              <div className="max-w-6xl mx-auto">
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  style={{
-                    color: isLightMode ? "rgba(51,51,51,0.35)" : "rgba(236,236,236,0.3)",
-                    fontSize: "11px", fontWeight: 500, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: monoFont,
-                    transition: "color 0.8s ease",
-                  }}>
-                  [ features ]
-                </motion.span>
-
-                <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-                  <div className="space-y-0">
-                    {[
-                      { num: "01", title: "교재 횡단 취약 단원", desc: "연습서 → 파이널, 교재가 달라도 같은 단원에서 틀린 문제를 전부 모아봅니다.", mockupIdx: 0 },
-                      { num: "02", title: "동차생 풀이량 비교", desc: "종이는 혼자입니다. 동차생·3유예 평균과 내 풀이량을 실시간으로 비교하세요.", mockupIdx: 1 },
-                      { num: "03", title: "N번 틀린 것만 필터", desc: "종이는 전체를 훑어야 합니다. 2번 이상 틀린 문제만 터치 한 번으로 추려냅니다.", mockupIdx: 2 },
-                      { num: "04", title: "풀이 기록 추적", desc: "매일 몇 문제를 풀었는지, 정답률은 어떤지 한눈에 확인하세요.", mockupIdx: 3 },
-                      { num: "05", title: "간편 채점", desc: "답을 입력하면 채점부터 기록까지 한번에 끝납니다.", mockupIdx: 4 },
-                    ].map((feature, i) => (
-                      <React.Fragment key={feature.num}>
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true, margin: "-50px" }}
-                          transition={{ duration: 0.5, delay: i * 0.08 }}
-                          className="group flex items-start gap-6 sm:gap-10 py-8 border-t cursor-pointer"
-                          style={{ borderColor: "rgba(255,255,255,0.08)" }}
-                          onMouseEnter={() => setActiveFeature(feature.mockupIdx)}
-                          onClick={() => setActiveFeature(feature.mockupIdx)}
-                        >
-                          <span style={{
-                            color: activeFeature === feature.mockupIdx ? "#FFFFFF" : "rgba(255,255,255,0.4)",
-                            fontSize: "14px", fontWeight: 400, fontFamily: monoFont, minWidth: "2rem",
-                            transition: "color 0.3s",
-                          }}>
-                            {feature.num}
-                          </span>
-                          <div className="flex-1">
-                            <h4
-                              className="group-hover:translate-x-2 transition-all duration-300"
-                              style={{
-                                color: activeFeature === feature.mockupIdx ? "#FFFFFF" : "rgba(255,255,255,0.5)",
-                                fontSize: "clamp(1.25rem, 2.5vw, 1.5rem)", fontWeight: 700, fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
-                                letterSpacing: "-0.02em",
-                                transition: "color 0.3s",
-                              }}>
-                              {feature.title}
-                            </h4>
-                            <p style={{
-                              color: activeFeature === feature.mockupIdx ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.3)",
-                              fontSize: "15px", fontWeight: 300, fontFamily: "'Pretendard Variable', Pretendard, sans-serif", lineHeight: 1.65, marginTop: "8px",
-                              letterSpacing: "-0.035em",
-                              transition: "color 0.3s",
-                            }}>
-                              {feature.desc}
-                            </p>
-                          </div>
-                        </motion.div>
-
-                        <div className="lg:hidden pb-6">
-                          {activeFeature === feature.mockupIdx && (
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.95 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ duration: 0.3 }}
-                            >
-                              <AppMockup activeFeature={feature.mockupIdx} />
-                            </motion.div>
-                          )}
-                        </div>
-                      </React.Fragment>
-                    ))}
-                  </div>
-
-                  <div className="hidden lg:block">
-                    <div className="sticky top-32">
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                      >
-                        <AppMockup activeFeature={activeFeature} />
-                      </motion.div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-
-
-
-
-
-            {/* Footer CTA */}
-            <section
-              ref={ctaRef}
-              className="relative min-h-screen flex flex-col justify-between overflow-hidden"
-              style={{ background: "linear-gradient(180deg, #EA5027 0%, #C43D1A 50%, #9A2F12 100%)" }}>
-              <div className="absolute inset-0 pointer-events-none" style={{ opacity: 0.2 }}>
-                <svg width="100%" height="100%">
-                  <filter id="grain-cta">
-                    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch" />
-                    <feColorMatrix type="saturate" values="0" />
-                  </filter>
-                  <rect width="100%" height="100%" filter="url(#grain-cta)" />
-                </svg>
-              </div>
-              <div className="w-full h-px" style={{ background: "rgba(236,236,236,0.15)" }} />
-
-              <div className="flex-1 flex flex-col justify-center px-5 sm:px-10 lg:px-20 py-12 sm:py-20">
-                <div className="max-w-5xl mx-auto w-full">
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    style={{
-                      color: "rgba(236,236,236,0.5)",
-                      fontSize: "11px",
-                      fontWeight: 500,
-                      letterSpacing: "0.2em",
-                      textTransform: "uppercase",
-                      fontFamily: monoFont,
-                      display: "block",
-                      marginBottom: "40px"
-                    }}>
-                    [ start now ]
-                  </motion.span>
-
-                  <motion.h2
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    style={{
-                      color: "#ECECEC",
-                      fontSize: "clamp(2.5rem, 7vw, 6rem)",
-                      fontWeight: 700,
-                      fontFamily: monoFont,
-                      letterSpacing: "-0.04em",
-                      lineHeight: 1.05,
-                      textTransform: "uppercase"
-                    }}>
-                    지금
-                    <br />
-                    시작하세요_
-                  </motion.h2>
-
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.15 }}
-                    style={{
-                      color: "hsl(0 0% 93% / 0.67)",
-                      fontSize: "14px",
-                      fontWeight: 300,
-                      fontFamily: monoFont,
-                      lineHeight: 1.8,
-                      marginTop: "32px",
-                      maxWidth: "420px"
-                    }}>
-                    종이가 절대 못 하는 세 가지,<br className="sm:hidden" />
-                    Xycle은 됩니다.
-                  </motion.p>
-
-                  <motion.button
-                    onClick={handleGoogleLogin}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.25 }}
-                    whileHover={{ scaleX: 1.05, scaleY: 0.96 }}
-                    whileTap={{ scale: 0.97 }}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      marginTop: "48px",
-                      background: "#ECECEC",
-                      color: "#EA5027",
-                      border: "none",
-                      padding: "14px 32px",
-                      fontSize: "13px",
-                      fontWeight: 700,
-                      letterSpacing: "-0.02em",
-                      fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
-                      cursor: "pointer"
-                    }}>
-                    Google로 시작하기
-                    <span style={{ fontSize: "16px" }}>→</span>
-                  </motion.button>
-                </div>
-              </div>
-
-              <div className="px-6 sm:px-10 lg:px-20 pb-8">
-                <div className="max-w-5xl mx-auto w-full flex flex-col sm:flex-row items-start sm:items-end justify-between gap-8">
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.3 }}
-                    className="space-y-2">
-                    <span style={{ color: "rgba(236,236,236,0.4)", fontSize: "10px", fontWeight: 400, letterSpacing: "0.15em", textTransform: "uppercase", fontFamily: monoFont }}>
-                      CONTACT
-                    </span>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <p style={{ color: "rgba(236,236,236,0.7)", fontSize: "13px", fontWeight: 400, fontFamily: monoFont }}>
-                        wiserlab1@gmail.com
-                      </p>
-                      <span style={{ color: "rgba(236,236,236,0.25)", fontSize: "13px", fontWeight: 300 }}>|</span>
-                      <a
-                        href="http://pf.kakao.com/_uSAyn"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="카카오톡 채널"
-                        style={{ display: "inline-flex", alignItems: "center", color: "rgba(236,236,236,0.7)", transition: "color 0.2s" }}
-                        onMouseEnter={e => (e.currentTarget.style.color = "#FEE500")}
-                        onMouseLeave={e => (e.currentTarget.style.color = "rgba(236,236,236,0.7)")}
-                      >
-                        <MessageCircle size={16} />
-                      </a>
-                    </div>
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.4 }}
-                    className="flex gap-10">
-                    {[{ label: "SERVICE", value: "RANK & REVIEW & REPEAT" }].map((item) => (
-                      <div key={item.label} className="space-y-1">
-                        <span style={{ color: "rgba(236,236,236,0.35)", fontSize: "10px", fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: monoFont, display: "block" }}>
-                          {item.label}
-                        </span>
-                        <span style={{ color: "rgba(236,236,236,0.7)", fontSize: "12px", fontWeight: 500, fontFamily: monoFont }}>
-                          {item.value}
-                        </span>
-                      </div>
-                    ))}
-                  </motion.div>
-                </div>
-              </div>
-
-              <div
-                className="px-6 sm:px-10 py-5 flex items-center justify-between"
-                style={{ borderTop: "1px solid rgba(236,236,236,0.15)" }}>
-                <span style={{ color: "rgba(236,236,236,0.35)", fontSize: "11px", fontWeight: 300, fontFamily: monoFont }}>
-                  © 2026 Xycle
-                </span>
-                <span style={{ color: "rgba(236,236,236,0.35)", fontSize: "11px", fontWeight: 300, fontFamily: monoFont, letterSpacing: "0.1em" }}>
-                  rank · review · repeat
-                </span>
-              </div>
-            </section>
-
-          </motion.div>
-        }
-      </AnimatePresence>
-
-      {/* Fixed Floating Nav Button */}
-      <AnimatePresence>
-        {phase === "ready" && !isHeroInView && hasPassedAbout && !isCtaInView &&
-        <motion.div
-          key="floating-btn-left"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed z-50 left-0 top-1/2 -translate-y-1/2 hidden sm:block"
-          style={{ pointerEvents: "none" }}>
-          <motion.button
-            onClick={handleGoogleLogin}
+      {/* ───── Hero Section ───── */}
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background: "linear-gradient(180deg, hsl(30 60% 96%) 0%, hsl(25 50% 94%) 40%, hsl(0 0% 100%) 100%)",
+        }}
+      >
+        <div className="max-w-4xl mx-auto px-6 pt-20 sm:pt-32 pb-24 sm:pb-40 text-center">
+          {/* Announcement pill */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-8"
             style={{
-              color: "#ECECEC",
-              background: "#EA5027",
-              border: "none",
-              fontSize: "11px",
-              fontWeight: 700,
-              letterSpacing: "-0.02em",
-              fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
-              cursor: "pointer",
-              pointerEvents: "auto",
-              padding: "14px 12px",
-              writingMode: "vertical-rl",
-              textOrientation: "mixed",
-              whiteSpace: "nowrap"
+              background: "hsl(0 0% 100% / 0.7)",
+              border: "1px solid hsl(0 0% 0% / 0.08)",
+              backdropFilter: "blur(10px)",
             }}
-            whileHover={{ paddingLeft: "16px", paddingRight: "16px" }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}>
+          >
+            <span
+              className="text-xs font-bold rounded-full px-2.5 py-0.5"
+              style={{
+                background: "hsl(14 82% 52%)",
+                color: "hsl(0 0% 100%)",
+              }}
+            >
+              NEW
+            </span>
+            <span className="text-sm" style={{ color: "hsl(0 0% 25%)" }}>
+              이승철 세무회계연습 전 과목 등록 완료
+            </span>
+            <ChevronRight className="h-4 w-4" style={{ color: "hsl(0 0% 50%)" }} />
+          </motion.div>
+
+          {/* Heading */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-6"
+            style={{
+              color: "hsl(0 0% 10%)",
+              fontFamily: "'Airbnb Cereal', 'Pretendard Variable', Pretendard, sans-serif",
+              letterSpacing: "-0.04em",
+              wordBreak: "keep-all",
+            }}
+          >
+            종이 위에선 보이지 않던
+            <br />
+            나의 위치를 확인하세요
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-lg sm:text-xl mb-10 mx-auto max-w-2xl"
+            style={{
+              color: "hsl(0 0% 35%)",
+              lineHeight: 1.6,
+              fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Xycle은 객관식 교재의 풀이 기록을 디지털화하여,
+            <br className="hidden sm:block" />
+            동차생 비교·교재 횡단 분석·오답 필터를 제공합니다.
+          </motion.p>
+
+          {/* CTA Button */}
+          <motion.button
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            onClick={handleGoogleLogin}
+            className="rounded-full text-base font-bold px-8 py-3.5 transition-all hover:opacity-90 active:scale-[0.97] mb-10"
+            style={{
+              background: "hsl(14 82% 52%)",
+              color: "hsl(0 0% 100%)",
+              boxShadow: "0 4px 20px hsl(14 82% 52% / 0.3)",
+            }}
+          >
             Google로 시작하기
           </motion.button>
-        </motion.div>
-        }
-      </AnimatePresence>
+
+          {/* Suggestion chips */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.45 }}
+            className="flex flex-col items-center gap-3"
+          >
+            <p
+              className="text-xs font-medium tracking-widest uppercase"
+              style={{ color: "hsl(0 0% 55%)" }}
+            >
+              지원 교재 미리보기
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {suggestionChips.map((chip) => (
+                <span
+                  key={chip}
+                  className="rounded-full px-4 py-2 text-sm cursor-default transition-colors hover:bg-white/80"
+                  style={{
+                    border: "1px solid hsl(0 0% 0% / 0.1)",
+                    color: "hsl(0 0% 25%)",
+                    background: "hsl(0 0% 100% / 0.5)",
+                  }}
+                >
+                  {chip}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ───── Features Section (Numbered like Base44) ───── */}
+      <section
+        className="py-20 sm:py-32"
+        style={{ background: "hsl(0 0% 100%)" }}
+      >
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6 }}
+            className="text-3xl sm:text-4xl font-bold tracking-tight mb-20 text-center"
+            style={{
+              color: "hsl(0 0% 10%)",
+              letterSpacing: "-0.03em",
+            }}
+          >
+            종이가 할 수 없는 것들
+          </motion.h2>
+
+          <div className="space-y-0">
+            {features.map((f, i) => (
+              <motion.div
+                key={f.num}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-8 lg:gap-16 py-12 sm:py-16 border-t items-start"
+                style={{ borderColor: "hsl(0 0% 0% / 0.08)" }}
+              >
+                {/* Left: image placeholder */}
+                <div
+                  className="rounded-2xl overflow-hidden aspect-[4/3] lg:aspect-[3/4]"
+                  style={{
+                    background: `linear-gradient(135deg, hsl(${14 + i * 30} 40% 95%) 0%, hsl(${14 + i * 30} 30% 90%) 100%)`,
+                  }}
+                >
+                  <div className="w-full h-full flex items-center justify-center p-8">
+                    <div className="text-center space-y-4">
+                      <div
+                        className="text-5xl sm:text-6xl font-bold"
+                        style={{
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          color: `hsl(${14 + i * 30} 50% 65%)`,
+                        }}
+                      >
+                        {f.num}
+                      </div>
+                      <p
+                        className="text-sm font-medium"
+                        style={{ color: `hsl(${14 + i * 30} 30% 55%)` }}
+                      >
+                        {f.title}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: text */}
+                <div className="flex flex-col justify-center py-4">
+                  <div className="flex items-center gap-2 mb-6">
+                    <span
+                      className="text-sm font-medium"
+                      style={{
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        color: "hsl(0 0% 50%)",
+                      }}
+                    >
+                      {f.num}
+                    </span>
+                    <span style={{ color: "hsl(0 0% 75%)" }}>/</span>
+                    <span
+                      className="text-sm font-medium"
+                      style={{
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        color: "hsl(0 0% 75%)",
+                      }}
+                    >
+                      {f.total}
+                    </span>
+                  </div>
+                  <h3
+                    className="text-2xl sm:text-3xl font-bold tracking-tight mb-4"
+                    style={{
+                      color: "hsl(0 0% 10%)",
+                      letterSpacing: "-0.03em",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {f.title}
+                  </h3>
+                  <p
+                    className="text-base leading-relaxed mb-8"
+                    style={{
+                      color: "hsl(0 0% 40%)",
+                      fontFamily: "'Pretendard Variable', Pretendard, sans-serif",
+                      maxWidth: "440px",
+                    }}
+                  >
+                    {f.desc}
+                  </p>
+                  <div>
+                    <button
+                      onClick={handleGoogleLogin}
+                      className="inline-flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-70"
+                      style={{ color: "hsl(14 82% 52%)" }}
+                    >
+                      시작하기
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ───── FAQ Section ───── */}
+      <section
+        className="py-20 sm:py-32"
+        style={{ background: "hsl(0 0% 98%)" }}
+      >
+        <div className="max-w-3xl mx-auto px-6">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6 }}
+            className="text-3xl sm:text-4xl font-bold tracking-tight mb-12 text-center"
+            style={{
+              color: "hsl(0 0% 10%)",
+              letterSpacing: "-0.03em",
+            }}
+          >
+            자주 묻는 질문
+          </motion.h2>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.5 }}
+          >
+            {faqs.map((faq, i) => (
+              <FAQItem
+                key={i}
+                item={faq}
+                isOpen={openFaq === i}
+                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+              />
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ───── Final CTA ───── */}
+      <section
+        className="py-24 sm:py-40 text-center"
+        style={{ background: "hsl(0 0% 100%)" }}
+      >
+        <div className="max-w-3xl mx-auto px-6">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="text-3xl sm:text-5xl font-bold tracking-tight mb-10"
+            style={{
+              color: "hsl(0 0% 10%)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.15,
+            }}
+          >
+            지금, 무엇을 풀고 계신가요?
+          </motion.h2>
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <button
+              onClick={handleGoogleLogin}
+              className="rounded-full text-base font-bold px-10 py-4 transition-all hover:opacity-90 active:scale-[0.97]"
+              style={{
+                background: "hsl(14 82% 52%)",
+                color: "hsl(0 0% 100%)",
+                boxShadow: "0 4px 20px hsl(14 82% 52% / 0.3)",
+              }}
+            >
+              시작하기
+            </button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ───── Footer ───── */}
+      <footer
+        className="py-8"
+        style={{
+          background: "hsl(0 0% 100%)",
+          borderTop: "1px solid hsl(0 0% 0% / 0.06)",
+        }}
+      >
+        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <img src={xycleLogomark} alt="Xycle" className="h-5 w-5 opacity-40" />
+            <span className="text-xs" style={{ color: "hsl(0 0% 55%)" }}>
+              © 2026 Xycle
+            </span>
+          </div>
+          <div className="flex items-center gap-6">
+            <a
+              href="mailto:wiserlab1@gmail.com"
+              className="text-xs transition-colors hover:text-foreground"
+              style={{ color: "hsl(0 0% 55%)" }}
+            >
+              wiserlab1@gmail.com
+            </a>
+            <a
+              href="http://pf.kakao.com/_uSAyn"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs transition-colors hover:text-foreground"
+              style={{ color: "hsl(0 0% 55%)" }}
+            >
+              카카오톡
+            </a>
+          </div>
+        </div>
+      </footer>
+
       <CookieConsent />
     </div>
   );
