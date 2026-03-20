@@ -23,7 +23,7 @@ export interface ReferralState {
 export function useReferral(): ReferralState {
   const { user } = useAuth();
 
-  const storageKey = `xycle_invited_${user?.id ?? "anon"}`;
+  const storageKey = `phonegaejang_invited_${user?.id ?? "anon"}`;
   const [invitedCount, setInvitedCount] = useState<number>(() => {
     const stored = localStorage.getItem(storageKey);
     return stored ? parseInt(stored, 10) : 0;
