@@ -244,7 +244,7 @@ export default function StudentLogin() {
               letterSpacing: "-0.02em",
             }}
           >
-            Xycle은 객관식 교재의 풀이 기록을 디지털화하여,
+            폰개장은 객관식 교재의 풀이 기록을 디지털화하여,
             <br className="hidden sm:block" />
             동차생 비교·교재 횡단 분석·오답 필터를 제공합니다.
           </motion.p>

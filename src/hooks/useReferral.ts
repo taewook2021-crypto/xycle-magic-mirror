@@ -31,8 +31,8 @@ export function useReferral(): ReferralState {
 
   // Generate a deterministic-ish code from user id
   const code = useMemo(() => {
-    if (!user?.id) return "XYCLE000";
-    return "XY" + user.id.slice(0, 6).toUpperCase();
+    if (!user?.id) return "PGJ000";
+    return "PG" + user.id.slice(0, 6).toUpperCase();
   }, [user?.id]);
 
   const tier: ReferralTier = invitedCount >= 2 ? 2 : invitedCount >= 1 ? 1 : 0;
