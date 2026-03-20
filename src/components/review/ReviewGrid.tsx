@@ -49,7 +49,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   const [questions, setQuestions] = useState<QuestionRow[]>([]);
   const [loading, setLoading] = useState(!singleChapter);
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("all");
-  const [essentialOnly, setEssentialOnly] = useState(false);
+  const [examYearFilter, setExamYearFilter] = useState(false);
   const [memoOnly, setMemoOnly] = useState(false);
   const [resultFilter, setResultFilter] = useState<string>("off"); // "off" | "wrong-1" | "wrong-2" | "wrong-3" | "half-1" | "half-2" | "half-3"
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
@@ -59,7 +59,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   // Filtered indices mapping
   const filtered = questions.filter((q) => {
     if (sectionFilter !== "all" && q.questionType !== sectionFilter) return false;
-    if (essentialOnly && !q.isEssential) return false;
+    if (examYearFilter && q.examYear !== '2유') return false;
     if (memoOnly && !(memos[q.questionId]?.trim())) return false;
     if (resultFilter !== "off") {
       const [type, countStr] = resultFilter.split("-");
@@ -479,10 +479,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
         ))}
         <div className="w-px h-4 bg-border mx-0.5" />
         <button
-          onClick={() => { setEssentialOnly((v) => !v); setActiveCell(null); }}
+          onClick={() => { setExamYearFilter((v) => !v); setActiveCell(null); }}
           className={cn(
             "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
-            essentialOnly
+            examYearFilter
               ? "bg-primary text-primary-foreground border-primary"
               : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
           )}
