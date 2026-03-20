@@ -504,12 +504,9 @@ export default function StudentLogin() {
         }}
       >
         <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <img src={xycleLogomark} alt="Xycle" className="h-5 w-5 opacity-40" />
-            <span className="text-xs" style={{ color: "hsl(0 0% 55%)" }}>
-              © 2026 Xycle
-            </span>
-          </div>
+          <span className="text-xs font-medium" style={{ color: "hsl(0 0% 55%)" }}>
+              © 2026 폰개장
+          </span>
           <div className="flex items-center gap-6">
             <a
               href="mailto:wiserlab1@gmail.com"
