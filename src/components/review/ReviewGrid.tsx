@@ -411,19 +411,27 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
     [activeCell, filteredGlobalIndices, roundCount]
   );
 
-  // Section filter config
-  const sectionFilters: { key: SectionFilter; label: string }[] = [
-    { key: "all", label: "전체" },
-    { key: "example", label: "예제" },
-    { key: "past_exam", label: "기출" },
-    { key: "practice", label: "실전" },
-  ];
+  // Detect if this book uses past_exam type — if not, use 기본/응용 labels
+  const hasPastExam = questions.some((q) => q.questionType === "past_exam");
+
+  const sectionFilters: { key: SectionFilter; label: string }[] = hasPastExam
+    ? [
+        { key: "all", label: "전체" },
+        { key: "example", label: "예제" },
+        { key: "past_exam", label: "기출" },
+        { key: "practice", label: "실전" },
+      ]
+    : [
+        { key: "all", label: "전체" },
+        { key: "example", label: "기본" },
+        { key: "practice", label: "응용" },
+      ];
 
   // Group by type
   const groupedByType = () => {
     if (sectionFilter !== "all" || resultFilter !== "off") return [{ type: sectionFilter !== "all" ? sectionFilter : "all", rows: filtered }];
     const groups: { type: string; rows: QuestionRow[] }[] = [];
-    const typeOrder: QuestionType[] = ["example", "past_exam", "practice"];
+    const typeOrder: QuestionType[] = hasPastExam ? ["example", "past_exam", "practice"] : ["example", "practice"];
     for (const t of typeOrder) {
       const rows = filtered.filter((q) => q.questionType === t);
       if (rows.length > 0) groups.push({ type: t, rows });
@@ -431,11 +439,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
     return groups;
   };
 
-  const typeLabels: Record<string, string> = {
-    example: "예제",
-    past_exam: "기출문제",
-    practice: "실전연습",
-  };
+  const typeLabels: Record<string, string> = hasPastExam
+    ? { example: "예제", past_exam: "기출문제", practice: "실전연습" }
+    : { example: "기본문제", practice: "응용문제" };
 
   const activeQuestion = activeCell ? questions[activeCell.qIdx] : undefined;
 
@@ -583,8 +589,8 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                               {q.questionType === "past_exam" && (
                                 <span className="text-primary/70 font-semibold">{q.examYear || "기출"}</span>
                               )}
-                              {q.questionType === "practice" && <span className="font-semibold">실전</span>}
-                              {q.questionType === "example" && <span className="font-semibold">예제</span>}
+                              {q.questionType === "practice" && <span className="font-semibold">{hasPastExam ? "실전" : "응용"}</span>}
+                              {q.questionType === "example" && <span className="font-semibold">{hasPastExam ? "예제" : "기본"}</span>}
                             </span>
                           </td>
                           {!isMobile && (
