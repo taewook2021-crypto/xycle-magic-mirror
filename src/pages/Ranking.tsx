@@ -634,6 +634,7 @@ export default function Ranking() {
         peerName={peerReviewName}
         peerId={peerReviewUserId}
         isMePublic={isMePublic}
+        onGoPublic={handleGoPublic}
       />
     </AppShell>
   );
