@@ -599,15 +599,24 @@ export default function Ranking() {
                       </>
                     )}
                   </Button>
-                  <Button
+                   <Button
                     variant="outline"
                     onClick={() => {
+                      if (!isMePublic) {
+                        toast({
+                          title: "프로필 공개가 필요합니다",
+                          description: "회독표를 보려면 내 프로필을 공개로 전환해야 합니다.",
+                          action: <Button size="sm" onClick={handleGoPublic}>공개로 전환</Button>,
+                        });
+                        return;
+                      }
                       setPeerReviewUserId(selectedUserId!);
                       setPeerReviewName(selectedProfile?.display_name ?? "");
                       setPeerReviewOpen(true);
                       setSelectedUserId(null);
                     }}
                   >
+                    {!isMePublic && <Lock className="h-3.5 w-3.5 mr-1" />}
                     <Eye className="h-4 w-4 mr-1" />
                     회독표
                   </Button>
