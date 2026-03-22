@@ -234,9 +234,9 @@ export default function StudentLogin() {
               wordBreak: "keep-all",
             }}
           >
-            종이 위에선 보이지 않던
+            다른 동차생들은 나보다 잘하고 있나,
             <br />
-            나의 위치를 확인하세요
+            궁금하지 않으신가요?
           </motion.h1>
 
           {/* Subtitle */}
