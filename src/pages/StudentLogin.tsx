@@ -146,7 +146,7 @@ export default function StudentLogin() {
       }}
     >
       {/* ───── Nav ───── */}
-      <nav className="sticky top-0 z-50 py-3 px-4">
+      <nav className="sticky top-0 z-50 py-3 px-4" style={{ background: "transparent" }}>
         <div
           className="max-w-6xl mx-auto flex items-center justify-between px-5 h-12 rounded-full"
           style={{
