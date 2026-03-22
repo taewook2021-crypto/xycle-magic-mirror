@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import AppShell from "@/components/layout/AppShell";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -21,12 +21,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { User, Eye, LogOut, Users } from "lucide-react";
+import { Pencil, Eye, LogOut, Users, User } from "lucide-react";
 
 export default function Profile() {
   const { user, profile, setProfile, signOut } = useAuth();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const [nickname, setNickname] = useState(profile?.display_name ?? "");
   const [saving, setSaving] = useState(false);
@@ -41,6 +40,13 @@ export default function Profile() {
       setIsPublic(profile.is_public);
     }
   }, [profile]);
+
+  const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
+  const googleName = user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? user?.email;
+  const displayName = profile?.display_name || googleName || "사용자";
+  const joinedDate = user?.created_at
+    ? new Date(user.created_at).toLocaleDateString("ko-KR", { year: "numeric", month: "long" })
+    : "";
 
   // Follower / following counts
   const { data: followerCount = 0 } = useQuery({
@@ -158,104 +164,132 @@ export default function Profile() {
 
   return (
     <AppShell>
-      <div className="max-w-lg mx-auto px-4 py-5 pb-24 md:pb-6 space-y-4">
-        <h1 className="text-lg font-bold text-foreground">프로필</h1>
+      <div className="max-w-3xl mx-auto pb-24 md:pb-6">
+        {/* Hero banner */}
+        <div
+          className="h-36 sm:h-48 rounded-b-2xl"
+          style={{
+            background: "linear-gradient(180deg, hsl(0 0% 85%) 0%, hsl(200 20% 88%) 50%, hsl(120 15% 90%) 100%)",
+          }}
+        />
 
-        {/* Social stats */}
-        <Card>
-          <CardContent className="py-4 px-4">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <User className="h-6 w-6 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground truncate">{profile?.display_name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {(profile as any)?.exam_status ?? ""}
-                </p>
-              </div>
+        {/* Profile header */}
+        <div className="px-4 sm:px-6 -mt-12 sm:-mt-14 relative">
+          <div className="flex items-end gap-4 sm:gap-6">
+            {/* Avatar */}
+            <div className="h-24 w-24 sm:h-28 sm:w-28 rounded-full border-4 border-white bg-[#f4f4f5] flex-shrink-0 overflow-hidden">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={displayName}
+                  className="h-full w-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="h-full w-full flex items-center justify-center">
+                  <User className="h-10 w-10 text-muted-foreground" />
+                </div>
+              )}
             </div>
-            <div className="flex gap-6 mt-4">
-              <button
-                onClick={() => setShowFollowers(true)}
-                className="text-center flex-1 hover:bg-accent/50 rounded-lg py-2 transition-colors"
-              >
-                <p className="text-lg font-bold text-foreground">{followerCount}</p>
-                <p className="text-[11px] text-muted-foreground">팔로워</p>
-              </button>
-              <button
-                onClick={() => setShowFollowing(true)}
-                className="text-center flex-1 hover:bg-accent/50 rounded-lg py-2 transition-colors"
-              >
-                <p className="text-lg font-bold text-foreground">{followingCount}</p>
-                <p className="text-[11px] text-muted-foreground">팔로잉</p>
-              </button>
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Nickname */}
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <CardTitle className="text-sm">닉네임 변경</CardTitle>
+            {/* Name & meta */}
+            <div className="pb-1 flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
+                {displayName}
+              </h1>
+              {profile?.display_name && googleName && profile.display_name !== googleName && (
+                <p className="text-sm text-muted-foreground truncate">@{profile.display_name}</p>
+              )}
+              {joinedDate && (
+                <p className="text-xs text-muted-foreground mt-0.5">Joined {joinedDate}</p>
+              )}
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-2">
-              <Input
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                maxLength={20}
-                placeholder="닉네임 입력"
-                className="flex-1"
-              />
-              <Button
-                onClick={handleSaveNickname}
-                disabled={saving || nickname.trim() === profile?.display_name}
-                size="sm"
-              >
-                {saving ? "저장 중..." : "저장"}
+          </div>
+
+          {/* Follower / following row */}
+          <div className="flex items-center gap-6 mt-5">
+            <button
+              onClick={() => setShowFollowers(true)}
+              className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
+            >
+              <span className="text-sm font-bold text-foreground">{followerCount}</span>
+              <span className="text-sm text-muted-foreground">팔로워</span>
+            </button>
+            <button
+              onClick={() => setShowFollowing(true)}
+              className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
+            >
+              <span className="text-sm font-bold text-foreground">{followingCount}</span>
+              <span className="text-sm text-muted-foreground">팔로잉</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Settings cards */}
+        <div className="px-4 sm:px-6 mt-8 space-y-4">
+          {/* Nickname */}
+          <Card className="border bg-white">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Pencil className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm">닉네임 변경</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-2">
+                <Input
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  maxLength={20}
+                  placeholder="닉네임 입력"
+                  className="flex-1"
+                />
+                <Button
+                  onClick={handleSaveNickname}
+                  disabled={saving || nickname.trim() === profile?.display_name}
+                  size="sm"
+                >
+                  {saving ? "저장 중..." : "저장"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Public toggle */}
+          <Card className="border bg-white">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Eye className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm">공개 설정</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="public-toggle" className="text-sm cursor-pointer">
+                  내 학습 현황 공개
+                </Label>
+                <Switch
+                  id="public-toggle"
+                  checked={isPublic}
+                  onCheckedChange={handlePublicToggle}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                공개 시 다른 수험생이 나의 회독표와 상세 통계를 볼 수 있습니다.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Logout */}
+          <Card className="border bg-white">
+            <CardContent className="pt-6">
+              <Button variant="destructive" className="w-full" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                로그아웃
               </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Public toggle */}
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4 text-muted-foreground" />
-              <CardTitle className="text-sm">공개 설정</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="public-toggle" className="text-sm cursor-pointer">
-                내 학습 현황 공개
-              </Label>
-              <Switch
-                id="public-toggle"
-                checked={isPublic}
-                onCheckedChange={handlePublicToggle}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              공개 시 다른 수험생이 나의 회독표와 상세 통계를 볼 수 있습니다.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Logout */}
-        <Card>
-          <CardContent className="pt-6">
-            <Button variant="destructive" className="w-full" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              로그아웃
-            </Button>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Private warning dialog */}
