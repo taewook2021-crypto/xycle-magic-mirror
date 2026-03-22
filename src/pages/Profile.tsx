@@ -42,10 +42,13 @@ export default function Profile() {
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
 
+  const [examStatus, setExamStatus] = useState(profile?.exam_status ?? null);
+
   useEffect(() => {
     if (profile) {
       setNickname(profile.display_name);
       setIsPublic(profile.is_public);
+      setExamStatus(profile.exam_status);
     }
   }, [profile]);
 
