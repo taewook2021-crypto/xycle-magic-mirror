@@ -123,7 +123,17 @@ export default function Dashboard() {
                   book.attempted > 0
                     ? Math.round((book.correct / book.attempted) * 100)
                     : 0;
-                const color = getSubjectColor(book.colorIndex);
+                const gradients = [
+                  "linear-gradient(135deg, #fbc2eb 0%, #f6d365 50%, #fda085 100%)",
+                  "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 50%, #f6d365 100%)",
+                  "linear-gradient(135deg, #f6d365 0%, #fda085 50%, #f5576c 100%)",
+                  "linear-gradient(135deg, #89f7fe 0%, #66a6ff 50%, #c2b0e2 100%)",
+                  "linear-gradient(135deg, #fbc2eb 0%, #c2b0e2 50%, #89f7fe 100%)",
+                  "linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #fda085 100%)",
+                  "linear-gradient(135deg, #fddb92 0%, #d1fdff 50%, #a18cd1 100%)",
+                  "linear-gradient(135deg, #fda085 0%, #f6d365 50%, #89f7fe 100%)",
+                ];
+                const gradient = gradients[book.colorIndex % gradients.length];
 
                 return (
                   <button
@@ -133,21 +143,15 @@ export default function Dashboard() {
                   >
                     {/* Thumbnail area */}
                     <div
-                      className="h-32 sm:h-36 flex items-end p-4 relative"
-                      style={{
-                        background: `linear-gradient(135deg, hsl(${color} / 0.15) 0%, hsl(${color} / 0.05) 100%)`,
-                      }}
+                      className="h-32 sm:h-36 flex items-end p-4 relative rounded-t-xl"
+                      style={{ background: gradient }}
                     >
-                      <div
-                        className="absolute top-3 right-3 w-2 h-2 rounded-full"
-                        style={{ backgroundColor: `hsl(${color})` }}
-                      />
                       <div className="space-y-1 w-full">
-                        <p className="text-base font-semibold text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+                        <p className="text-base font-semibold text-white leading-snug line-clamp-2 drop-shadow-sm">
                           {book.title}
                         </p>
                         {book.author && (
-                          <p className="text-xs text-muted-foreground">{book.author}</p>
+                          <p className="text-xs text-white/80 drop-shadow-sm">{book.author}</p>
                         )}
                       </div>
                     </div>
@@ -157,7 +161,7 @@ export default function Dashboard() {
                       <Progress
                         value={progress}
                         className="h-1.5"
-                        style={{ ["--progress-color" as string]: `hsl(${color})` }}
+                        style={{ ["--progress-color" as string]: "#DA77D1" }}
                       />
                       <div className="flex items-center justify-between text-[11px] text-muted-foreground tabular-nums">
                         <span>
@@ -166,7 +170,7 @@ export default function Dashboard() {
                         <span>정답률 {correctRate}%</span>
                       </div>
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-accent text-foreground">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#DA77D1]/10 text-[#DA77D1] border border-[#DA77D1]/20">
                           {book.subjectName}
                         </span>
                       </div>
