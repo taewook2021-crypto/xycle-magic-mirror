@@ -326,6 +326,7 @@ export default function Ranking() {
           return {
             userId, name: profileMap.get(userId)?.display_name ?? "?",
             examStatus: profileMap.get(userId)?.exam_status ?? "",
+            avatarUrl: (profileMap.get(userId) as any)?.avatar_url ?? null,
             value: streak, label: `${streak}일`, isMe: userId === user?.id,
           };
         })
