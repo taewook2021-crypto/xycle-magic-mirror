@@ -609,7 +609,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                             </td>
                           )}
                           {q.rounds.map((round, rIdx) => (
-                            <td key={rIdx} className="p-0 border-b border-r border-border last:border-r-0">
+                            <td key={rIdx} className="p-0 border-b border-r border-[hsl(0,0%,0%,0.06)] last:border-r-0">
                               <ReviewCell
                                 result={round.result}
                                 date={round.date}
