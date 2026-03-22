@@ -202,18 +202,21 @@ export function useSocialFeed() {
           .slice(0, 10);
 
         const myCount = userMap.get(user?.id ?? "") ?? 0;
+        // Only compare with peers who have the same exam_status
         const otherCounts = Array.from(userMap.entries())
-          .filter(([uid]) => uid !== user?.id)
+          .filter(([uid]) => uid !== user?.id && (!myExamStatus || examStatusMap.get(uid) === myExamStatus))
           .map(([, c]) => c);
         const avgCount = otherCounts.length > 0
           ? Math.round(otherCounts.reduce((s, c) => s + c, 0) / otherCounts.length)
           : 0;
+        const peerGroupLabel = myExamStatus || "전체";
 
         return {
           bookTitle: bookMap.get(bookId) ?? "교재",
           myCount,
           avgCount,
           peers,
+          peerGroupLabel,
         };
       })
       .filter((b) => b.peers.length > 0);
