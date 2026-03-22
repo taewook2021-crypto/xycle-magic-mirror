@@ -296,7 +296,7 @@ function MockWrongFilter() {
       <div className="rounded-lg p-2.5 text-center" style={{ background: "hsl(0 0% 96%)", border: "1px solid hsl(0 0% 90%)" }}>
         <p className="text-[9px]" style={{ color: "hsl(0 0% 55%)" }}>
           종이 회독표에선 전체를 훑어야 합니다.<br />
-          <span className="font-bold" style={{ color: "hsl(0 0% 14%)" }}>폰개장은 터치 한 번.</span>
+          <span className="font-bold" style={{ color: "hsl(0 0% 14%)" }}>분개장은 터치 한 번.</span>
         </p>
       </div>
     </div>
