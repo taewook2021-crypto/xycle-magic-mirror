@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import CookieConsent from "@/components/CookieConsent";
+import bungaejangLogo from "@/assets/bungaejang-logo.svg";
 
 const features = [
   {
