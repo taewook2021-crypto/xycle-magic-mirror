@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useSocialFeed } from "@/hooks/useSocialFeed";
-import { Search, BookOpen, Check, Plus } from "lucide-react";
+import { Search, BookOpen, Plus, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { getSubjectColor } from "@/components/dashboard/SubjectProgressCard";
@@ -12,6 +12,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { subjectProgress, bookProgress, userBooks, allBooks, loading, addBook } =
     useDashboardData();
+  const { liveFeedBooks } = useSocialFeed();
 
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -99,6 +100,61 @@ export default function Dashboard() {
             </button>
           ))}
         </div>
+
+        {/* Peer comparison summary */}
+        {!loading && liveFeedBooks.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold text-foreground mb-3">오늘의 동차생 비교</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {liveFeedBooks.map((feed) => {
+                const diff = feed.myCount - feed.avgCount;
+                const isAhead = diff > 0;
+                const isBehind = diff < 0;
+                return (
+                  <div
+                    key={feed.bookTitle}
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-white transition-all hover:shadow-sm"
+                    style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
+                  >
+                    <div
+                      className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{
+                        background: isAhead ? "hsl(142 70% 95%)" : isBehind ? "hsl(0 70% 95%)" : "hsl(0 0% 96%)",
+                      }}
+                    >
+                      {isAhead ? (
+                        <TrendingUp className="h-5 w-5" style={{ color: "hsl(142 70% 40%)" }} />
+                      ) : isBehind ? (
+                        <TrendingDown className="h-5 w-5" style={{ color: "hsl(0 70% 50%)" }} />
+                      ) : (
+                        <Minus className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">{feed.bookTitle}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        나 <span className="font-bold text-foreground">{feed.myCount}</span>문제
+                        <span className="mx-1.5">·</span>
+                        동차생 평균 <span className="font-bold text-foreground">{feed.avgCount}</span>문제
+                      </p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <span
+                        className="text-sm font-bold"
+                        style={{
+                          color: isAhead ? "hsl(142 70% 40%)" : isBehind ? "hsl(0 70% 50%)" : "hsl(0 0% 50%)",
+                        }}
+                      >
+                        {isAhead ? "+" : ""}{diff}
+                      </span>
+                      <p className="text-[10px] text-muted-foreground">문제</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Book card grid */}
         <div className="mt-6">
