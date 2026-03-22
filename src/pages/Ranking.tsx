@@ -612,7 +612,7 @@ export default function Ranking() {
 
       {/* User profile sheet - styled like /profile page */}
       <Sheet open={!!selectedUserId} onOpenChange={(open) => !open && setSelectedUserId(null)}>
-        <SheetContent side="bottom" className="max-h-[70vh] p-0 overflow-y-auto">
+        <SheetContent side="bottom" className="max-h-[85vh] min-h-[400px] p-0 overflow-y-auto rounded-t-2xl">
           {selectedProfile && (
             <PeerProfileCard
               profile={selectedProfile}
