@@ -183,6 +183,7 @@ export default function Ranking() {
     };
   }, [queryClient]);
 
+  const chapterToBook = useMemo(() => {
     const m = new Map<string, string>();
     chapters?.forEach((c) => m.set(c.id, c.book_id));
     return m;
