@@ -9,6 +9,7 @@ interface PeerProfileCardProps {
     display_name: string;
     exam_status: string | null;
     is_public: boolean;
+    avatar_url?: string | null;
   };
   isMe: boolean;
   isFollowing: boolean;
