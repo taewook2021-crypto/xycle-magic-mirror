@@ -183,6 +183,7 @@ export default function Profile() {
     }
   };
 
+  const handleSignOut = async () => {
     await signOut();
     navigate("/");
   };
