@@ -301,6 +301,7 @@ export default function StudentLogin() {
                 </span>
               ))}
             </div>
+            <p className="text-xs mt-2" style={{ color: "hsl(0 0% 60%)" }}>...and more!</p>
           </motion.div>
         </div>
       </section>
