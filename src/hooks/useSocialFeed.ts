@@ -29,13 +29,13 @@ export function useSocialFeed() {
     refetchInterval: 60_000,
   });
 
-  // Public profiles
+  // Public profiles with exam_status
   const { data: profiles } = useQuery({
     queryKey: ["social-profiles"],
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, display_name, is_public")
+        .select("id, display_name, is_public, exam_status")
         .eq("is_public", true);
       return data ?? [];
     },
