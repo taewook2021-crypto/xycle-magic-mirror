@@ -361,7 +361,7 @@ export default function Ranking() {
   }, [allAttempts, selectedBook, questionToBook, questionsPerBook, profileMap, user]);
 
   const selectedProfile = selectedUserId ? allProfileMap.get(selectedUserId) : null;
-  const isFollowing = myFollows?.has(selectedUserId ?? "") ?? false;
+  const isFollowing = !!selectedUserId && myFollows.includes(selectedUserId);
   const isMe = selectedUserId === user?.id;
 
   const handleUserClick = (userId: string) => {
