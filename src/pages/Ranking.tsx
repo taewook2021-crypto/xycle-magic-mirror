@@ -299,6 +299,7 @@ export default function Ranking() {
           return {
             userId, name: profileMap.get(userId)?.display_name ?? "?",
             examStatus: profileMap.get(userId)?.exam_status ?? "",
+            avatarUrl: (profileMap.get(userId) as any)?.avatar_url ?? null,
             value: pct, label: `${pct}% (${s.correct}/${s.total})`, isMe: userId === user?.id,
           };
         })
