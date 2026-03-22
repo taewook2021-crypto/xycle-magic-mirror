@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import AppShell from "@/components/layout/AppShell";
@@ -9,7 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import PeerProfileCard from "@/components/ranking/PeerProfileCard";
+import PeerReviewSheet from "@/components/dashboard/PeerReviewSheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +36,7 @@ const EXAM_STATUSES = [
 export default function Profile() {
   const { user, profile, setProfile, signOut } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [nickname, setNickname] = useState(profile?.display_name ?? "");
   const [saving, setSaving] = useState(false);
@@ -41,6 +44,10 @@ export default function Profile() {
   const [showPrivateWarning, setShowPrivateWarning] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [peerReviewOpen, setPeerReviewOpen] = useState(false);
+  const [peerReviewUserId, setPeerReviewUserId] = useState("");
+  const [peerReviewName, setPeerReviewName] = useState("");
 
   const [examStatus, setExamStatus] = useState(profile?.exam_status ?? null);
 
@@ -96,7 +103,7 @@ export default function Profile() {
       const ids = data.map((f) => f.follower_id);
       const { data: profs } = await supabase
         .from("profiles")
-        .select("id, display_name, exam_status")
+        .select("id, display_name, exam_status, avatar_url, is_public")
         .in("id", ids);
       return profs ?? [];
     },
@@ -115,11 +122,66 @@ export default function Profile() {
       const ids = data.map((f) => f.following_id);
       const { data: profs } = await supabase
         .from("profiles")
-        .select("id, display_name, exam_status")
+        .select("id, display_name, exam_status, avatar_url, is_public")
         .in("id", ids);
       return profs ?? [];
     },
     enabled: !!user && showFollowing,
+  });
+
+  // My follows for checking isFollowing in nested profile card
+  const { data: myFollows = [] } = useQuery({
+    queryKey: ["my-follows", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("follows")
+        .select("following_id")
+        .eq("follower_id", user!.id);
+      return data?.map((f) => f.following_id) ?? [];
+    },
+    enabled: !!user,
+  });
+
+  // Selected user profile for nested dialog
+  const { data: selectedProfile } = useQuery({
+    queryKey: ["peer-profile", selectedUserId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, display_name, exam_status, avatar_url, is_public")
+        .eq("id", selectedUserId!)
+        .single();
+      return data;
+    },
+    enabled: !!selectedUserId,
+  });
+
+  const followMutation = useMutation({
+    mutationFn: async (targetId: string) => {
+      await supabase.from("follows").insert({ follower_id: user!.id, following_id: targetId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["follower-count"] });
+      queryClient.invalidateQueries({ queryKey: ["following-count"] });
+      queryClient.invalidateQueries({ queryKey: ["followers-list"] });
+      queryClient.invalidateQueries({ queryKey: ["following-list"] });
+      toast({ title: "팔로우했습니다." });
+    },
+  });
+
+  const unfollowMutation = useMutation({
+    mutationFn: async (targetId: string) => {
+      await supabase.from("follows").delete().eq("follower_id", user!.id).eq("following_id", targetId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["follower-count"] });
+      queryClient.invalidateQueries({ queryKey: ["following-count"] });
+      queryClient.invalidateQueries({ queryKey: ["followers-list"] });
+      queryClient.invalidateQueries({ queryKey: ["following-list"] });
+      toast({ title: "언팔로우했습니다." });
+    },
   });
 
   const handleSaveNickname = async () => {
@@ -345,61 +407,116 @@ export default function Profile() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Followers sheet */}
-      <Sheet open={showFollowers} onOpenChange={setShowFollowers}>
-        <SheetContent side="bottom" className="max-h-[60vh]">
-          <SheetHeader>
-            <SheetTitle className="text-sm">팔로워</SheetTitle>
-          </SheetHeader>
-          <div className="mt-3 space-y-2 overflow-y-auto">
+      {/* Followers dialog */}
+      <Dialog open={showFollowers} onOpenChange={setShowFollowers}>
+        <DialogContent className="p-0 overflow-hidden rounded-2xl border-0 shadow-[0_25px_60px_-15px_hsl(0,0%,0%,0.25)] max-w-sm w-[calc(100%-2rem)] sm:w-full">
+          <div className="p-5 pb-2 border-b border-border">
+            <h3 className="text-base font-bold text-foreground">팔로워</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">{followerCount}명</p>
+          </div>
+          <div className="max-h-[50vh] overflow-y-auto p-2">
             {followers.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-6">팔로워가 없습니다.</p>
+              <p className="text-sm text-muted-foreground text-center py-10">팔로워가 없습니다.</p>
             ) : (
-              followers.map((f) => (
-                <div key={f.id} className="flex items-center gap-3 py-2 px-1">
-                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">{f.display_name}</p>
-                    {f.exam_status && (
-                      <p className="text-[10px] text-muted-foreground">{f.exam_status}</p>
+              followers.map((f: any) => (
+                <button
+                  key={f.id}
+                  onClick={() => { setShowFollowers(false); setSelectedUserId(f.id); }}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors text-left"
+                >
+                  <div className="h-10 w-10 rounded-full bg-muted flex-shrink-0 overflow-hidden flex items-center justify-center">
+                    {f.avatar_url ? (
+                      <img src={f.avatar_url} alt={f.display_name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <User className="h-4 w-4 text-muted-foreground" />
                     )}
                   </div>
-                </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{f.display_name}</p>
+                    {f.exam_status && (
+                      <p className="text-[11px] text-muted-foreground">{f.exam_status}</p>
+                    )}
+                  </div>
+                </button>
               ))
             )}
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
-      {/* Following sheet */}
-      <Sheet open={showFollowing} onOpenChange={setShowFollowing}>
-        <SheetContent side="bottom" className="max-h-[60vh]">
-          <SheetHeader>
-            <SheetTitle className="text-sm">팔로잉</SheetTitle>
-          </SheetHeader>
-          <div className="mt-3 space-y-2 overflow-y-auto">
+      {/* Following dialog */}
+      <Dialog open={showFollowing} onOpenChange={setShowFollowing}>
+        <DialogContent className="p-0 overflow-hidden rounded-2xl border-0 shadow-[0_25px_60px_-15px_hsl(0,0%,0%,0.25)] max-w-sm w-[calc(100%-2rem)] sm:w-full">
+          <div className="p-5 pb-2 border-b border-border">
+            <h3 className="text-base font-bold text-foreground">팔로잉</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">{followingCount}명</p>
+          </div>
+          <div className="max-h-[50vh] overflow-y-auto p-2">
             {following.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-6">팔로잉이 없습니다.</p>
+              <p className="text-sm text-muted-foreground text-center py-10">팔로잉이 없습니다.</p>
             ) : (
-              following.map((f) => (
-                <div key={f.id} className="flex items-center gap-3 py-2 px-1">
-                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">{f.display_name}</p>
-                    {f.exam_status && (
-                      <p className="text-[10px] text-muted-foreground">{f.exam_status}</p>
+              following.map((f: any) => (
+                <button
+                  key={f.id}
+                  onClick={() => { setShowFollowing(false); setSelectedUserId(f.id); }}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors text-left"
+                >
+                  <div className="h-10 w-10 rounded-full bg-muted flex-shrink-0 overflow-hidden flex items-center justify-center">
+                    {f.avatar_url ? (
+                      <img src={f.avatar_url} alt={f.display_name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <User className="h-4 w-4 text-muted-foreground" />
                     )}
                   </div>
-                </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{f.display_name}</p>
+                    {f.exam_status && (
+                      <p className="text-[11px] text-muted-foreground">{f.exam_status}</p>
+                    )}
+                  </div>
+                </button>
               ))
             )}
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
+
+      {/* Peer profile card dialog */}
+      <Dialog open={!!selectedUserId} onOpenChange={(open) => !open && setSelectedUserId(null)}>
+        <DialogContent className="p-0 overflow-hidden rounded-2xl border-0 shadow-[0_25px_60px_-15px_hsl(0,0%,0%,0.25)] max-w-md w-[calc(100%-2rem)] sm:w-full">
+          {selectedProfile && (
+            <PeerProfileCard
+              profile={selectedProfile}
+              isMe={selectedUserId === user?.id}
+              isFollowing={myFollows.includes(selectedUserId!)}
+              onFollow={() => followMutation.mutate(selectedUserId!)}
+              onUnfollow={() => unfollowMutation.mutate(selectedUserId!)}
+              followPending={followMutation.isPending || unfollowMutation.isPending}
+              onViewReview={() => {
+                if (!isPublic) {
+                  toast({ title: "프로필 공개가 필요합니다", description: "회독표를 보려면 내 프로필을 공개로 전환해야 합니다." });
+                  return;
+                }
+                setPeerReviewUserId(selectedUserId!);
+                setPeerReviewName(selectedProfile.display_name);
+                setPeerReviewOpen(true);
+                setSelectedUserId(null);
+              }}
+              isMePublic={isPublic}
+              userId={selectedUserId!}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <PeerReviewSheet
+        open={peerReviewOpen}
+        onOpenChange={setPeerReviewOpen}
+        peerName={peerReviewName}
+        peerId={peerReviewUserId}
+        isMePublic={isPublic}
+        onGoPublic={() => updatePublic(true)}
+      />
     </AppShell>
   );
 }
