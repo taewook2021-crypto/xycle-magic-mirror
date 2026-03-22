@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -156,6 +156,32 @@ export default function Ranking() {
       return data ?? [];
     },
   });
+
+  // Real-time subscription: invalidate ranking queries when attempts change
+  useEffect(() => {
+    const channel = supabase
+      .channel("ranking-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "attempts" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["ranking-today-attempts"] });
+          queryClient.invalidateQueries({ queryKey: ["ranking-all-attempts"] });
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "profiles" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["ranking-profiles"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const chapterToBook = useMemo(() => {
     const m = new Map<string, string>();
