@@ -261,6 +261,7 @@ export default function Ranking() {
         .map(([userId, count]) => ({
           userId, name: profileMap.get(userId)?.display_name ?? "?",
           examStatus: profileMap.get(userId)?.exam_status ?? "",
+          avatarUrl: (profileMap.get(userId) as any)?.avatar_url ?? null,
           value: count, label: `${count}문제`, isMe: userId === user?.id,
         }))
         .sort((a, b) => b.value - a.value);
