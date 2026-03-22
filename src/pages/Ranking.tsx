@@ -9,6 +9,7 @@ import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus, Target, Hash, Check
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import PeerReviewSheet from "@/components/dashboard/PeerReviewSheet";
+import PeerProfileCard from "@/components/ranking/PeerProfileCard";
 
 const EXAM_GROUPS = [
   { value: "all", label: "전체" },
@@ -592,64 +593,30 @@ export default function Ranking() {
         </div>
       </div>
 
-      {/* User profile sheet */}
+      {/* User profile sheet - styled like /profile page */}
       <Sheet open={!!selectedUserId} onOpenChange={(open) => !open && setSelectedUserId(null)}>
-        <SheetContent side="bottom" className="max-h-[50vh]">
-          <SheetHeader>
-            <SheetTitle className="text-sm">프로필</SheetTitle>
-          </SheetHeader>
+        <SheetContent side="bottom" className="max-h-[70vh] p-0 overflow-y-auto">
           {selectedProfile && (
-            <div className="mt-4 space-y-5">
-              <div className="flex items-center gap-4">
-                <div className="h-14 w-14 rounded-full bg-[#f4f4f5] flex items-center justify-center">
-                  <User className="h-7 w-7 text-muted-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-base font-semibold text-foreground truncate">
-                    {selectedProfile.display_name}
-                  </p>
-                  {selectedProfile.exam_status && (
-                    <p className="text-xs text-muted-foreground">{selectedProfile.exam_status}</p>
-                  )}
-                </div>
-              </div>
-              {!isMe && (
-                <div className="flex gap-2">
-                  <Button
-                    variant={isFollowing ? "outline" : "default"}
-                    className="flex-1"
-                    onClick={() => {
-                      if (isFollowing) unfollowMutation.mutate(selectedUserId!);
-                      else followMutation.mutate(selectedUserId!);
-                    }}
-                    disabled={followMutation.isPending || unfollowMutation.isPending}
-                  >
-                    {isFollowing ? (
-                      <><UserMinus className="h-4 w-4 mr-2" />언팔로우</>
-                    ) : (
-                      <><UserPlus className="h-4 w-4 mr-2" />팔로우</>
-                    )}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      if (!isMePublic) {
-                        toast({ title: "프로필 공개가 필요합니다", description: "회독표를 보려면 내 프로필을 공개로 전환해야 합니다." });
-                        return;
-                      }
-                      setPeerReviewUserId(selectedUserId!);
-                      setPeerReviewName(selectedProfile?.display_name ?? "");
-                      setPeerReviewOpen(true);
-                      setSelectedUserId(null);
-                    }}
-                  >
-                    {!isMePublic && <Lock className="h-3.5 w-3.5 mr-1" />}
-                    <Eye className="h-4 w-4 mr-1" />
-                    회독표
-                  </Button>
-                </div>
-              )}
-            </div>
+            <PeerProfileCard
+              profile={selectedProfile}
+              isMe={isMe}
+              isFollowing={isFollowing}
+              onFollow={() => followMutation.mutate(selectedUserId!)}
+              onUnfollow={() => unfollowMutation.mutate(selectedUserId!)}
+              followPending={followMutation.isPending || unfollowMutation.isPending}
+              onViewReview={() => {
+                if (!isMePublic) {
+                  toast({ title: "프로필 공개가 필요합니다", description: "회독표를 보려면 내 프로필을 공개로 전환해야 합니다." });
+                  return;
+                }
+                setPeerReviewUserId(selectedUserId!);
+                setPeerReviewName(selectedProfile?.display_name ?? "");
+                setPeerReviewOpen(true);
+                setSelectedUserId(null);
+              }}
+              isMePublic={isMePublic}
+              userId={selectedUserId!}
+            />
           )}
         </SheetContent>
       </Sheet>
