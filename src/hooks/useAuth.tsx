@@ -108,9 +108,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const userName = nextUser.user_metadata?.full_name || nextUser.user_metadata?.name || nextUser.email?.split("@")[0];
+      const userAvatar = nextUser.user_metadata?.avatar_url || nextUser.user_metadata?.picture;
       const [nextRole, nextProfile] = await Promise.all([
         fetchRole(nextUser.id),
-        fetchProfile(nextUser.id, userName),
+        fetchProfile(nextUser.id, userName, userAvatar),
       ]);
 
       if (!isMounted) return;
