@@ -574,7 +574,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                       return (
                         <tr key={q.questionId} className={cn("transition-colors", isSkipped && "opacity-40", isActiveRow ? "bg-primary/5" : "hover:bg-accent/20")}>
                           <td
-                            className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-border cursor-pointer select-none", !isMobile && "sticky left-0 w-9 px-1", isActiveRow ? "bg-primary/5" : "bg-card")}
+                            className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-[hsl(0,0%,0%,0.06)] cursor-pointer select-none", !isMobile && "sticky left-0 w-9 px-1", isActiveRow ? "bg-primary/5" : "bg-white")}
                             onClick={() => toggleSkip(q.questionId)}
                           >
                             <span className={cn(
