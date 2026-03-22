@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useSocialFeed } from "@/hooks/useSocialFeed";
-import { Search, BookOpen, Check, Plus } from "lucide-react";
+import { Search, BookOpen, Plus, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { getSubjectColor } from "@/components/dashboard/SubjectProgressCard";
@@ -12,6 +12,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { subjectProgress, bookProgress, userBooks, allBooks, loading, addBook } =
     useDashboardData();
+  const { liveFeedBooks } = useSocialFeed();
 
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
