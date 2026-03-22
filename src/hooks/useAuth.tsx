@@ -5,6 +5,7 @@ import type { User, Session } from "@supabase/supabase-js";
 type Profile = {
   display_name: string;
   is_public: boolean;
+  exam_status: string | null;
 };
 
 type AuthContextType = {
