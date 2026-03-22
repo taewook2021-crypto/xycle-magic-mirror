@@ -24,7 +24,7 @@ const features = [
     num: "03",
     total: "04",
     title: "N번 틀린 문제만 즉시 필터",
-    desc: "종이는 처음부터 끝까지 다시 훑어야 합니다. 폰개장은 2번 이상 틀린 문제만 터치 한 번으로 추려냅니다.",
+    desc: "종이는 처음부터 끝까지 다시 훑어야 합니다. 분개장은 2번 이상 틀린 문제만 터치 한 번으로 추려냅니다.",
   },
   {
     num: "04",
@@ -36,8 +36,8 @@ const features = [
 
 const faqs = [
   {
-    q: "폰개장은 어떤 서비스인가요?",
-    a: "폰개장은 세무사·회계사 수험생을 위한 회독 관리 플랫폼입니다. 객관식 교재의 풀이 기록을 디지털화하여, 교재 횡단 취약 분석·동차생 풀이량 비교·오답 필터링 등 종이에서는 불가능한 기능을 제공합니다.",
+    q: "분개장은 어떤 서비스인가요?",
+    a: "분개장은 세무사·회계사 수험생을 위한 회독 관리 플랫폼입니다. 객관식 교재의 풀이 기록을 디지털화하여, 교재 횡단 취약 분석·동차생 풀이량 비교·오답 필터링 등 종이에서는 불가능한 기능을 제공합니다.",
   },
   {
     q: "어떤 교재가 지원되나요?",
@@ -45,7 +45,7 @@ const faqs = [
   },
   {
     q: "무료로 사용할 수 있나요?",
-    a: "네. 폰개장의 모든 핵심 기능(회독 기록, 채점, 오답 필터, 교재 횡단 분석)은 무료로 제공됩니다.",
+    a: "네. 분개장의 모든 핵심 기능(회독 기록, 채점, 오답 필터, 교재 횡단 분석)은 무료로 제공됩니다.",
   },
   {
     q: "내 풀이 데이터는 안전한가요?",
@@ -53,7 +53,7 @@ const faqs = [
   },
   {
     q: "모바일에서도 사용할 수 있나요?",
-    a: "네. 폰개장은 모바일 환경에 최적화되어 있어, 스마트폰에서도 편리하게 채점하고 기록을 확인할 수 있습니다.",
+    a: "네. 분개장은 모바일 환경에 최적화되어 있어, 스마트폰에서도 편리하게 채점하고 기록을 확인할 수 있습니다.",
   },
 ];
 
@@ -154,7 +154,7 @@ export default function StudentLogin() {
         }}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-14">
-          <span className="text-lg font-bold tracking-tight" style={{ color: "hsl(0 0% 10%)" }}>폰개장</span>
+          <span className="text-lg font-bold tracking-tight" style={{ color: "hsl(0 0% 10%)" }}>분개장</span>
           <div className="flex items-center gap-3">
             <a
               href="https://melodious-virgo-658.notion.site/Xycle-31e519deaa6280aab38bce598fbfe718"
@@ -245,7 +245,7 @@ export default function StudentLogin() {
               letterSpacing: "-0.02em",
             }}
           >
-            폰개장은 객관식 교재의 풀이 기록을 디지털화하여,
+            분개장은 객관식 교재의 풀이 기록을 디지털화하여,
             <br className="hidden sm:block" />
             동차생 비교·교재 횡단 분석·오답 필터를 제공합니다.
           </motion.p>
@@ -506,7 +506,7 @@ export default function StudentLogin() {
       >
         <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="text-xs font-medium" style={{ color: "hsl(0 0% 55%)" }}>
-              © 2026 폰개장
+              © 2026 분개장
           </span>
           <div className="flex items-center gap-6">
             <a
