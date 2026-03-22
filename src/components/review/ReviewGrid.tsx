@@ -561,8 +561,8 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                 {groupedByType().map((group) => (
                   <>
                     {sectionFilter === "all" && resultFilter === "off" && (
-                      <tr key={`header-${group.type}`}>
-                        <td colSpan={(isMobile ? 2 : 3) + roundCount} className="px-2 py-1 text-[10px] font-bold text-muted-foreground bg-muted/30 border-b border-border uppercase tracking-wider">
+                       <tr key={`header-${group.type}`}>
+                        <td colSpan={(isMobile ? 2 : 3) + roundCount} className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground bg-[#fafafa] border-b border-[hsl(0,0%,0%,0.06)] uppercase tracking-wider">
                           {typeLabels[group.type]} ({group.rows.length})
                         </td>
                       </tr>
