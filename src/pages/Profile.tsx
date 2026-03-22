@@ -220,14 +220,16 @@ export default function Profile() {
 
             {/* Name & meta */}
             <div className="pb-1 flex-1 min-w-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
-                {displayName}
-              </h1>
-              {examStatus && (
-                <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[hsl(var(--primary)/0.1)] text-[hsl(var(--primary))]">
-                  {examStatus}
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
+                  {displayName}
+                </h1>
+                {examStatus && (
+                  <span className="shrink-0 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[hsl(var(--primary)/0.1)] text-[hsl(var(--primary))]">
+                    {examStatus}
+                  </span>
+                )}
+              </div>
               {joinedDate && (
                 <p className="text-xs text-muted-foreground mt-0.5">Joined {joinedDate}</p>
               )}
