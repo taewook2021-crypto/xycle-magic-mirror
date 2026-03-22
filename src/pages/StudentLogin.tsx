@@ -147,15 +147,12 @@ export default function StudentLogin() {
     >
       {/* ───── Nav ───── */}
       <nav
-        className="sticky top-0 z-50 backdrop-blur-xl"
-        style={{
-          background: "transparent",
-          borderBottom: "1px solid hsl(0 0% 0% / 0.06)",
-        }}
+        className="sticky top-0 z-50"
+        style={{ background: "transparent" }}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-14">
-          <span className="text-lg font-bold tracking-tight" style={{ color: "hsl(0 0% 10%)" }}>분개장</span>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-6">
+            <span className="text-lg font-bold tracking-tight" style={{ color: "hsl(0 0% 10%)" }}>분개장</span>
             <a
               href="https://melodious-virgo-658.notion.site/Xycle-31e519deaa6280aab38bce598fbfe718"
               target="_blank"
@@ -165,17 +162,17 @@ export default function StudentLogin() {
             >
               도움말
             </a>
-            <button
-              onClick={handleGoogleLogin}
-              className="rounded-full text-sm font-semibold px-5 py-2 transition-all hover:opacity-90 active:scale-95"
-              style={{
-                background: "hsl(0 0% 13%)",
-                color: "hsl(0 0% 94%)",
-              }}
-            >
-              시작하기
-            </button>
           </div>
+          <button
+            onClick={handleGoogleLogin}
+            className="rounded-full text-sm font-semibold px-5 py-2 transition-all hover:opacity-90 active:scale-95"
+            style={{
+              background: "hsl(0 0% 13%)",
+              color: "hsl(0 0% 94%)",
+            }}
+          >
+            시작하기
+          </button>
         </div>
       </nav>
 
