@@ -22,7 +22,7 @@ interface ChapterTabsProps {
 export default function ChapterTabs({ chapters, selectedId, onSelect }: ChapterTabsProps) {
   return (
     <Select value={selectedId ?? undefined} onValueChange={onSelect}>
-      <SelectTrigger className="w-full h-9 text-xs font-medium">
+      <SelectTrigger className="w-full h-9 text-xs font-medium rounded-full bg-[#f4f4f5] border-0 px-4">
         <SelectValue placeholder="단원 선택" />
       </SelectTrigger>
       <SelectContent>

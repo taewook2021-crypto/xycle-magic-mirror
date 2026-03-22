@@ -462,16 +462,16 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
       {!singleChapter && <ChapterTabs chapters={chapters} selectedId={selectedChapterId} onSelect={setSelectedChapterId} />}
 
       {/* Section filters */}
-      <div className="flex flex-wrap items-center gap-1">
+      <div className="flex flex-wrap items-center gap-1.5">
         {sectionFilters.map((f) => (
           <button
             key={f.key}
             onClick={() => { setSectionFilter(f.key); setActiveCell(null); }}
             className={cn(
-              "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap",
               sectionFilter === f.key
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
+                ? "bg-[#DA77D1] text-white"
+                : "bg-[#f4f4f5] text-[#555] hover:bg-[#e8e8ea]"
             )}
           >
             {f.label}
@@ -481,10 +481,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
         <button
           onClick={() => { setExamYearFilter((v) => !v); setActiveCell(null); }}
           className={cn(
-            "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
+            "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap",
             examYearFilter
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
+              ? "bg-[#DA77D1] text-white"
+              : "bg-[#f4f4f5] text-[#555] hover:bg-[#e8e8ea]"
           )}
         >
           ★ 2유
@@ -492,10 +492,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
         <button
           onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
           className={cn(
-            "px-2 py-1 rounded-md text-[11px] font-medium transition-all border whitespace-nowrap",
+            "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap",
             memoOnly
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
+              ? "bg-[#DA77D1] text-white"
+              : "bg-[#f4f4f5] text-[#555] hover:bg-[#e8e8ea]"
           )}
         >
           📝
@@ -503,10 +503,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
         <div className="w-px h-4 bg-border mx-0.5" />
         <Select value={resultFilter} onValueChange={(v) => { setResultFilter(v); setActiveCell(null); }}>
           <SelectTrigger className={cn(
-            "h-auto px-2 py-1 rounded-md text-[11px] font-medium border whitespace-nowrap w-auto min-w-0 gap-1 [&>svg]:h-3 [&>svg]:w-3",
+            "h-auto px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap w-auto min-w-0 gap-1 [&>svg]:h-3 [&>svg]:w-3 border-0",
             resultFilter !== "off"
-              ? "bg-destructive/15 text-destructive border-destructive/30"
-              : "bg-secondary text-secondary-foreground border-border"
+              ? "bg-[#DA77D1] text-white"
+              : "bg-[#f4f4f5] text-[#555] hover:bg-[#e8e8ea]"
           )}>
             <SelectValue />
           </SelectTrigger>
