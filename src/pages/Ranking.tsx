@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AppShell from "@/components/layout/AppShell";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus, Target, Hash, CheckCircle, Calendar, Search, Eye, Lock } from "lucide-react";
@@ -28,7 +27,7 @@ const SORT_OPTIONS = [
 ];
 
 export default function Ranking() {
-  const { user } = useAuth();
+  const { user, profile, setProfile } = useAuth();
   const queryClient = useQueryClient();
   const [group, setGroup] = useState("all");
   const [sortBy, setSortBy] = useState("today-count");
@@ -235,7 +234,6 @@ export default function Ranking() {
       .slice(0, 8);
   }, [searchQuery, profiles, user]);
 
-  const { profile, setProfile } = useAuth();
   const isMePublic = profile?.is_public ?? false;
 
   const handleGoPublic = async () => {
