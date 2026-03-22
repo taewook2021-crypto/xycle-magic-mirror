@@ -172,6 +172,8 @@ export function useSocialFeed() {
     // Count today's attempts per user per book
     const bookUserCounts = new Map<string, Map<string, number>>();
 
+    const myExamStatus = profile?.exam_status;
+
     for (const a of recentAttempts) {
       const chapterId = questionToChapter.get(a.question_id);
       if (!chapterId) continue;
