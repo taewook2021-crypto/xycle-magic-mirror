@@ -188,12 +188,12 @@ export default function StudentLogin() {
 
       {/* ───── Hero Section ───── */}
       <section
-        className="relative overflow-hidden"
+        className="relative overflow-hidden -mt-[72px]"
         style={{
           background: "linear-gradient(180deg, hsl(310 30% 93%) 0%, hsl(305 25% 91%) 40%, hsl(0 0% 100%) 100%)",
         }}
       >
-        <div className="max-w-4xl mx-auto px-6 pt-20 sm:pt-32 pb-24 sm:pb-40 text-center">
+        <div className="max-w-4xl mx-auto px-6 pt-[calc(72px+5rem)] sm:pt-[calc(72px+8rem)] pb-24 sm:pb-40 text-center">
           {/* Announcement pill */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
