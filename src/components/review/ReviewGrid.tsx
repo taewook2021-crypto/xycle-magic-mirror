@@ -529,7 +529,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
       {filtered.length === 0 ? (
         <div className="text-center py-8 text-xs text-muted-foreground">해당 유형의 문항이 없습니다.</div>
       ) : (
-        <div className={cn("border border-border rounded-lg overflow-hidden bg-card", activeCell && "mb-16")}>
+        <div className={cn("rounded-2xl overflow-hidden bg-white border border-[hsl(0,0%,0%,0.08)]", activeCell && "mb-16")}
+          style={{ boxShadow: "0 1px 3px hsl(0 0% 0% / 0.04)" }}
+        >
           <div className={isMobile ? "overflow-hidden" : "overflow-x-auto"}>
             <table className={cn("w-full border-collapse text-xs", isMobile && "table-fixed")}>
               {isMobile && (
