@@ -72,13 +72,13 @@ export default function Dashboard() {
         {/* Search + Stats row */}
         <div className="flex items-center gap-3 mt-6">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
             <input
               type="text"
-              placeholder="교재 검색"
+              placeholder="Search apps"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-4 rounded-lg border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
+              className="w-full h-10 pl-10 pr-4 rounded-full border border-border/60 bg-white text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-border transition-colors"
             />
           </div>
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground bg-card border border-border rounded-lg px-3 h-10">
@@ -95,8 +95,8 @@ export default function Dashboard() {
               onClick={() => setActiveFilter(f.id)}
               className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
                 activeFilter === f.id
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-card text-foreground border-border hover:bg-accent"
+                  ? "bg-white text-foreground border-border shadow-sm"
+                  : "bg-transparent text-muted-foreground border-transparent hover:bg-accent"
               }`}
             >
               {f.label}
