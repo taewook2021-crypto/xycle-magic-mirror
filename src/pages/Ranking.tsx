@@ -612,8 +612,8 @@ export default function Ranking() {
       </div>
 
       {/* User profile sheet - styled like /profile page */}
-      <Sheet open={!!selectedUserId} onOpenChange={(open) => !open && setSelectedUserId(null)}>
-        <SheetContent side="bottom" className="max-h-[85vh] min-h-[400px] p-0 overflow-y-auto rounded-t-2xl">
+      <Dialog open={!!selectedUserId} onOpenChange={(open) => !open && setSelectedUserId(null)}>
+        <DialogContent className="p-0 overflow-hidden rounded-2xl border-0 shadow-[0_25px_60px_-15px_hsl(0,0%,0%,0.25)] max-w-md w-[calc(100%-2rem)] sm:w-full">
           {selectedProfile && (
             <PeerProfileCard
               profile={selectedProfile}
@@ -636,8 +636,8 @@ export default function Ranking() {
               userId={selectedUserId!}
             />
           )}
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       <PeerReviewSheet
         open={peerReviewOpen}
