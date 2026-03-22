@@ -45,7 +45,7 @@ export default function Ranking() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, display_name, exam_status, is_public")
+        .select("id, display_name, exam_status, is_public, avatar_url")
         .eq("is_public", true);
       return data ?? [];
     },
