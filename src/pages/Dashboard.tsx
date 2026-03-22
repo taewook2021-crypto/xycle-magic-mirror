@@ -135,7 +135,7 @@ export default function Dashboard() {
                       <p className="text-xs text-muted-foreground mt-0.5">
                         나 <span className="font-bold text-foreground">{feed.myCount}</span>문제
                         <span className="mx-1.5">·</span>
-                        동차생 평균 <span className="font-bold text-foreground">{feed.avgCount}</span>문제
+                        {feed.peerGroupLabel || "전체"} 평균 <span className="font-bold text-foreground">{feed.avgCount}</span>문제
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">

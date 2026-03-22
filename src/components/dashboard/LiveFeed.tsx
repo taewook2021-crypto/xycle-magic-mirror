@@ -11,6 +11,7 @@ export interface BookFeedItem {
   myCount: number;
   avgCount: number;
   peers: PeerEntry[];
+  peerGroupLabel?: string;
 }
 
 export interface PeerEntry {
