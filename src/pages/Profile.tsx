@@ -131,7 +131,7 @@ export default function Profile() {
 
   // My follows for checking isFollowing in nested profile card
   const { data: myFollows = [] } = useQuery({
-    queryKey: ["my-follows", user?.id],
+    queryKey: ["profile-my-follows", user?.id],
     queryFn: async () => {
       const { data } = await supabase
         .from("follows")
@@ -161,7 +161,8 @@ export default function Profile() {
       await supabase.from("follows").insert({ follower_id: user!.id, following_id: targetId });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["profile-my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["ranking-my-follows"] });
       queryClient.invalidateQueries({ queryKey: ["follower-count"] });
       queryClient.invalidateQueries({ queryKey: ["following-count"] });
       queryClient.invalidateQueries({ queryKey: ["followers-list"] });
@@ -175,7 +176,8 @@ export default function Profile() {
       await supabase.from("follows").delete().eq("follower_id", user!.id).eq("following_id", targetId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["profile-my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["ranking-my-follows"] });
       queryClient.invalidateQueries({ queryKey: ["follower-count"] });
       queryClient.invalidateQueries({ queryKey: ["following-count"] });
       queryClient.invalidateQueries({ queryKey: ["followers-list"] });

@@ -52,14 +52,14 @@ export default function Ranking() {
   });
 
   // Fetch my follows
-  const { data: myFollows } = useQuery({
-    queryKey: ["my-follows", user?.id],
+  const { data: myFollows = [] } = useQuery({
+    queryKey: ["ranking-my-follows", user?.id],
     queryFn: async () => {
       const { data } = await supabase
         .from("follows")
         .select("following_id")
         .eq("follower_id", user!.id);
-      return new Set((data ?? []).map((f) => f.following_id));
+      return (data ?? []).map((f) => f.following_id);
     },
     enabled: !!user,
   });
@@ -72,7 +72,8 @@ export default function Ranking() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["ranking-my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["profile-my-follows"] });
       queryClient.invalidateQueries({ queryKey: ["follower-count"] });
       queryClient.invalidateQueries({ queryKey: ["following-count"] });
       toast({ title: "팔로우했습니다." });
@@ -89,7 +90,8 @@ export default function Ranking() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["ranking-my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["profile-my-follows"] });
       queryClient.invalidateQueries({ queryKey: ["follower-count"] });
       queryClient.invalidateQueries({ queryKey: ["following-count"] });
       toast({ title: "언팔로우했습니다." });
@@ -359,7 +361,7 @@ export default function Ranking() {
   }, [allAttempts, selectedBook, questionToBook, questionsPerBook, profileMap, user]);
 
   const selectedProfile = selectedUserId ? allProfileMap.get(selectedUserId) : null;
-  const isFollowing = myFollows?.has(selectedUserId ?? "") ?? false;
+  const isFollowing = !!selectedUserId && myFollows.includes(selectedUserId);
   const isMe = selectedUserId === user?.id;
 
   const handleUserClick = (userId: string) => {
