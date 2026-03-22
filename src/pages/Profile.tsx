@@ -142,7 +142,19 @@ export default function Profile() {
     enabled: !!user,
   });
 
-...
+  // Selected user profile for nested dialog
+  const { data: selectedProfile } = useQuery({
+    queryKey: ["peer-profile", selectedUserId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, display_name, exam_status, avatar_url, is_public")
+        .eq("id", selectedUserId!)
+        .single();
+      return data;
+    },
+    enabled: !!selectedUserId,
+  });
 
   const followMutation = useMutation({
     mutationFn: async (targetId: string) => {
