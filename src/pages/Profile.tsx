@@ -36,6 +36,7 @@ const EXAM_STATUSES = [
 export default function Profile() {
   const { user, profile, setProfile, signOut } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [nickname, setNickname] = useState(profile?.display_name ?? "");
   const [saving, setSaving] = useState(false);
@@ -43,6 +44,10 @@ export default function Profile() {
   const [showPrivateWarning, setShowPrivateWarning] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [peerReviewOpen, setPeerReviewOpen] = useState(false);
+  const [peerReviewUserId, setPeerReviewUserId] = useState("");
+  const [peerReviewName, setPeerReviewName] = useState("");
 
   const [examStatus, setExamStatus] = useState(profile?.exam_status ?? null);
 
