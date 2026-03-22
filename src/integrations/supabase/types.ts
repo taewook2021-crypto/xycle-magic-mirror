@@ -148,6 +148,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           display_name: string
           exam_status: string | null
@@ -155,6 +156,7 @@ export type Database = {
           is_public: boolean
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           display_name?: string
           exam_status?: string | null
@@ -162,6 +164,7 @@ export type Database = {
           is_public?: boolean
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           display_name?: string
           exam_status?: string | null

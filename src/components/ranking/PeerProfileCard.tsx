@@ -9,6 +9,7 @@ interface PeerProfileCardProps {
     display_name: string;
     exam_status: string | null;
     is_public: boolean;
+    avatar_url?: string | null;
   };
   isMe: boolean;
   isFollowing: boolean;
@@ -67,7 +68,11 @@ export default function PeerProfileCard({
       <div className="px-5 -mt-10 relative">
         <div className="flex items-end gap-4">
           <div className="h-20 w-20 rounded-full border-4 border-white bg-[#f4f4f5] flex-shrink-0 flex items-center justify-center overflow-hidden">
-            <User className="h-8 w-8 text-muted-foreground" />
+            {profile.avatar_url ? (
+              <img src={profile.avatar_url} alt={profile.display_name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+            ) : (
+              <User className="h-8 w-8 text-muted-foreground" />
+            )}
           </div>
           <div className="pb-1 flex-1 min-w-0">
             <div className="flex items-center gap-2">

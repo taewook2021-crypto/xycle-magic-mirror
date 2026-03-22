@@ -45,7 +45,7 @@ export default function Ranking() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, display_name, exam_status, is_public")
+        .select("id, display_name, exam_status, is_public, avatar_url")
         .eq("is_public", true);
       return data ?? [];
     },
@@ -261,6 +261,7 @@ export default function Ranking() {
         .map(([userId, count]) => ({
           userId, name: profileMap.get(userId)?.display_name ?? "?",
           examStatus: profileMap.get(userId)?.exam_status ?? "",
+          avatarUrl: (profileMap.get(userId) as any)?.avatar_url ?? null,
           value: count, label: `${count}문제`, isMe: userId === user?.id,
         }))
         .sort((a, b) => b.value - a.value);
@@ -275,6 +276,7 @@ export default function Ranking() {
         .map(([userId, count]) => ({
           userId, name: profileMap.get(userId)?.display_name ?? "?",
           examStatus: profileMap.get(userId)?.exam_status ?? "",
+          avatarUrl: (profileMap.get(userId) as any)?.avatar_url ?? null,
           value: count, label: `${count}문제`, isMe: userId === user?.id,
         }))
         .sort((a, b) => b.value - a.value);
@@ -297,6 +299,7 @@ export default function Ranking() {
           return {
             userId, name: profileMap.get(userId)?.display_name ?? "?",
             examStatus: profileMap.get(userId)?.exam_status ?? "",
+            avatarUrl: (profileMap.get(userId) as any)?.avatar_url ?? null,
             value: pct, label: `${pct}% (${s.correct}/${s.total})`, isMe: userId === user?.id,
           };
         })
@@ -323,6 +326,7 @@ export default function Ranking() {
           return {
             userId, name: profileMap.get(userId)?.display_name ?? "?",
             examStatus: profileMap.get(userId)?.exam_status ?? "",
+            avatarUrl: (profileMap.get(userId) as any)?.avatar_url ?? null,
             value: streak, label: `${streak}일`, isMe: userId === user?.id,
           };
         })
@@ -348,6 +352,7 @@ export default function Ranking() {
       .map(([userId, qs]) => ({
         userId, name: profileMap.get(userId)?.display_name ?? "?",
         examStatus: profileMap.get(userId)?.exam_status ?? "",
+        avatarUrl: (profileMap.get(userId) as any)?.avatar_url ?? null,
         solved: qs.size, total: totalQ, pct: Math.round((qs.size / totalQ) * 100),
         isMe: userId === user?.id,
       }))
@@ -401,8 +406,12 @@ export default function Ranking() {
                   className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#f9f9f9] transition-colors"
                   onClick={() => { setSelectedUserId(p.id); setSearchQuery(""); }}
                 >
-                  <div className="h-8 w-8 rounded-full bg-[#f4f4f5] flex items-center justify-center">
-                    <User className="h-4 w-4 text-muted-foreground" />
+                  <div className="h-8 w-8 rounded-full bg-[#f4f4f5] flex items-center justify-center overflow-hidden">
+                    {(p as any).avatar_url ? (
+                      <img src={(p as any).avatar_url} alt={p.display_name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <User className="h-4 w-4 text-muted-foreground" />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{p.display_name}</p>
@@ -502,8 +511,12 @@ export default function Ranking() {
                       <div className="w-8 flex items-center justify-center flex-shrink-0">
                         {getRankIcon(i)}
                       </div>
-                      <div className="h-9 w-9 rounded-full bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
-                        <User className="h-4 w-4 text-muted-foreground" />
+                      <div className="h-9 w-9 rounded-full bg-[#f4f4f5] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {r.avatarUrl ? (
+                          <img src={r.avatarUrl} alt={r.name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                        ) : (
+                          <User className="h-4 w-4 text-muted-foreground" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-foreground truncate">
@@ -570,8 +583,12 @@ export default function Ranking() {
                       <div className="w-8 flex items-center justify-center flex-shrink-0">
                         {getRankIcon(i)}
                       </div>
-                      <div className="h-9 w-9 rounded-full bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
-                        <User className="h-4 w-4 text-muted-foreground" />
+                      <div className="h-9 w-9 rounded-full bg-[#f4f4f5] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {r.avatarUrl ? (
+                          <img src={r.avatarUrl} alt={r.name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                        ) : (
+                          <User className="h-4 w-4 text-muted-foreground" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-foreground truncate">
