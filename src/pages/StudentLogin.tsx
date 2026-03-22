@@ -163,15 +163,6 @@ export default function StudentLogin() {
         >
           <div className="flex items-center gap-6">
             <img src={bungaejangLogo} alt="분개장" className="h-5" />
-            <a
-              href="https://melodious-virgo-658.notion.site/Xycle-31e519deaa6280aab38bce598fbfe718"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium transition-colors hover:text-foreground"
-              style={{ color: "hsl(0 0% 40%)" }}
-            >
-              도움말
-            </a>
           </div>
           <button
             onClick={handleGoogleLogin}
