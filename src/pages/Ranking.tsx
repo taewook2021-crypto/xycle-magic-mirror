@@ -234,7 +234,6 @@ export default function Ranking() {
       .slice(0, 8);
   }, [searchQuery, profiles, user]);
 
-  const { profile, setProfile } = useAuth();
   const isMePublic = profile?.is_public ?? false;
 
   const handleGoPublic = async () => {
