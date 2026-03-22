@@ -1,14 +1,10 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AppShell from "@/components/layout/AppShell";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus, Target, Hash, CheckCircle, Calendar, Search, Eye, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -34,6 +30,7 @@ export default function Ranking() {
   const queryClient = useQueryClient();
   const [group, setGroup] = useState("all");
   const [sortBy, setSortBy] = useState("today-count");
+  const [activeTab, setActiveTab] = useState<"today" | "book">("today");
   const [selectedBook, setSelectedBook] = useState<string>("all");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -98,7 +95,6 @@ export default function Ranking() {
     },
   });
 
-  // Fetch today's attempts for all public users
   const todayStart = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
@@ -116,7 +112,6 @@ export default function Ranking() {
     },
   });
 
-  // Fetch user's registered books only
   const { data: books } = useQuery({
     queryKey: ["ranking-books", user?.id],
     queryFn: async () => {
@@ -149,9 +144,7 @@ export default function Ranking() {
   const { data: questions } = useQuery({
     queryKey: ["ranking-questions"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("questions")
-        .select("id, chapter_id");
+      const { data } = await supabase.from("questions").select("id, chapter_id");
       return data ?? [];
     },
   });
@@ -159,14 +152,11 @@ export default function Ranking() {
   const { data: chapters } = useQuery({
     queryKey: ["ranking-chapters"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("chapters")
-        .select("id, book_id");
+      const { data } = await supabase.from("chapters").select("id, book_id");
       return data ?? [];
     },
   });
 
-  // Build lookup maps
   const chapterToBook = useMemo(() => {
     const m = new Map<string, string>();
     chapters?.forEach((c) => m.set(c.id, c.book_id));
@@ -191,7 +181,6 @@ export default function Ranking() {
     return m;
   }, [questions, questionToBook]);
 
-  // Filter profiles by group
   const filteredProfiles = useMemo(() => {
     if (!profiles) return [];
     if (group === "all") return profiles;
@@ -204,14 +193,12 @@ export default function Ranking() {
     return m;
   }, [filteredProfiles]);
 
-  // All profiles map (unfiltered) for sheet lookup
   const allProfileMap = useMemo(() => {
     const m = new Map<string, NonNullable<typeof profiles>[number]>();
     profiles?.forEach((p) => m.set(p.id, p));
     return m;
   }, [profiles]);
 
-  // Search results
   const searchResults = useMemo(() => {
     if (!searchQuery.trim() || !profiles) return [];
     const q = searchQuery.trim().toLowerCase();
@@ -235,48 +222,36 @@ export default function Ranking() {
     }
   };
 
-  // Unified ranking based on sortBy
+  // Unified ranking
   const generalRanking = useMemo(() => {
     if (sortBy === "today-count") {
       if (!todayAttempts) return [];
       const counts = new Map<string, number>();
       todayAttempts.forEach((a) => {
-        if (profileMap.has(a.user_id)) {
-          counts.set(a.user_id, (counts.get(a.user_id) ?? 0) + 1);
-        }
+        if (profileMap.has(a.user_id)) counts.set(a.user_id, (counts.get(a.user_id) ?? 0) + 1);
       });
       return Array.from(counts.entries())
         .map(([userId, count]) => ({
-          userId,
-          name: profileMap.get(userId)?.display_name ?? "?",
+          userId, name: profileMap.get(userId)?.display_name ?? "?",
           examStatus: profileMap.get(userId)?.exam_status ?? "",
-          value: count,
-          label: `${count}문제`,
-          isMe: userId === user?.id,
+          value: count, label: `${count}문제`, isMe: userId === user?.id,
         }))
         .sort((a, b) => b.value - a.value);
     }
-
     if (sortBy === "total-count") {
       if (!allAttempts) return [];
       const counts = new Map<string, number>();
       allAttempts.forEach((a) => {
-        if (profileMap.has(a.user_id)) {
-          counts.set(a.user_id, (counts.get(a.user_id) ?? 0) + 1);
-        }
+        if (profileMap.has(a.user_id)) counts.set(a.user_id, (counts.get(a.user_id) ?? 0) + 1);
       });
       return Array.from(counts.entries())
         .map(([userId, count]) => ({
-          userId,
-          name: profileMap.get(userId)?.display_name ?? "?",
+          userId, name: profileMap.get(userId)?.display_name ?? "?",
           examStatus: profileMap.get(userId)?.exam_status ?? "",
-          value: count,
-          label: `${count}문제`,
-          isMe: userId === user?.id,
+          value: count, label: `${count}문제`, isMe: userId === user?.id,
         }))
         .sort((a, b) => b.value - a.value);
     }
-
     if (sortBy === "today-correct") {
       if (!todayAttempts) return [];
       const stats = new Map<string, { correct: number; total: number }>();
@@ -293,17 +268,13 @@ export default function Ranking() {
         .map(([userId, s]) => {
           const pct = Math.round((s.correct / s.total) * 100);
           return {
-            userId,
-            name: profileMap.get(userId)?.display_name ?? "?",
+            userId, name: profileMap.get(userId)?.display_name ?? "?",
             examStatus: profileMap.get(userId)?.exam_status ?? "",
-            value: pct,
-            label: `${pct}% (${s.correct}/${s.total})`,
-            isMe: userId === user?.id,
+            value: pct, label: `${pct}% (${s.correct}/${s.total})`, isMe: userId === user?.id,
           };
         })
         .sort((a, b) => b.value - a.value);
     }
-
     if (sortBy === "streak") {
       if (!allAttempts) return [];
       const userDates = new Map<string, Set<string>>();
@@ -320,30 +291,21 @@ export default function Ranking() {
           const d = new Date(today);
           while (true) {
             const key = d.toISOString().slice(0, 10);
-            if (dates.has(key)) {
-              streak++;
-              d.setDate(d.getDate() - 1);
-            } else {
-              break;
-            }
+            if (dates.has(key)) { streak++; d.setDate(d.getDate() - 1); } else break;
           }
           return {
-            userId,
-            name: profileMap.get(userId)?.display_name ?? "?",
+            userId, name: profileMap.get(userId)?.display_name ?? "?",
             examStatus: profileMap.get(userId)?.exam_status ?? "",
-            value: streak,
-            label: `${streak}일`,
-            isMe: userId === user?.id,
+            value: streak, label: `${streak}일`, isMe: userId === user?.id,
           };
         })
         .filter((r) => r.value > 0)
         .sort((a, b) => b.value - a.value);
     }
-
     return [];
   }, [sortBy, todayAttempts, allAttempts, profileMap, user]);
 
-  // Book-based ranking
+  // Book ranking
   const bookRanking = useMemo(() => {
     if (!allAttempts || selectedBook === "all") return [];
     const counts = new Map<string, Set<string>>();
@@ -357,105 +319,67 @@ export default function Ranking() {
     const totalQ = questionsPerBook.get(selectedBook) ?? 1;
     return Array.from(counts.entries())
       .map(([userId, qs]) => ({
-        userId,
-        name: profileMap.get(userId)?.display_name ?? "?",
+        userId, name: profileMap.get(userId)?.display_name ?? "?",
         examStatus: profileMap.get(userId)?.exam_status ?? "",
-        solved: qs.size,
-        total: totalQ,
-        pct: Math.round((qs.size / totalQ) * 100),
+        solved: qs.size, total: totalQ, pct: Math.round((qs.size / totalQ) * 100),
         isMe: userId === user?.id,
       }))
       .sort((a, b) => b.pct - a.pct);
   }, [allAttempts, selectedBook, questionToBook, questionsPerBook, profileMap, user]);
 
-  // Selected user for sheet
   const selectedProfile = selectedUserId ? allProfileMap.get(selectedUserId) : null;
   const isFollowing = myFollows?.has(selectedUserId ?? "") ?? false;
   const isMe = selectedUserId === user?.id;
 
   const handleUserClick = (userId: string) => {
-    if (userId !== user?.id) {
-      setSelectedUserId(userId);
-    }
+    if (userId !== user?.id) setSelectedUserId(userId);
   };
 
-  // Rank card renderer
-  const RankCard = ({ userId, rank, isMe: cardIsMe, children }: {
-    userId: string;
-    rank: number;
-    isMe: boolean;
-    children: React.ReactNode;
-  }) => (
-    <Card
-      className={cn(
-        cardIsMe ? "ring-1 ring-primary" : "cursor-pointer hover:bg-accent/30 transition-colors",
-      )}
-      onClick={() => handleUserClick(userId)}
-    >
-      <CardContent className="flex items-center gap-3 py-3 px-4">
-        <span className={cn(
-          "w-6 text-center font-bold text-sm",
-          rank === 0 && "text-yellow-500",
-          rank === 1 && "text-gray-400",
-          rank === 2 && "text-amber-600",
-          rank > 2 && "text-muted-foreground"
-        )}>
-          {rank === 0 ? <Trophy className="h-4 w-4 mx-auto text-yellow-500" /> : rank + 1}
-        </span>
-        {children}
-      </CardContent>
-    </Card>
-  );
+  const getRankIcon = (rank: number) => {
+    if (rank === 0) return <Trophy className="h-4 w-4" style={{ color: "hsl(45 90% 50%)" }} />;
+    if (rank === 1) return <span className="text-sm font-bold" style={{ color: "hsl(0 0% 65%)" }}>2</span>;
+    if (rank === 2) return <span className="text-sm font-bold" style={{ color: "hsl(25 70% 50%)" }}>3</span>;
+    return <span className="text-sm font-bold text-muted-foreground">{rank + 1}</span>;
+  };
 
   return (
     <AppShell>
-      <div className="max-w-lg mx-auto px-4 py-5 pb-24 md:pb-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-lg font-bold text-foreground">랭킹</h1>
-          <Select value={group} onValueChange={setGroup}>
-            <SelectTrigger className="w-24 h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {EXAM_GROUPS.map((g) => (
-                <SelectItem key={g.value} value={g.value} className="text-xs">
-                  {g.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="px-4 sm:px-8 pt-8 pb-24 md:pb-6 max-w-6xl mx-auto">
+        {/* Header */}
+        <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+          랭킹
+        </h1>
+        <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+          다른 수험생들과 풀이량을 비교하세요.
+        </p>
 
-        {/* User search */}
-        <div className="relative">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-            <Input
-              placeholder="닉네임으로 검색..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9 text-sm"
-            />
-          </div>
+        {/* Search */}
+        <div className="relative mt-6 max-w-md">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+          <input
+            type="text"
+            placeholder="닉네임으로 검색"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-10 pl-10 pr-4 rounded-full border border-border/60 bg-white text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-border transition-colors"
+          />
           {searchResults.length > 0 && (
-            <div className="absolute z-20 top-full mt-1 w-full bg-popover border border-border rounded-lg shadow-lg overflow-hidden">
+            <div
+              className="absolute z-20 top-full mt-2 w-full rounded-2xl overflow-hidden bg-white"
+              style={{ border: "1px solid hsl(0 0% 0% / 0.08)", boxShadow: "0 4px 20px hsl(0 0% 0% / 0.08)" }}
+            >
               {searchResults.map((p) => (
                 <button
                   key={p.id}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-accent transition-colors"
-                  onClick={() => {
-                    setSelectedUserId(p.id);
-                    setSearchQuery("");
-                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#f9f9f9] transition-colors"
+                  onClick={() => { setSelectedUserId(p.id); setSearchQuery(""); }}
                 >
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <User className="h-4 w-4 text-primary" />
+                  <div className="h-8 w-8 rounded-full bg-[#f4f4f5] flex items-center justify-center">
+                    <User className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{p.display_name}</p>
-                    {p.exam_status && (
-                      <p className="text-[10px] text-muted-foreground">{p.exam_status}</p>
-                    )}
+                    {p.exam_status && <p className="text-[10px] text-muted-foreground">{p.exam_status}</p>}
                   </div>
                 </button>
               ))}
@@ -463,92 +387,183 @@ export default function Ranking() {
           )}
         </div>
 
-        <Tabs defaultValue="today">
-          <TabsList className="w-full">
-            <TabsTrigger value="today" className="flex-1 text-xs gap-1">
-              <Flame className="h-3.5 w-3.5" />
-              오늘의 풀이왕
-            </TabsTrigger>
-            <TabsTrigger value="book" className="flex-1 text-xs gap-1">
-              <BookOpen className="h-3.5 w-3.5" />
-              교재별
-            </TabsTrigger>
-          </TabsList>
+        {/* Group filter pills */}
+        <div className="flex items-center gap-2 mt-5 overflow-x-auto pb-1 scrollbar-hide">
+          {EXAM_GROUPS.map((g) => (
+            <button
+              key={g.value}
+              onClick={() => setGroup(g.value)}
+              className={cn(
+                "shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
+                group === g.value
+                  ? "bg-[#DA77D1] text-white border-[#DA77D1]"
+                  : "bg-transparent text-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+              )}
+            >
+              {g.label}
+            </button>
+          ))}
+        </div>
 
-          <TabsContent value="today" className="space-y-2 mt-3">
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="h-8 text-xs w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
+        {/* Tab pills */}
+        <div className="flex items-center gap-2 mt-4">
+          <button
+            onClick={() => setActiveTab("today")}
+            className={cn(
+              "flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
+              activeTab === "today"
+                ? "bg-foreground text-white border-foreground"
+                : "bg-transparent text-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+            )}
+          >
+            <Flame className="h-3.5 w-3.5" />
+            오늘의 풀이왕
+          </button>
+          <button
+            onClick={() => setActiveTab("book")}
+            className={cn(
+              "flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
+              activeTab === "book"
+                ? "bg-foreground text-white border-foreground"
+                : "bg-transparent text-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+            )}
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            교재별
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="mt-6">
+          {activeTab === "today" && (
+            <>
+              {/* Sort pills */}
+              <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide">
                 {SORT_OPTIONS.map((o) => (
-                  <SelectItem key={o.value} value={o.value} className="text-xs">
+                  <button
+                    key={o.value}
+                    onClick={() => setSortBy(o.value)}
+                    className={cn(
+                      "shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border",
+                      sortBy === o.value
+                        ? "bg-[#DA77D1] text-white border-[#DA77D1]"
+                        : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+                    )}
+                  >
+                    <o.icon className="h-3 w-3" />
                     {o.label}
-                  </SelectItem>
+                  </button>
                 ))}
-              </SelectContent>
-            </Select>
+              </div>
 
-            {generalRanking.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                {sortBy === "today-correct" ? "오늘 5문제 이상 푼 사용자가 없습니다." : "풀이 기록이 없습니다."}
-              </p>
-            ) : (
-              generalRanking.map((r, i) => (
-                <RankCard key={r.userId} userId={r.userId} rank={i} isMe={r.isMe}>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {r.name}
-                      {r.isMe && <span className="text-xs text-primary ml-1">(나)</span>}
-                    </p>
-                    {r.examStatus && (
-                      <span className="text-[10px] text-muted-foreground">{r.examStatus}</span>
-                    )}
-                  </div>
-                  <span className="text-sm font-semibold text-foreground">{r.label}</span>
-                </RankCard>
-              ))
-            )}
-          </TabsContent>
+              {generalRanking.length === 0 ? (
+                <div className="text-center py-16 text-muted-foreground text-sm">
+                  {sortBy === "today-correct" ? "오늘 5문제 이상 푼 사용자가 없습니다." : "풀이 기록이 없습니다."}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {generalRanking.map((r, i) => (
+                    <button
+                      key={r.userId}
+                      onClick={() => handleUserClick(r.userId)}
+                      className={cn(
+                        "w-full flex items-center gap-4 p-4 rounded-2xl bg-white transition-all hover:shadow-sm text-left",
+                        r.isMe && "ring-2 ring-[#DA77D1]/30"
+                      )}
+                      style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
+                    >
+                      <div className="w-8 flex items-center justify-center flex-shrink-0">
+                        {getRankIcon(i)}
+                      </div>
+                      <div className="h-9 w-9 rounded-full bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">
+                          {r.name}
+                          {r.isMe && <span className="text-xs text-[#DA77D1] ml-1.5">(나)</span>}
+                        </p>
+                        {r.examStatus && <p className="text-[11px] text-muted-foreground">{r.examStatus}</p>}
+                      </div>
+                      <span className="text-sm font-bold text-foreground">{r.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
 
-          <TabsContent value="book" className="space-y-3 mt-3">
-            <Select value={selectedBook} onValueChange={setSelectedBook}>
-              <SelectTrigger className="h-9 text-sm">
-                <SelectValue placeholder="교재 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all" className="text-sm">교재를 선택하세요</SelectItem>
+          {activeTab === "book" && (
+            <>
+              {/* Book select pills */}
+              <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide">
+                <button
+                  onClick={() => setSelectedBook("all")}
+                  className={cn(
+                    "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border",
+                    selectedBook === "all"
+                      ? "bg-[#DA77D1] text-white border-[#DA77D1]"
+                      : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+                  )}
+                >
+                  교재 선택
+                </button>
                 {books?.map((b) => (
-                  <SelectItem key={b.id} value={b.id} className="text-sm">{b.title}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {selectedBook === "all" ? (
-              <p className="text-sm text-muted-foreground text-center py-8">교재를 선택해주세요.</p>
-            ) : bookRanking.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">풀이 기록이 없습니다.</p>
-            ) : (
-              bookRanking.map((r, i) => (
-                <RankCard key={r.userId} userId={r.userId} rank={i} isMe={r.isMe}>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {r.name}
-                      {r.isMe && <span className="text-xs text-primary ml-1">(나)</span>}
-                    </p>
-                    {r.examStatus && (
-                      <span className="text-[10px] text-muted-foreground">{r.examStatus}</span>
+                  <button
+                    key={b.id}
+                    onClick={() => setSelectedBook(b.id)}
+                    className={cn(
+                      "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border whitespace-nowrap",
+                      selectedBook === b.id
+                        ? "bg-[#DA77D1] text-white border-[#DA77D1]"
+                        : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
                     )}
-                  </div>
-                  <div className="text-right">
-                    <span className="text-sm font-semibold text-foreground">{r.pct}%</span>
-                    <p className="text-[10px] text-muted-foreground">{r.solved}/{r.total}</p>
-                  </div>
-                </RankCard>
-              ))
-            )}
-          </TabsContent>
-        </Tabs>
+                  >
+                    {b.title}
+                  </button>
+                ))}
+              </div>
+
+              {selectedBook === "all" ? (
+                <div className="text-center py-16 text-muted-foreground text-sm">교재를 선택해주세요.</div>
+              ) : bookRanking.length === 0 ? (
+                <div className="text-center py-16 text-muted-foreground text-sm">풀이 기록이 없습니다.</div>
+              ) : (
+                <div className="space-y-2">
+                  {bookRanking.map((r, i) => (
+                    <button
+                      key={r.userId}
+                      onClick={() => handleUserClick(r.userId)}
+                      className={cn(
+                        "w-full flex items-center gap-4 p-4 rounded-2xl bg-white transition-all hover:shadow-sm text-left",
+                        r.isMe && "ring-2 ring-[#DA77D1]/30"
+                      )}
+                      style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
+                    >
+                      <div className="w-8 flex items-center justify-center flex-shrink-0">
+                        {getRankIcon(i)}
+                      </div>
+                      <div className="h-9 w-9 rounded-full bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">
+                          {r.name}
+                          {r.isMe && <span className="text-xs text-[#DA77D1] ml-1.5">(나)</span>}
+                        </p>
+                        {r.examStatus && <p className="text-[11px] text-muted-foreground">{r.examStatus}</p>}
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <span className="text-sm font-bold text-foreground">{r.pct}%</span>
+                        <p className="text-[10px] text-muted-foreground">{r.solved}/{r.total}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       {/* User profile sheet */}
@@ -560,8 +575,8 @@ export default function Ranking() {
           {selectedProfile && (
             <div className="mt-4 space-y-5">
               <div className="flex items-center gap-4">
-                <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-7 w-7 text-primary" />
+                <div className="h-14 w-14 rounded-full bg-[#f4f4f5] flex items-center justify-center">
+                  <User className="h-7 w-7 text-muted-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-base font-semibold text-foreground truncate">
@@ -572,41 +587,28 @@ export default function Ranking() {
                   )}
                 </div>
               </div>
-
               {!isMe && (
                 <div className="flex gap-2">
                   <Button
                     variant={isFollowing ? "outline" : "default"}
                     className="flex-1"
                     onClick={() => {
-                      if (isFollowing) {
-                        unfollowMutation.mutate(selectedUserId!);
-                      } else {
-                        followMutation.mutate(selectedUserId!);
-                      }
+                      if (isFollowing) unfollowMutation.mutate(selectedUserId!);
+                      else followMutation.mutate(selectedUserId!);
                     }}
                     disabled={followMutation.isPending || unfollowMutation.isPending}
                   >
                     {isFollowing ? (
-                      <>
-                        <UserMinus className="h-4 w-4 mr-2" />
-                        언팔로우
-                      </>
+                      <><UserMinus className="h-4 w-4 mr-2" />언팔로우</>
                     ) : (
-                      <>
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        팔로우
-                      </>
+                      <><UserPlus className="h-4 w-4 mr-2" />팔로우</>
                     )}
                   </Button>
-                   <Button
+                  <Button
                     variant="outline"
                     onClick={() => {
                       if (!isMePublic) {
-                        toast({
-                          title: "프로필 공개가 필요합니다",
-                          description: "회독표를 보려면 내 프로필을 공개로 전환해야 합니다.",
-                        });
+                        toast({ title: "프로필 공개가 필요합니다", description: "회독표를 보려면 내 프로필을 공개로 전환해야 합니다." });
                         return;
                       }
                       setPeerReviewUserId(selectedUserId!);
@@ -626,7 +628,6 @@ export default function Ranking() {
         </SheetContent>
       </Sheet>
 
-      {/* Peer review sheet */}
       <PeerReviewSheet
         open={peerReviewOpen}
         onOpenChange={setPeerReviewOpen}
