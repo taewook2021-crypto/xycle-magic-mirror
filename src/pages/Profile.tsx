@@ -103,7 +103,7 @@ export default function Profile() {
       const ids = data.map((f) => f.follower_id);
       const { data: profs } = await supabase
         .from("profiles")
-        .select("id, display_name, exam_status")
+        .select("id, display_name, exam_status, avatar_url, is_public")
         .in("id", ids);
       return profs ?? [];
     },
@@ -122,11 +122,66 @@ export default function Profile() {
       const ids = data.map((f) => f.following_id);
       const { data: profs } = await supabase
         .from("profiles")
-        .select("id, display_name, exam_status")
+        .select("id, display_name, exam_status, avatar_url, is_public")
         .in("id", ids);
       return profs ?? [];
     },
     enabled: !!user && showFollowing,
+  });
+
+  // My follows for checking isFollowing in nested profile card
+  const { data: myFollows = [] } = useQuery({
+    queryKey: ["my-follows", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("follows")
+        .select("following_id")
+        .eq("follower_id", user!.id);
+      return data?.map((f) => f.following_id) ?? [];
+    },
+    enabled: !!user,
+  });
+
+  // Selected user profile for nested dialog
+  const { data: selectedProfile } = useQuery({
+    queryKey: ["peer-profile", selectedUserId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, display_name, exam_status, avatar_url, is_public")
+        .eq("id", selectedUserId!)
+        .single();
+      return data;
+    },
+    enabled: !!selectedUserId,
+  });
+
+  const followMutation = useMutation({
+    mutationFn: async (targetId: string) => {
+      await supabase.from("follows").insert({ follower_id: user!.id, following_id: targetId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["follower-count"] });
+      queryClient.invalidateQueries({ queryKey: ["following-count"] });
+      queryClient.invalidateQueries({ queryKey: ["followers-list"] });
+      queryClient.invalidateQueries({ queryKey: ["following-list"] });
+      toast({ title: "팔로우했습니다." });
+    },
+  });
+
+  const unfollowMutation = useMutation({
+    mutationFn: async (targetId: string) => {
+      await supabase.from("follows").delete().eq("follower_id", user!.id).eq("following_id", targetId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-follows"] });
+      queryClient.invalidateQueries({ queryKey: ["follower-count"] });
+      queryClient.invalidateQueries({ queryKey: ["following-count"] });
+      queryClient.invalidateQueries({ queryKey: ["followers-list"] });
+      queryClient.invalidateQueries({ queryKey: ["following-list"] });
+      toast({ title: "언팔로우했습니다." });
+    },
   });
 
   const handleSaveNickname = async () => {
