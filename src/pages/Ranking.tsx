@@ -358,7 +358,7 @@ export default function Ranking() {
   const isMe = selectedUserId === user?.id;
 
   const handleUserClick = (userId: string) => {
-    if (userId !== user?.id) setSelectedUserId(userId);
+    setSelectedUserId(userId);
   };
 
   const getRankIcon = (rank: number) => {
