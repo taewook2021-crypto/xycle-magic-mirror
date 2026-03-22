@@ -197,9 +197,6 @@ export default function Profile() {
               <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
                 {displayName}
               </h1>
-              {profile?.display_name && googleName && profile.display_name !== googleName && (
-                <p className="text-sm text-muted-foreground truncate">@{profile.display_name}</p>
-              )}
               {joinedDate && (
                 <p className="text-xs text-muted-foreground mt-0.5">Joined {joinedDate}</p>
               )}
