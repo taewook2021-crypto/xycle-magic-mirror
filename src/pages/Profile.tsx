@@ -251,8 +251,40 @@ export default function Profile() {
         {/* Settings cards */}
         <div className="px-4 sm:px-6 mt-8 space-y-4">
 
+          {/* Exam status selector */}
+          <div
+            className="p-5 rounded-2xl bg-white transition-all"
+            style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <div className="h-10 w-10 rounded-xl bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
+                <GraduationCap className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">수험 상태</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  랭킹에서 같은 그룹끼리 비교할 수 있습니다.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {EXAM_STATUSES.map((s) => (
+                <button
+                  key={s.value}
+                  onClick={() => handleExamStatus(s.value)}
+                  className={cn(
+                    "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
+                    examStatus === s.value
+                      ? "bg-[hsl(var(--primary))] text-white border-[hsl(var(--primary))]"
+                      : "bg-transparent text-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+                  )}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          {/* Public toggle */}
           <div
             className="flex items-center gap-4 p-5 rounded-2xl bg-white transition-all hover:shadow-sm"
             style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
