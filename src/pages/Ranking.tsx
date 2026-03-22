@@ -27,7 +27,7 @@ const SORT_OPTIONS = [
 ];
 
 export default function Ranking() {
-  const { user } = useAuth();
+  const { user, profile, setProfile } = useAuth();
   const queryClient = useQueryClient();
   const [group, setGroup] = useState("all");
   const [sortBy, setSortBy] = useState("today-count");
