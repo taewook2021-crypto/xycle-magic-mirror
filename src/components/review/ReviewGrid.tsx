@@ -468,10 +468,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
             key={f.key}
             onClick={() => { setSectionFilter(f.key); setActiveCell(null); }}
             className={cn(
-              "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap",
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
               sectionFilter === f.key
-                ? "bg-[#DA77D1] text-white"
-                : "bg-[#f4f4f5] text-[#555] hover:bg-[#e8e8ea]"
+                ? "bg-[#DA77D1] text-white border-[#DA77D1]"
+                : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
             )}
           >
             {f.label}
