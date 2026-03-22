@@ -20,7 +20,7 @@ const EXAM_STATUSES = [
 
 interface NicknameSetupProps {
   userId: string;
-  onComplete: (name: string) => void;
+  onComplete: (name: string, examStatus: string) => void;
 }
 
 export default function NicknameSetup({ userId, onComplete }: NicknameSetupProps) {
@@ -60,7 +60,7 @@ export default function NicknameSetup({ userId, onComplete }: NicknameSetupProps
       return;
     }
 
-    onComplete(trimmed);
+    onComplete(trimmed, examStatus);
   };
 
   return (
