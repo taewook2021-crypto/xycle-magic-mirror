@@ -517,5 +517,6 @@ export default function Profile() {
         isMePublic={isPublic}
         onGoPublic={() => updatePublic(true)}
       />
+    </AppShell>
   );
 }
