@@ -147,7 +147,7 @@ export default function Dashboard() {
                       style={{ background: gradient }}
                     >
                       <div className="space-y-1 w-full">
-                        <p className="text-base font-semibold text-white leading-snug line-clamp-2 drop-shadow-sm">
+                        <p className="text-base font-semibold text-[#222222] leading-snug line-clamp-2 drop-shadow-sm">
                           {book.title}
                         </p>
                         {book.author && (
