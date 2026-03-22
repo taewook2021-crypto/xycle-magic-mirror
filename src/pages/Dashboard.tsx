@@ -10,7 +10,7 @@ import { getSubjectColor } from "@/components/dashboard/SubjectProgressCard";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, loading, addBook } =
+  const { subjectProgress, bookProgress, userBooks, allBooks, loading, addBook } =
     useDashboardData();
 
   const [activeFilter, setActiveFilter] = useState("all");
