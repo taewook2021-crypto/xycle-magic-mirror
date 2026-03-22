@@ -579,8 +579,12 @@ export default function Ranking() {
                       <div className="w-8 flex items-center justify-center flex-shrink-0">
                         {getRankIcon(i)}
                       </div>
-                      <div className="h-9 w-9 rounded-full bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
-                        <User className="h-4 w-4 text-muted-foreground" />
+                      <div className="h-9 w-9 rounded-full bg-[#f4f4f5] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {r.avatarUrl ? (
+                          <img src={r.avatarUrl} alt={r.name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                        ) : (
+                          <User className="h-4 w-4 text-muted-foreground" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-foreground truncate">
