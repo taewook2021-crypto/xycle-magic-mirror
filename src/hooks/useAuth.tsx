@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return (data?.role as "instructor" | "student") ?? null;
     };
 
-    const fetchProfile = async (userId: string): Promise<Profile | null> => {
+    const fetchProfile = async (userId: string, userName?: string): Promise<Profile | null> => {
       const { data, error } = await supabase
         .from("profiles")
         .select("display_name, is_public, exam_status")
@@ -63,6 +63,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) {
         console.error("Profile fetch error:", error);
         return null;
+      }
+
+      // Auto-create profile if it doesn't exist
+      if (!data) {
+        const defaultName = userName || "사용자";
+        const { data: newProfile, error: insertError } = await supabase
+          .from("profiles")
+          .insert({ id: userId, display_name: defaultName, is_public: true })
+          .select("display_name, is_public, exam_status")
+          .single();
+        if (insertError) {
+          console.error("Profile create error:", insertError);
+          return null;
+        }
+        return newProfile as Profile;
       }
 
       return data as Profile | null;
@@ -82,9 +97,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      const userName = nextUser.user_metadata?.full_name || nextUser.user_metadata?.name || nextUser.email?.split("@")[0];
       const [nextRole, nextProfile] = await Promise.all([
         fetchRole(nextUser.id),
-        fetchProfile(nextUser.id),
+        fetchProfile(nextUser.id, userName),
       ]);
 
       if (!isMounted) return;
