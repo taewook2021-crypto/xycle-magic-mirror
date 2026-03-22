@@ -33,20 +33,17 @@ export default function FloatingInputBar({
   return (
     <div
       className={cn(
-        "fixed z-50",
-        isMobile ? "bottom-14 inset-x-0 safe-area-bottom px-3 pb-2" : "bottom-0 inset-x-0"
+        "fixed z-50 px-4",
+        isMobile ? "bottom-16 inset-x-0 safe-area-bottom" : "bottom-4 inset-x-0"
       )}
     >
       <div
-        className={cn(
-          "mx-auto flex items-center gap-3 px-4 py-3 bg-white",
-          isMobile ? "rounded-2xl max-w-md" : "max-w-4xl border-t border-[hsl(0,0%,0%,0.06)]"
-        )}
+        className="max-w-3xl mx-auto flex items-center gap-3 px-5 h-14 rounded-full"
         style={{
-          boxShadow: isMobile
-            ? "0 -4px 30px hsl(0 0% 0% / 0.1), 0 1px 3px hsl(0 0% 0% / 0.06)"
-            : "0 -2px 20px hsl(0 0% 0% / 0.06)",
-          ...(isMobile ? { border: "1px solid hsl(0 0% 0% / 0.08)" } : {}),
+          background: "hsl(0 0% 100% / 0.85)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid hsl(0 0% 0% / 0.06)",
+          boxShadow: "0 4px 20px hsl(0 0% 0% / 0.08)",
         }}
       >
         {/* Current question indicator */}
