@@ -223,6 +223,11 @@ export default function Profile() {
               <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
                 {displayName}
               </h1>
+              {examStatus && (
+                <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[hsl(var(--primary)/0.1)] text-[hsl(var(--primary))]">
+                  {examStatus}
+                </span>
+              )}
               {joinedDate && (
                 <p className="text-xs text-muted-foreground mt-0.5">Joined {joinedDate}</p>
               )}
