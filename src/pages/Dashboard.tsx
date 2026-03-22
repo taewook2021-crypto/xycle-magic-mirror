@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useSocialFeed } from "@/hooks/useSocialFeed";
-import { Search, BookOpen, Check, Plus, BarChart3 } from "lucide-react";
+import { Search, BookOpen, Check, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { getSubjectColor } from "@/components/dashboard/SubjectProgressCard";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, loading, addBook } =
+  const { subjectProgress, bookProgress, userBooks, allBooks, loading, addBook } =
     useDashboardData();
 
   const [activeFilter, setActiveFilter] = useState("all");
@@ -75,15 +75,11 @@ export default function Dashboard() {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
             <input
               type="text"
-              placeholder="Search apps"
+              placeholder="교재 검색"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-10 pl-10 pr-4 rounded-full border border-border/60 bg-white text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-border transition-colors"
             />
-          </div>
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground bg-card border border-border rounded-lg px-3 h-10">
-            <BarChart3 className="h-3.5 w-3.5" />
-            총 {totalAttempts.toLocaleString()}문제 풀이
           </div>
         </div>
 
@@ -95,8 +91,8 @@ export default function Dashboard() {
               onClick={() => setActiveFilter(f.id)}
               className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
                 activeFilter === f.id
-                  ? "bg-white text-foreground border-border shadow-sm"
-                  : "bg-transparent text-muted-foreground border-transparent hover:bg-accent"
+                  ? "bg-[#DA77D1] text-white border-[#DA77D1]"
+                  : "bg-transparent text-foreground border-border hover:bg-accent"
               }`}
             >
               {f.label}
@@ -133,7 +129,7 @@ export default function Dashboard() {
                   <button
                     key={book.id}
                     onClick={() => navigate(`/review/${book.bookId}`)}
-                    className="group text-left rounded-xl border border-border bg-card overflow-hidden hover:shadow-md transition-all duration-200"
+                    className="group text-left rounded-xl border border-border bg-white overflow-hidden hover:shadow-md transition-all duration-200"
                   >
                     {/* Thumbnail area */}
                     <div
