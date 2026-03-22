@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import CookieConsent from "@/components/CookieConsent";
+import bungaejangLogo from "@/assets/bungaejang-logo.svg";
 
 const features = [
   {
@@ -162,7 +162,7 @@ export default function StudentLogin() {
           }}
         >
           <div className="flex items-center gap-6">
-            <span className="text-base font-bold tracking-tight" style={{ color: "hsl(0 0% 10%)" }}>분개장</span>
+            <img src={bungaejangLogo} alt="분개장" className="h-5" />
             <a
               href="https://melodious-virgo-658.notion.site/Xycle-31e519deaa6280aab38bce598fbfe718"
               target="_blank"
@@ -506,7 +506,9 @@ export default function StudentLogin() {
       </section>
 
       {/* ───── Footer ───── */}
-      <footer className="py-8" />
+      <footer className="py-10 flex justify-center">
+        <img src={bungaejangLogo} alt="분개장" className="h-5 opacity-40" />
+      </footer>
 
     </div>
   );
