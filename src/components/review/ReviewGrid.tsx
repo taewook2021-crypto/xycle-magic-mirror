@@ -596,7 +596,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                             </span>
                           </td>
                           {!isMobile && (
-                            <td className={cn("sticky left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-border", isActiveRow ? "bg-primary/5" : "bg-card")}>
+                            <td className={cn("sticky left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", isActiveRow ? "bg-primary/5" : "bg-white")}>
                               <div className="flex items-center gap-1">
                                 <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{q.topic || "–"}</span>
                                 {!readOnly && (
