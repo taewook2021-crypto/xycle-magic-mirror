@@ -146,13 +146,18 @@ export default function StudentLogin() {
       }}
     >
       {/* ───── Nav ───── */}
-      <nav
-        className="sticky top-0 z-50"
-        style={{ background: "transparent" }}
-      >
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-14">
+      <nav className="sticky top-0 z-50 py-3 px-4">
+        <div
+          className="max-w-6xl mx-auto flex items-center justify-between px-5 h-12 rounded-full"
+          style={{
+            background: "hsl(0 0% 100% / 0.85)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid hsl(0 0% 0% / 0.06)",
+            boxShadow: "0 1px 3px hsl(0 0% 0% / 0.04)",
+          }}
+        >
           <div className="flex items-center gap-6">
-            <span className="text-lg font-bold tracking-tight" style={{ color: "hsl(0 0% 10%)" }}>분개장</span>
+            <span className="text-base font-bold tracking-tight" style={{ color: "hsl(0 0% 10%)" }}>분개장</span>
             <a
               href="https://melodious-virgo-658.notion.site/Xycle-31e519deaa6280aab38bce598fbfe718"
               target="_blank"
