@@ -544,14 +544,14 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                 </colgroup>
               )}
               <thead>
-                <tr className="bg-muted/60">
-                  <th className={cn("z-10 bg-muted/60 px-0.5 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border text-[10px]", !isMobile && "sticky left-0 w-9 px-1")}>#</th>
-                  <th className={cn("z-10 bg-muted/60 px-0.5 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border text-[10px]", !isMobile && "sticky left-9 w-10 px-1")}>유형</th>
+                <tr className="bg-[#fafafa]">
+                  <th className={cn("z-10 bg-[#fafafa] px-0.5 py-2.5 text-center font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]", !isMobile && "sticky left-0 w-9 px-1")}>#</th>
+                  <th className={cn("z-10 bg-[#fafafa] px-0.5 py-2.5 text-center font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]", !isMobile && "sticky left-9 w-10 px-1")}>유형</th>
                   {!isMobile && (
-                    <th className="sticky left-[76px] z-10 bg-muted/60 min-w-[100px] px-2 py-1.5 text-left font-semibold text-muted-foreground border-b border-r border-border text-[10px]">주제</th>
+                    <th className="sticky left-[76px] z-10 bg-[#fafafa] min-w-[100px] px-2 py-2.5 text-left font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]">주제</th>
                   )}
                   {Array.from({ length: roundCount }, (_, i) => (
-                    <th key={i} className="px-0.5 md:px-1 py-1.5 text-center font-semibold text-muted-foreground border-b border-r border-border last:border-r-0 text-[10px]">
+                    <th key={i} className="px-0.5 md:px-1 py-2.5 text-center font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] last:border-r-0 text-[10px]">
                       {i + 1}회
                     </th>
                   ))}
