@@ -157,7 +157,32 @@ export default function Ranking() {
     },
   });
 
-  const chapterToBook = useMemo(() => {
+  // Real-time subscription: invalidate ranking queries when attempts change
+  useEffect(() => {
+    const channel = supabase
+      .channel("ranking-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "attempts" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["ranking-today-attempts"] });
+          queryClient.invalidateQueries({ queryKey: ["ranking-all-attempts"] });
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "profiles" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["ranking-profiles"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
     const m = new Map<string, string>();
     chapters?.forEach((c) => m.set(c.id, c.book_id));
     return m;
