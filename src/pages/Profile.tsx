@@ -168,7 +168,21 @@ export default function Profile() {
     }
   };
 
-  const handleSignOut = async () => {
+  const handleExamStatus = async (value: string) => {
+    const newStatus = value === examStatus ? null : value;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ exam_status: newStatus })
+      .eq("id", user!.id);
+    if (error) {
+      toast({ title: "저장 실패", variant: "destructive" });
+    } else {
+      setExamStatus(newStatus);
+      setProfile({ ...profile!, exam_status: newStatus });
+      toast({ title: newStatus ? `${newStatus}으로 설정되었습니다.` : "수험 상태가 해제되었습니다." });
+    }
+  };
+
     await signOut();
     navigate("/");
   };
