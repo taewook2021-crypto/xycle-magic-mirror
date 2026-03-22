@@ -91,8 +91,8 @@ export default function Dashboard() {
               onClick={() => setActiveFilter(f.id)}
               className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
                 activeFilter === f.id
-                  ? "bg-white text-foreground border-border shadow-sm"
-                  : "bg-transparent text-muted-foreground border-transparent hover:bg-accent"
+                  ? "bg-[#DA77D1] text-white border-[#DA77D1]"
+                  : "bg-transparent text-foreground border-border hover:bg-accent"
               }`}
             >
               {f.label}
