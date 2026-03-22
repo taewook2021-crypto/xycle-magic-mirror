@@ -188,12 +188,12 @@ export default function StudentLogin() {
 
       {/* ───── Hero Section ───── */}
       <section
-        className="relative overflow-hidden"
+        className="relative overflow-hidden -mt-[72px]"
         style={{
           background: "linear-gradient(180deg, hsl(310 30% 93%) 0%, hsl(305 25% 91%) 40%, hsl(0 0% 100%) 100%)",
         }}
       >
-        <div className="max-w-4xl mx-auto px-6 pt-20 sm:pt-32 pb-24 sm:pb-40 text-center">
+        <div className="max-w-4xl mx-auto px-6 pt-[calc(72px+5rem)] sm:pt-[calc(72px+8rem)] pb-24 sm:pb-40 text-center">
           {/* Announcement pill */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -504,37 +504,7 @@ export default function StudentLogin() {
       </section>
 
       {/* ───── Footer ───── */}
-      <footer
-        className="py-8"
-        style={{
-          background: "transparent",
-          borderTop: "1px solid hsl(0 0% 0% / 0.06)",
-        }}
-      >
-        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="text-xs font-medium" style={{ color: "hsl(0 0% 55%)" }}>
-              © 2026 분개장
-          </span>
-          <div className="flex items-center gap-6">
-            <a
-              href="mailto:wiserlab1@gmail.com"
-              className="text-xs transition-colors hover:text-foreground"
-              style={{ color: "hsl(0 0% 55%)" }}
-            >
-              wiserlab1@gmail.com
-            </a>
-            <a
-              href="http://pf.kakao.com/_uSAyn"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs transition-colors hover:text-foreground"
-              style={{ color: "hsl(0 0% 55%)" }}
-            >
-              카카오톡
-            </a>
-          </div>
-        </div>
-      </footer>
+      <footer className="py-8" />
 
     </div>
   );
