@@ -75,7 +75,7 @@ export default function Dashboard() {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
             <input
               type="text"
-              placeholder="Search apps"
+              placeholder="교재 검색"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-10 pl-10 pr-4 rounded-full border border-border/60 bg-white text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-border transition-colors"
