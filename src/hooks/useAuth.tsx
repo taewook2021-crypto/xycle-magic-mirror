@@ -6,6 +6,7 @@ type Profile = {
   display_name: string;
   is_public: boolean;
   exam_status: string | null;
+  avatar_url: string | null;
 };
 
 type AuthContextType = {
