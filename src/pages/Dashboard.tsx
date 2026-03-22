@@ -81,10 +81,6 @@ export default function Dashboard() {
               className="w-full h-10 pl-10 pr-4 rounded-full border border-border/60 bg-white text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-border transition-colors"
             />
           </div>
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground bg-card border border-border rounded-lg px-3 h-10">
-            <BarChart3 className="h-3.5 w-3.5" />
-            총 {totalAttempts.toLocaleString()}문제 풀이
-          </div>
         </div>
 
         {/* Filter pills */}
