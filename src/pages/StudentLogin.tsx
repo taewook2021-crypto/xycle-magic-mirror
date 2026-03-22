@@ -308,7 +308,9 @@ export default function StudentLogin() {
       {/* ───── Features Section (Numbered like Base44) ───── */}
       <section
         className="py-20 sm:py-32"
-        
+        style={{
+          background: "linear-gradient(180deg, hsl(0 0% 100%) 0%, transparent 30%)",
+        }}
       >
         <div className="max-w-6xl mx-auto px-6">
           <motion.h2
