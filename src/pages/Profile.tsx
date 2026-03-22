@@ -227,39 +227,40 @@ export default function Profile() {
 
 
           {/* Public toggle */}
-          <Card className="border bg-white">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-muted-foreground" />
-                <CardTitle className="text-sm">공개 설정</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="public-toggle" className="text-sm cursor-pointer">
-                  내 학습 현황 공개
-                </Label>
-                <Switch
-                  id="public-toggle"
-                  checked={isPublic}
-                  onCheckedChange={handlePublicToggle}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
+          <div
+            className="flex items-center gap-4 p-5 rounded-2xl bg-white transition-all hover:shadow-sm"
+            style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
+          >
+            <div className="h-10 w-10 rounded-xl bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
+              <Eye className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">공개 설정</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
                 공개 시 다른 수험생이 나의 회독표와 상세 통계를 볼 수 있습니다.
               </p>
-            </CardContent>
-          </Card>
+            </div>
+            <Switch
+              id="public-toggle"
+              checked={isPublic}
+              onCheckedChange={handlePublicToggle}
+            />
+          </div>
 
           {/* Logout */}
-          <Card className="border bg-white">
-            <CardContent className="pt-6">
-              <Button variant="destructive" className="w-full" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                로그아웃
-              </Button>
-            </CardContent>
-          </Card>
+          <button
+            onClick={handleSignOut}
+            className="w-full flex items-center gap-4 p-5 rounded-2xl bg-white transition-all hover:shadow-sm text-left group"
+            style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
+          >
+            <div className="h-10 w-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+              <LogOut className="h-5 w-5 text-red-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground group-hover:text-red-600 transition-colors">로그아웃</p>
+              <p className="text-xs text-muted-foreground mt-0.5">계정에서 로그아웃합니다.</p>
+            </div>
+          </button>
         </div>
       </div>
 
