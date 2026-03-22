@@ -9,6 +9,7 @@ import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus, Target, Hash, Check
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import PeerReviewSheet from "@/components/dashboard/PeerReviewSheet";
+import PeerProfileCard from "@/components/ranking/PeerProfileCard";
 
 const EXAM_GROUPS = [
   { value: "all", label: "전체" },
