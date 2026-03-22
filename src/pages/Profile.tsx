@@ -21,7 +21,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Pencil, Eye, LogOut, Users, User } from "lucide-react";
+import { Pencil, Eye, LogOut, Users, User, GraduationCap } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const EXAM_STATUSES = [
+  { value: "초시생", label: "초시생" },
+  { value: "동차생", label: "동차생" },
+  { value: "유예생", label: "유예생" },
+  { value: "N시생", label: "N시생" },
+];
 
 export default function Profile() {
   const { user, profile, setProfile, signOut } = useAuth();
