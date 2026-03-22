@@ -220,7 +220,7 @@ export function useSocialFeed() {
         };
       })
       .filter((b) => b.peers.length > 0);
-  }, [recentAttempts, myUserBooks, questionToChapter, chapterMap, bookMap, profileMap, user, profile]);
+  }, [recentAttempts, myUserBooks, questionToChapter, chapterMap, bookMap, profileMap, examStatusMap, user, profile]);
 
   return {
     activities,
