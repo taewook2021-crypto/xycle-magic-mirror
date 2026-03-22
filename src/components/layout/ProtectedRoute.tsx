@@ -22,8 +22,8 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     return (
       <NicknameSetup
         userId={user.id}
-        onComplete={(name) => {
-          setProfile({ ...profile!, display_name: name });
+        onComplete={(name, examStatus) => {
+          setProfile({ ...profile!, display_name: name, exam_status: examStatus });
         }}
       />
     );

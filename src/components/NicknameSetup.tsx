@@ -60,7 +60,7 @@ export default function NicknameSetup({ userId, onComplete }: NicknameSetupProps
       return;
     }
 
-    onComplete(trimmed);
+    onComplete(trimmed, examStatus);
   };
 
   return (
