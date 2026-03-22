@@ -169,7 +169,7 @@ export default function Profile() {
         <div
           className="h-36 sm:h-48 rounded-b-2xl"
           style={{
-            background: "linear-gradient(180deg, hsl(0 0% 85%) 0%, hsl(200 20% 88%) 50%, hsl(120 15% 90%) 100%)",
+            background: "linear-gradient(135deg, #fbc2eb 0%, #f6d365 50%, #fda085 100%)",
           }}
         />
 
