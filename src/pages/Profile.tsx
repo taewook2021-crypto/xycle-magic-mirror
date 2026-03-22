@@ -224,33 +224,7 @@ export default function Profile() {
 
         {/* Settings cards */}
         <div className="px-4 sm:px-6 mt-8 space-y-4">
-          {/* Nickname */}
-          <Card className="border bg-white">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <Pencil className="h-4 w-4 text-muted-foreground" />
-                <CardTitle className="text-sm">닉네임 변경</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-2">
-                <Input
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  maxLength={20}
-                  placeholder="닉네임 입력"
-                  className="flex-1"
-                />
-                <Button
-                  onClick={handleSaveNickname}
-                  disabled={saving || nickname.trim() === profile?.display_name}
-                  size="sm"
-                >
-                  {saving ? "저장 중..." : "저장"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+
 
           {/* Public toggle */}
           <Card className="border bg-white">
