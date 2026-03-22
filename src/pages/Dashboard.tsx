@@ -129,7 +129,7 @@ export default function Dashboard() {
                   <button
                     key={book.id}
                     onClick={() => navigate(`/review/${book.bookId}`)}
-                    className="group text-left rounded-xl border border-border bg-card overflow-hidden hover:shadow-md transition-all duration-200"
+                    className="group text-left rounded-xl border border-border bg-white overflow-hidden hover:shadow-md transition-all duration-200"
                   >
                     {/* Thumbnail area */}
                     <div
