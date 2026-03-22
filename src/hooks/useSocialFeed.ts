@@ -85,6 +85,13 @@ export function useSocialFeed() {
     return m;
   }, [profiles]);
 
+  // Map of userId -> exam_status for filtering peers
+  const examStatusMap = useMemo(() => {
+    const m = new Map<string, string | null>();
+    profiles?.forEach((p) => m.set(p.id, p.exam_status));
+    return m;
+  }, [profiles]);
+
   const chapterMap = useMemo(() => {
     const m = new Map<string, { bookId: string; title: string }>();
     chapters?.forEach((c) => m.set(c.id, { bookId: c.book_id, title: c.title }));
