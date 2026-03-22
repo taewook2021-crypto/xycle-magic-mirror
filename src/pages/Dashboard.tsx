@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useSocialFeed } from "@/hooks/useSocialFeed";
-import { Search, BookOpen, Check, Plus, BarChart3 } from "lucide-react";
+import { Search, BookOpen, Check, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { getSubjectColor } from "@/components/dashboard/SubjectProgressCard";
