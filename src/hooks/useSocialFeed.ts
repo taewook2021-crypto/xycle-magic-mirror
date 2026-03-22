@@ -29,13 +29,13 @@ export function useSocialFeed() {
     refetchInterval: 60_000,
   });
 
-  // Public profiles
+  // Public profiles with exam_status
   const { data: profiles } = useQuery({
     queryKey: ["social-profiles"],
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, display_name, is_public")
+        .select("id, display_name, is_public, exam_status")
         .eq("is_public", true);
       return data ?? [];
     },
@@ -82,6 +82,13 @@ export function useSocialFeed() {
   const profileMap = useMemo(() => {
     const m = new Map<string, string>();
     profiles?.forEach((p) => m.set(p.id, p.display_name));
+    return m;
+  }, [profiles]);
+
+  // Map of userId -> exam_status for filtering peers
+  const examStatusMap = useMemo(() => {
+    const m = new Map<string, string | null>();
+    profiles?.forEach((p) => m.set(p.id, p.exam_status));
     return m;
   }, [profiles]);
 
@@ -165,6 +172,8 @@ export function useSocialFeed() {
     // Count today's attempts per user per book
     const bookUserCounts = new Map<string, Map<string, number>>();
 
+    const myExamStatus = profile?.exam_status;
+
     for (const a of recentAttempts) {
       const chapterId = questionToChapter.get(a.question_id);
       if (!chapterId) continue;
@@ -193,22 +202,25 @@ export function useSocialFeed() {
           .slice(0, 10);
 
         const myCount = userMap.get(user?.id ?? "") ?? 0;
+        // Only compare with peers who have the same exam_status
         const otherCounts = Array.from(userMap.entries())
-          .filter(([uid]) => uid !== user?.id)
+          .filter(([uid]) => uid !== user?.id && (!myExamStatus || examStatusMap.get(uid) === myExamStatus))
           .map(([, c]) => c);
         const avgCount = otherCounts.length > 0
           ? Math.round(otherCounts.reduce((s, c) => s + c, 0) / otherCounts.length)
           : 0;
+        const peerGroupLabel = myExamStatus || "전체";
 
         return {
           bookTitle: bookMap.get(bookId) ?? "교재",
           myCount,
           avgCount,
           peers,
+          peerGroupLabel,
         };
       })
       .filter((b) => b.peers.length > 0);
-  }, [recentAttempts, myUserBooks, questionToChapter, chapterMap, bookMap, profileMap, user, profile]);
+  }, [recentAttempts, myUserBooks, questionToChapter, chapterMap, bookMap, profileMap, examStatusMap, user, profile]);
 
   return {
     activities,
