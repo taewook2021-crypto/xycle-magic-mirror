@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Auto-create profile if it doesn't exist
       if (!data) {
-        const defaultName = userName || "사용자";
+        const defaultName = "사용자";
         const { data: newProfile, error: insertError } = await supabase
           .from("profiles")
           .insert({ id: userId, display_name: defaultName, is_public: true, avatar_url: avatarUrl || null })
