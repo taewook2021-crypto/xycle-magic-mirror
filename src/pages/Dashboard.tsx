@@ -104,7 +104,7 @@ export default function Dashboard() {
         {/* Peer comparison summary */}
         {!loading && liveFeedBooks.length > 0 && (
           <div className="mt-6">
-            <h2 className="text-lg font-semibold text-foreground mb-3">오늘의 동차생 비교</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-3">오늘의 수험생 비교</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {liveFeedBooks.map((feed) => {
                 const diff = feed.myCount - feed.avgCount;
