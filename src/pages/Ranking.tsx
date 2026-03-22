@@ -352,6 +352,7 @@ export default function Ranking() {
       .map(([userId, qs]) => ({
         userId, name: profileMap.get(userId)?.display_name ?? "?",
         examStatus: profileMap.get(userId)?.exam_status ?? "",
+        avatarUrl: (profileMap.get(userId) as any)?.avatar_url ?? null,
         solved: qs.size, total: totalQ, pct: Math.round((qs.size / totalQ) * 100),
         isMe: userId === user?.id,
       }))
