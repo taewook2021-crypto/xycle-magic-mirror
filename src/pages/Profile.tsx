@@ -21,7 +21,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Pencil, Eye, LogOut, Users, User } from "lucide-react";
+import { Pencil, Eye, LogOut, Users, User, GraduationCap } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const EXAM_STATUSES = [
+  { value: "초시생", label: "초시생" },
+  { value: "동차생", label: "동차생" },
+  { value: "유예생", label: "유예생" },
+  { value: "N시생", label: "N시생" },
+];
 
 export default function Profile() {
   const { user, profile, setProfile, signOut } = useAuth();
@@ -34,10 +42,13 @@ export default function Profile() {
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
 
+  const [examStatus, setExamStatus] = useState(profile?.exam_status ?? null);
+
   useEffect(() => {
     if (profile) {
       setNickname(profile.display_name);
       setIsPublic(profile.is_public);
+      setExamStatus(profile.exam_status);
     }
   }, [profile]);
 
@@ -157,6 +168,21 @@ export default function Profile() {
     }
   };
 
+  const handleExamStatus = async (value: string) => {
+    const newStatus = value === examStatus ? null : value;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ exam_status: newStatus })
+      .eq("id", user!.id);
+    if (error) {
+      toast({ title: "저장 실패", variant: "destructive" });
+    } else {
+      setExamStatus(newStatus);
+      setProfile({ ...profile!, exam_status: newStatus });
+      toast({ title: newStatus ? `${newStatus}으로 설정되었습니다.` : "수험 상태가 해제되었습니다." });
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
@@ -197,6 +223,11 @@ export default function Profile() {
               <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
                 {displayName}
               </h1>
+              {examStatus && (
+                <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[hsl(var(--primary)/0.1)] text-[hsl(var(--primary))]">
+                  {examStatus}
+                </span>
+              )}
               {joinedDate && (
                 <p className="text-xs text-muted-foreground mt-0.5">Joined {joinedDate}</p>
               )}
@@ -225,8 +256,40 @@ export default function Profile() {
         {/* Settings cards */}
         <div className="px-4 sm:px-6 mt-8 space-y-4">
 
+          {/* Exam status selector */}
+          <div
+            className="p-5 rounded-2xl bg-white transition-all"
+            style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <div className="h-10 w-10 rounded-xl bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
+                <GraduationCap className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">수험 상태</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  랭킹에서 같은 그룹끼리 비교할 수 있습니다.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {EXAM_STATUSES.map((s) => (
+                <button
+                  key={s.value}
+                  onClick={() => handleExamStatus(s.value)}
+                  className={cn(
+                    "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
+                    examStatus === s.value
+                      ? "bg-[hsl(var(--primary))] text-white border-[hsl(var(--primary))]"
+                      : "bg-transparent text-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+                  )}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          {/* Public toggle */}
           <div
             className="flex items-center gap-4 p-5 rounded-2xl bg-white transition-all hover:shadow-sm"
             style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}

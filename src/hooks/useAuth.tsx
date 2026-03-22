@@ -5,6 +5,7 @@ import type { User, Session } from "@supabase/supabase-js";
 type Profile = {
   display_name: string;
   is_public: boolean;
+  exam_status: string | null;
 };
 
 type AuthContextType = {
@@ -55,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const fetchProfile = async (userId: string): Promise<Profile | null> => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("display_name, is_public")
+        .select("display_name, is_public, exam_status")
         .eq("id", userId)
         .maybeSingle();
 
