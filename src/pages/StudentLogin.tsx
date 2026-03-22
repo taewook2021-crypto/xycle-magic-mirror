@@ -506,7 +506,9 @@ export default function StudentLogin() {
       </section>
 
       {/* ───── Footer ───── */}
-      <footer className="py-8" />
+      <footer className="py-10 flex justify-center">
+        <img src={bungaejangLogo} alt="분개장" className="h-5 opacity-40" />
+      </footer>
 
     </div>
   );
