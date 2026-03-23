@@ -90,7 +90,6 @@ export default function SubjectProgressCard({
                 {peerAvg && examStatus && (
                   <p className="text-[10px] text-muted-foreground/70">
                     {examStatus} 평균: {peerAvg.avgRound}회독 · {peerAvg.avgChapterTitle}
-                    <span className="ml-1 opacity-60">({peerAvg.peerCount}명)</span>
                   </p>
                 )}
               </button>
