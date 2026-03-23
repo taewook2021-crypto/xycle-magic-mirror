@@ -73,6 +73,8 @@ export default function Dashboard() {
                     colorIndex={index}
                     userBooks={userBooks}
                     bookProgress={bookProgress}
+                    peerAvgMap={peerAvgMap}
+                    examStatus={examStatus}
                   />
                 ))}
               </div>
