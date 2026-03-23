@@ -1,25 +1,43 @@
 
 
-## 강경태 법인세법 교재 문항별 주제(topic) 업데이트
+## 교재별 필터 설정 시스템
 
-### 작업 내용
-강경태 세무회계연습(법인세법) 교재(book_id: `16f79c03-ec3f-475f-8ffd-effc5fa10961`)의 1~20단원 문항에 주제(topic) 데이터를 입력합니다.
+### 요약
+books 테이블에 필터 설정 컬럼을 추가하여 교재마다 어떤 필터를 표시할지 DB에서 관리합니다.
 
-### 데이터 불일치 확인 필요
-- **9단원(감가상각비)**: 사용자 제공 8문항 vs DB 18문항 — 사용자가 제공한 8문항만 업데이트하고, 9~18번 문항은 topic을 비워둠
-- **12단원(기부금)**: 사용자 제공 16문항 vs DB 9문항 — 9문항까지만 업데이트 가능. 10~16번 문항은 DB에 존재하지 않아 누락됨 (12-10부터 12-16은 증여 관련 주제인데, 이것이 다른 단원 데이터가 잘못 포함된 것인지 확인 필요)
+### 필터 구성 정리
 
-> 12단원 10~16번 항목(초과배당, 증여재산가액 등)은 소득세법·부가세법·상증세법 교재의 증여세 단원과 동일한 주제입니다. 법인세법 12단원에 해당하지 않는 데이터일 가능성이 높습니다.
+| 교재 | 유형 필터 (기본/응용 등) | ★ 2유 | 📝 메모 | 오답 필터 |
+|------|------------------------|-------|---------|----------|
+| 김기동 | O (기본/응용) | O | O | O |
+| 강경태 | X | X | O | O |
 
-### 수정 방법
-- `questions` 테이블의 `topic` 컬럼을 UPDATE (데이터 변경이므로 insert tool 사용)
-- chapter_id + question_number 조합으로 각 문항 특정
+### 작업 단계
 
-### 업데이트 대상: 20개 단원, 약 180문항
-각 단원의 chapter_id를 사용하여 question_number별로 topic을 매칭합니다.
+**1. DB 스키마 변경 (마이그레이션)**
+- `books` 테이블에 `filter_config` jsonb 컬럼 추가 (기본값: `{"show_type_filters": true, "show_star_filter": false}`)
+- 구조: `{ show_type_filters: boolean, show_star_filter: boolean }`
+
+**2. 기존 교재 데이터 업데이트 (insert tool)**
+- 김기동 교재: `{"show_type_filters": true, "show_star_filter": true}`
+- 강경태 교재: `{"show_type_filters": false, "show_star_filter": false}`
+
+**3. ReviewGrid 컴포넌트 수정**
+- `bookId`를 이용해 해당 교재의 `filter_config`를 조회
+- `show_type_filters: false`이면 유형 필터 버튼(전체/기본/응용) 숨김
+- `show_star_filter: false`이면 ★ 2유 버튼 숨김
+- 📝 메모 필터와 오답 필터는 항상 표시
 
 ### 기술 상세
-- 단일 SQL UPDATE 문으로 CASE WHEN 패턴 사용
-- 각 chapter_id별로 별도 UPDATE 실행
-- 존재하지 않는 question_number에 대한 UPDATE는 자동으로 무시됨 (0 rows affected)
+
+```text
+books 테이블
+┌─────────────────┬────────┬─────────────────────────────────────────────┐
+│ column          │ type   │ default                                     │
+├─────────────────┼────────┼─────────────────────────────────────────────┤
+│ filter_config   │ jsonb  │ {"show_type_filters":true,"show_star_filter":false} │
+└─────────────────┴────────┴─────────────────────────────────────────────┘
+```
+
+ReviewGrid에서 `filter_config`를 fetch하여 필터 UI를 조건부 렌더링합니다. `show_type_filters`가 false인 경우 `sectionFilter`는 항상 `"all"`로 고정됩니다.
 
