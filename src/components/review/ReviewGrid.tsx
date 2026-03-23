@@ -515,7 +515,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
           </button>
         )}
         {/* Essential filter */}
-        {questions.some(q => q.isEssential) && (
+        {filterConfig.show_essential_filter && (
           <button
             onClick={() => { setEssentialOnly((v) => !v); setActiveCell(null); }}
             className={cn(
