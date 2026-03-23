@@ -59,9 +59,8 @@ export default function Profile() {
     }
   }, [profile]);
 
-  const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
-  const googleName = user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? user?.email;
-  const displayName = profile?.display_name || googleName || "사용자";
+  const avatarUrl = profile?.avatar_url ?? user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
+  const displayName = (profile?.display_name && profile.display_name !== "사용자") ? profile.display_name : "사용자";
   const joinedDate = user?.created_at
     ? new Date(user.created_at).toLocaleDateString("ko-KR", { year: "numeric", month: "long" })
     : "";
