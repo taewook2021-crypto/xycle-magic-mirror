@@ -62,7 +62,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
   const [skippedSet, setSkippedSet] = useState<Set<string>>(new Set());
   const [memos, setMemos] = useState<Record<string, string>>({});
-  const [filterConfig, setFilterConfig] = useState<FilterConfig>({ show_type_filters: true, show_star_filter: false });
+  const [filterConfig, setFilterConfig] = useState<FilterConfig>({ show_type_filters: true, show_star_filter: false, show_essential_filter: false });
 
   // Fetch filter_config for this book
   useEffect(() => {
