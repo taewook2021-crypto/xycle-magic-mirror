@@ -483,7 +483,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
 
       {/* Section filters */}
       <div className="flex flex-wrap items-center gap-1.5">
-        {sectionFilters.map((f) => (
+        {filterConfig.show_type_filters && sectionFilters.map((f) => (
           <button
             key={f.key}
             onClick={() => { setSectionFilter(f.key); setActiveCell(null); }}
@@ -497,18 +497,20 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
             {f.label}
           </button>
         ))}
-        <div className="w-px h-4 bg-border mx-0.5" />
-        <button
-          onClick={() => { setExamYearFilter((v) => !v); setActiveCell(null); }}
-          className={cn(
-            "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
-            examYearFilter
-              ? "bg-[#DA77D1] text-white border-[#DA77D1]"
-              : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
-          )}
-        >
-          ★ 2유
-        </button>
+        {filterConfig.show_type_filters && <div className="w-px h-4 bg-border mx-0.5" />}
+        {filterConfig.show_star_filter && (
+          <button
+            onClick={() => { setExamYearFilter((v) => !v); setActiveCell(null); }}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
+              examYearFilter
+                ? "bg-[#DA77D1] text-white border-[#DA77D1]"
+                : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+            )}
+          >
+            ★ 2유
+          </button>
+        )}
         <button
           onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
           className={cn(
