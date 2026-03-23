@@ -64,6 +64,7 @@ export type Database = {
           id: string
           subject_id: string
           title: string
+          user_count_offset: number
         }
         Insert: {
           author?: string | null
@@ -73,6 +74,7 @@ export type Database = {
           id?: string
           subject_id: string
           title: string
+          user_count_offset?: number
         }
         Update: {
           author?: string | null
@@ -82,6 +84,7 @@ export type Database = {
           id?: string
           subject_id?: string
           title?: string
+          user_count_offset?: number
         }
         Relationships: [
           {
