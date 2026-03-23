@@ -42,6 +42,7 @@ type ActiveCell = { qIdx: number; rIdx: number } | null;
 interface FilterConfig {
   show_type_filters: boolean;
   show_star_filter: boolean;
+  show_essential_filter: boolean;
 }
 
 export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyProp = false, initialChapterId, singleChapter = false, userId }: ReviewGridProps) {
