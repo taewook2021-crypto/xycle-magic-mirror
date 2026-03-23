@@ -615,14 +615,21 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                             className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-[hsl(0,0%,0%,0.06)] cursor-pointer select-none", !isMobile && "sticky left-0 w-9 px-1", isActiveRow ? "bg-primary/5" : "bg-white")}
                             onClick={() => toggleSkip(q.questionId)}
                           >
-                            <span className={cn(
-                              "font-medium text-[11px] transition-all",
-                              isSkipped && "line-through decoration-2 text-muted-foreground",
-                              !isSkipped && q.isEssential ? "text-primary font-bold" : !isSkipped ? "text-foreground" : "",
-                              !isSkipped && "hover:text-muted-foreground/70"
-                            )}>
-                              {q.questionNumber}
-                            </span>
+                            <div className="flex flex-col items-center leading-none gap-0">
+                              <span className={cn(
+                                "font-medium text-[11px] transition-all",
+                                isSkipped && "line-through decoration-2 text-muted-foreground",
+                                !isSkipped && q.isEssential ? "text-primary font-bold" : !isSkipped ? "text-foreground" : "",
+                                !isSkipped && "hover:text-muted-foreground/70"
+                              )}>
+                                {q.isEssential ? "★" : ""}{q.questionNumber}
+                              </span>
+                              {q.examYear && q.examYear !== '2유' && (
+                                <span className="text-[7px] text-orange-500 font-medium leading-none">
+                                  {q.examYear}
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className={cn("z-10 px-0.5 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", !isMobile && "sticky left-9 w-10 min-w-[80px]", isActiveRow ? "bg-primary/5" : "bg-white")}>
                             <span className="text-[9px] text-muted-foreground truncate block max-w-[80px] md:max-w-[120px]">
