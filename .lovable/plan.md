@@ -1,59 +1,25 @@
 
 
-## 동차생 평균 진도 위치 표시 기능
+## 강경태 법인세법 교재 문항별 주제(topic) 업데이트
 
-사용자의 수험 상태(동차생/유예생 등)와 동일한 집단의 평균적인 학습 위치를 교재별로 표시합니다. 예: "동차생 평균: 2회독 · 재고자산"
+### 작업 내용
+강경태 세무회계연습(법인세법) 교재(book_id: `16f79c03-ec3f-475f-8ffd-effc5fa10961`)의 1~20단원 문항에 주제(topic) 데이터를 입력합니다.
 
-### 표시 위치
+### 데이터 불일치 확인 필요
+- **9단원(감가상각비)**: 사용자 제공 8문항 vs DB 18문항 — 사용자가 제공한 8문항만 업데이트하고, 9~18번 문항은 topic을 비워둠
+- **12단원(기부금)**: 사용자 제공 16문항 vs DB 9문항 — 9문항까지만 업데이트 가능. 10~16번 문항은 DB에 존재하지 않아 누락됨 (12-10부터 12-16은 증여 관련 주제인데, 이것이 다른 단원 데이터가 잘못 포함된 것인지 확인 필요)
 
-`SubjectProgressCard` 내 각 교재 항목 아래에 한 줄로 표시:
+> 12단원 10~16번 항목(초과배당, 증여재산가액 등)은 소득세법·부가세법·상증세법 교재의 증여세 단원과 동일한 주제입니다. 법인세법 12단원에 해당하지 않는 데이터일 가능성이 높습니다.
 
-```text
-📖 중급회계 연습서                    >
-████████░░░░  120/300 · 진도 40%   정답률 72%
-동차생 평균: 2회독 · Ch.8 재고자산
-```
+### 수정 방법
+- `questions` 테이블의 `topic` 컬럼을 UPDATE (데이터 변경이므로 insert tool 사용)
+- chapter_id + question_number 조합으로 각 문항 특정
 
-### 데이터 수집 방식
+### 업데이트 대상: 20개 단원, 약 180문항
+각 단원의 chapter_id를 사용하여 question_number별로 topic을 매칭합니다.
 
-`useDashboardData` 또는 별도 hook(`usePeerAvgProgress`)에서:
-
-1. **공개 프로필** 중 나와 같은 `exam_status`인 유저 목록 조회
-2. 해당 유저들의 **attempts** 데이터에서 교재별로:
-   - 평균 `round` (회독 수) 계산 — `attempts.round` 필드의 max 값의 평균
-   - 가장 최근 풀이 챕터(최빈 또는 최근) → 해당 챕터 제목 표시
-3. 결과를 `Map<bookId, { avgRound: number, avgChapterTitle: string }>` 형태로 반환
-
-### 수정 파일
-
-1. **`src/hooks/usePeerAvgProgress.ts`** (신규)
-   - 같은 exam_status 그룹의 공개 유저 attempts를 집계
-   - 교재별 평균 회독 수, 평균 진도 챕터 계산
-   - `{ bookId, avgRound, avgChapterTitle, peerCount }` 배열 반환
-
-2. **`src/components/dashboard/SubjectProgressCard.tsx`**
-   - props에 `peerAvgMap` 추가 (bookId → 평균 진도 정보)
-   - 각 교재 진도 바 아래에 "동차생 평균: N회독 · 챕터명" 라벨 추가
-   - 나와 비교하여 앞서면 초록, 뒤처지면 빨간색 텍스트
-
-3. **`src/pages/Dashboard.tsx`**
-   - `usePeerAvgProgress` hook 호출
-   - `SubjectProgressCard`에 `peerAvgMap` prop 전달
-
-### 쿼리 로직 (usePeerAvgProgress)
-
-```text
-1. profiles에서 exam_status = 내 상태 & is_public = true 인 유저 ID 목록
-2. 해당 유저들의 attempts → question → chapter → book 매핑
-3. 교재별로:
-   - 각 유저의 max(round) → 전체 평균 = avgRound
-   - 각 유저의 가장 최근 attempt의 chapter → 최빈 chapter = avgChapterTitle
-4. 내 등록 교재(user_books)에 해당하는 것만 반환
-```
-
-### UI 디자인
-
-- 폰트: `text-[10px]` muted 색상, 같은 줄에 아이콘 없이 간결하게
-- 형식: `{수험상태} 평균: {N}회독 · {챕터명}`
-- 데이터 없을 시 해당 라벨 숨김
+### 기술 상세
+- 단일 SQL UPDATE 문으로 CASE WHEN 패턴 사용
+- 각 chapter_id별로 별도 UPDATE 실행
+- 존재하지 않는 question_number에 대한 UPDATE는 자동으로 무시됨 (0 rows affected)
 
