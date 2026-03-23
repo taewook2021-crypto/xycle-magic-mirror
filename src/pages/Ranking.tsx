@@ -407,12 +407,8 @@ export default function Ranking() {
                   className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#f9f9f9] transition-colors"
                   onClick={() => { setSelectedUserId(p.id); setSearchQuery(""); }}
                 >
-                  <div className="h-8 w-8 rounded-full bg-[#f4f4f5] flex items-center justify-center overflow-hidden">
-                    {(p as any).avatar_url ? (
-                      <img src={(p as any).avatar_url} alt={p.display_name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
-                    ) : (
-                      <User className="h-4 w-4 text-muted-foreground" />
-                    )}
+                  <div className="h-8 w-8 rounded-full bg-[#f4f4f5] flex items-center justify-center">
+                    <User className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{p.display_name}</p>
