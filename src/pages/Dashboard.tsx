@@ -2,6 +2,7 @@ import { useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useSocialFeed } from "@/hooks/useSocialFeed";
+import { usePeerAvgProgress } from "@/hooks/usePeerAvgProgress";
 import DashboardHeader, { getDDay } from "@/components/dashboard/DashboardHeader";
 import TodayStatsCard from "@/components/dashboard/TodayStatsCard";
 import SubjectProgressCard from "@/components/dashboard/SubjectProgressCard";
@@ -14,6 +15,7 @@ export default function Dashboard() {
   const { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, loading, addBook } =
     useDashboardData();
   const { liveFeedBooks } = useSocialFeed();
+  const { peerAvgMap, examStatus } = usePeerAvgProgress();
 
   const [activeTab, setActiveTab] = useState<"subjects" | "addBook">("subjects");
   const [showAddSheet, setShowAddSheet] = useState(false);
@@ -71,6 +73,8 @@ export default function Dashboard() {
                     colorIndex={index}
                     userBooks={userBooks}
                     bookProgress={bookProgress}
+                    peerAvgMap={peerAvgMap}
+                    examStatus={examStatus}
                   />
                 ))}
               </div>

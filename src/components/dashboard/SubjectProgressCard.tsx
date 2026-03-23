@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import { ChevronRight, BookOpen } from "lucide-react";
 import type { UserBookInfo, BookProgress } from "@/hooks/useDashboardData";
+import type { PeerAvgInfo } from "@/hooks/usePeerAvgProgress";
 
 const SUBJECT_COLORS = [
   "174 50% 50%", "217 91% 60%", "142 72% 40%", "270 67% 55%",
@@ -18,6 +19,8 @@ interface SubjectProgressCardProps {
   colorIndex: number;
   userBooks: UserBookInfo[];
   bookProgress: BookProgress[];
+  peerAvgMap?: Map<string, PeerAvgInfo>;
+  examStatus?: string | null;
 }
 
 export default function SubjectProgressCard({
@@ -26,6 +29,8 @@ export default function SubjectProgressCard({
   colorIndex,
   userBooks,
   bookProgress,
+  peerAvgMap,
+  examStatus,
 }: SubjectProgressCardProps) {
   const navigate = useNavigate();
   const color = getSubjectColor(colorIndex);
@@ -56,6 +61,7 @@ export default function SubjectProgressCard({
             const correct = bp?.correct || 0;
             const progress = total > 0 ? Math.round((attempted / total) * 100) : 0;
             const correctRate = attempted > 0 ? Math.round((correct / attempted) * 100) : 0;
+            const peerAvg = peerAvgMap?.get(b.bookId);
 
             return (
               <button
@@ -81,6 +87,12 @@ export default function SubjectProgressCard({
                     정답률 {correctRate}%
                   </span>
                 </div>
+                {peerAvg && examStatus && (
+                  <p className="text-[10px] text-muted-foreground/70">
+                    {examStatus} 평균: {peerAvg.avgRound}회독 · {peerAvg.avgChapterTitle}
+                    <span className="ml-1 opacity-60">({peerAvg.peerCount}명)</span>
+                  </p>
+                )}
               </button>
             );
           })
