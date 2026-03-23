@@ -60,6 +60,7 @@ export type Database = {
           author: string | null
           created_at: string
           display_order: number
+          filter_config: Json
           id: string
           subject_id: string
           title: string
@@ -68,6 +69,7 @@ export type Database = {
           author?: string | null
           created_at?: string
           display_order?: number
+          filter_config?: Json
           id?: string
           subject_id: string
           title: string
@@ -76,6 +78,7 @@ export type Database = {
           author?: string | null
           created_at?: string
           display_order?: number
+          filter_config?: Json
           id?: string
           subject_id?: string
           title?: string

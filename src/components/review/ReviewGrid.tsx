@@ -39,6 +39,11 @@ interface ReviewGridProps {
 type SectionFilter = "all" | "example" | "past_exam" | "practice";
 type ActiveCell = { qIdx: number; rIdx: number } | null;
 
+interface FilterConfig {
+  show_type_filters: boolean;
+  show_star_filter: boolean;
+}
+
 export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyProp = false, initialChapterId, singleChapter = false, userId }: ReviewGridProps) {
   const isMobile = useIsMobile();
   const { user } = useAuth();
@@ -51,11 +56,26 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("all");
   const [examYearFilter, setExamYearFilter] = useState(false);
   const [memoOnly, setMemoOnly] = useState(false);
-  const [resultFilter, setResultFilter] = useState<string>("off"); // "off" | "wrong-1" | "wrong-2" | "wrong-3" | "half-1" | "half-2" | "half-3"
+  const [resultFilter, setResultFilter] = useState<string>("off");
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
   const [skippedSet, setSkippedSet] = useState<Set<string>>(new Set());
   const [memos, setMemos] = useState<Record<string, string>>({});
+  const [filterConfig, setFilterConfig] = useState<FilterConfig>({ show_type_filters: true, show_star_filter: false });
 
+  // Fetch filter_config for this book
+  useEffect(() => {
+    const fetchConfig = async () => {
+      const { data } = await supabase
+        .from("books")
+        .select("filter_config")
+        .eq("id", bookId)
+        .single();
+      if (data?.filter_config) {
+        setFilterConfig(data.filter_config as unknown as FilterConfig);
+      }
+    };
+    fetchConfig();
+  }, [bookId]);
   // Filtered indices mapping
   const filtered = questions.filter((q) => {
     if (sectionFilter !== "all" && q.questionType !== sectionFilter) return false;
@@ -463,7 +483,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
 
       {/* Section filters */}
       <div className="flex flex-wrap items-center gap-1.5">
-        {sectionFilters.map((f) => (
+        {filterConfig.show_type_filters && sectionFilters.map((f) => (
           <button
             key={f.key}
             onClick={() => { setSectionFilter(f.key); setActiveCell(null); }}
@@ -477,18 +497,20 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
             {f.label}
           </button>
         ))}
-        <div className="w-px h-4 bg-border mx-0.5" />
-        <button
-          onClick={() => { setExamYearFilter((v) => !v); setActiveCell(null); }}
-          className={cn(
-            "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
-            examYearFilter
-              ? "bg-[#DA77D1] text-white border-[#DA77D1]"
-              : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
-          )}
-        >
-          ★ 2유
-        </button>
+        {filterConfig.show_type_filters && <div className="w-px h-4 bg-border mx-0.5" />}
+        {filterConfig.show_star_filter && (
+          <button
+            onClick={() => { setExamYearFilter((v) => !v); setActiveCell(null); }}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
+              examYearFilter
+                ? "bg-[#DA77D1] text-white border-[#DA77D1]"
+                : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+            )}
+          >
+            ★ 2유
+          </button>
+        )}
         <button
           onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
           className={cn(
