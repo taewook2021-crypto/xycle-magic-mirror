@@ -1,0 +1,2 @@
+UPDATE chapters SET chapter_number = 1, title = '상속세 및 증여세법 - 1. 상속세' WHERE id = '7eca7169-0e56-5592-be14-b1399e0f1061';
+UPDATE chapters SET chapter_number = 2, title = '상속세 및 증여세법 - 2. 증여세' WHERE id = '141272b8-f39b-5a17-946e-46f75baac140';
