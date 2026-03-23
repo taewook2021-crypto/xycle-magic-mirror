@@ -513,6 +513,20 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
             ★ 2유
           </button>
         )}
+        {/* Essential filter */}
+        {questions.some(q => q.isEssential) && (
+          <button
+            onClick={() => { setEssentialOnly((v) => !v); setActiveCell(null); }}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
+              essentialOnly
+                ? "bg-[#DA77D1] text-white border-[#DA77D1]"
+                : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+            )}
+          >
+            ★ 필수
+          </button>
+        )}
         <button
           onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
           className={cn(
