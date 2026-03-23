@@ -42,6 +42,7 @@ type ActiveCell = { qIdx: number; rIdx: number } | null;
 interface FilterConfig {
   show_type_filters: boolean;
   show_star_filter: boolean;
+  show_essential_filter: boolean;
 }
 
 export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyProp = false, initialChapterId, singleChapter = false, userId }: ReviewGridProps) {
@@ -61,7 +62,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
   const [skippedSet, setSkippedSet] = useState<Set<string>>(new Set());
   const [memos, setMemos] = useState<Record<string, string>>({});
-  const [filterConfig, setFilterConfig] = useState<FilterConfig>({ show_type_filters: true, show_star_filter: false });
+  const [filterConfig, setFilterConfig] = useState<FilterConfig>({ show_type_filters: true, show_star_filter: false, show_essential_filter: false });
 
   // Fetch filter_config for this book
   useEffect(() => {
@@ -514,7 +515,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
           </button>
         )}
         {/* Essential filter */}
-        {questions.some(q => q.isEssential) && (
+        {filterConfig.show_essential_filter && (
           <button
             onClick={() => { setEssentialOnly((v) => !v); setActiveCell(null); }}
             className={cn(
