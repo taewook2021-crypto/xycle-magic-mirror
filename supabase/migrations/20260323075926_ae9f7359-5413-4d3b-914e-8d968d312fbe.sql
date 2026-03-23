@@ -1,0 +1,2 @@
+-- 임세진 원가관리회계 최적서에 필수 필터 활성화
+UPDATE books SET filter_config = '{"show_type_filters": false, "show_star_filter": false, "show_essential_filter": true}'::jsonb WHERE id = '266af2bc-d010-496a-8c0d-a6cc80718666';
