@@ -1,0 +1,10 @@
+UPDATE chapters SET chapter_number = 1, title = '소득세법 - 1. 이자소득 및 배당소득' WHERE id = 'e464780c-dd35-5c9d-b15f-3da8c4bc2abd';
+UPDATE chapters SET chapter_number = 2, title = '소득세법 - 2. 사업소득' WHERE id = '8cc4df33-6f4c-584a-9cf0-6e527f897a37';
+UPDATE chapters SET chapter_number = 3, title = '소득세법 - 3. 근로소득' WHERE id = '4b9aeb1d-a035-5b5d-8da0-95b8164b2584';
+UPDATE chapters SET chapter_number = 4, title = '소득세법 - 4. 연금소득, 기타소득' WHERE id = '6d53a3f2-1d36-5634-b20f-3069b63dd85e';
+UPDATE chapters SET chapter_number = 5, title = '소득세법 - 5. 소득금액 계산의 특례' WHERE id = 'f2c88e9b-8623-5ff0-9804-395822c68215';
+UPDATE chapters SET chapter_number = 6, title = '소득세법 - 6. 종합소득과세표준의 계산' WHERE id = '84fef968-2455-5e3b-9a1d-9b2ee8ce047f';
+UPDATE chapters SET chapter_number = 7, title = '소득세법 - 7. 종합소득 차감납부세액의 계산' WHERE id = '0a14c943-7bf4-5f33-931a-6875c0ec42c8';
+UPDATE chapters SET chapter_number = 8, title = '소득세법 - 8. 퇴직소득' WHERE id = '9feb0adc-ba5d-5059-bb76-d6a12c1358a1';
+UPDATE chapters SET chapter_number = 9, title = '소득세법 - 9. 양도소득' WHERE id = '233a733e-8067-5d1a-acc6-16d9b4c62055';
+UPDATE chapters SET chapter_number = 10, title = '소득세법 - 10. 동업기업에 대한 조세특례' WHERE id = 'c95b9245-7226-5486-b3b4-f0e99c74a65d';
