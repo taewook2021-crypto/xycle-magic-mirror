@@ -546,7 +546,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
               <thead>
                 <tr className="bg-[#fafafa]">
                   <th className={cn("z-10 bg-[#fafafa] px-0.5 py-2.5 text-center font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]", !isMobile && "sticky left-0 w-9 px-1")}>#</th>
-                  <th className={cn("z-10 bg-[#fafafa] px-0.5 py-2.5 text-center font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]", !isMobile && "sticky left-9 w-10 px-1")}>유형</th>
+                  <th className={cn("z-10 bg-[#fafafa] px-0.5 py-2.5 text-left font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]", !isMobile && "sticky left-9 min-w-[80px] px-1")}>주제</th>
                   {!isMobile && (
                     <th className="sticky left-[76px] z-10 bg-[#fafafa] min-w-[100px] px-2 py-2.5 text-left font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]">주제</th>
                   )}
