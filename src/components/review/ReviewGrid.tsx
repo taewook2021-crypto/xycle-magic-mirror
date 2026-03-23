@@ -54,6 +54,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   const [questions, setQuestions] = useState<QuestionRow[]>([]);
   const [loading, setLoading] = useState(!singleChapter);
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("all");
+  const [essentialOnly, setEssentialOnly] = useState(false);
   const [examYearFilter, setExamYearFilter] = useState(false);
   const [memoOnly, setMemoOnly] = useState(false);
   const [resultFilter, setResultFilter] = useState<string>("off");
@@ -79,6 +80,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   // Filtered indices mapping
   const filtered = questions.filter((q) => {
     if (sectionFilter !== "all" && q.questionType !== sectionFilter) return false;
+    if (essentialOnly && !q.isEssential) return false;
     if (examYearFilter && q.examYear !== '2유') return false;
     if (memoOnly && !(memos[q.questionId]?.trim())) return false;
     if (resultFilter !== "off") {
@@ -511,6 +513,20 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
             ★ 2유
           </button>
         )}
+        {/* Essential filter */}
+        {questions.some(q => q.isEssential) && (
+          <button
+            onClick={() => { setEssentialOnly((v) => !v); setActiveCell(null); }}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
+              essentialOnly
+                ? "bg-[#DA77D1] text-white border-[#DA77D1]"
+                : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+            )}
+          >
+            ★ 필수
+          </button>
+        )}
         <button
           onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
           className={cn(
@@ -599,14 +615,21 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                             className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-[hsl(0,0%,0%,0.06)] cursor-pointer select-none", !isMobile && "sticky left-0 w-9 px-1", isActiveRow ? "bg-primary/5" : "bg-white")}
                             onClick={() => toggleSkip(q.questionId)}
                           >
-                            <span className={cn(
-                              "font-medium text-[11px] transition-all",
-                              isSkipped && "line-through decoration-2 text-muted-foreground",
-                              !isSkipped && q.isEssential ? "text-primary font-bold" : !isSkipped ? "text-foreground" : "",
-                              !isSkipped && "hover:text-muted-foreground/70"
-                            )}>
-                              {q.questionNumber}
-                            </span>
+                            <div className="flex flex-col items-center leading-none gap-0">
+                              <span className={cn(
+                                "font-medium text-[11px] transition-all",
+                                isSkipped && "line-through decoration-2 text-muted-foreground",
+                                !isSkipped && q.isEssential ? "text-primary font-bold" : !isSkipped ? "text-foreground" : "",
+                                !isSkipped && "hover:text-muted-foreground/70"
+                              )}>
+                                {q.isEssential ? "★" : ""}{q.questionNumber}
+                              </span>
+                              {q.examYear && q.examYear !== '2유' && (
+                                <span className="text-[7px] text-orange-500 font-medium leading-none">
+                                  {q.examYear}
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className={cn("z-10 px-0.5 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", !isMobile && "sticky left-9 w-10 min-w-[80px]", isActiveRow ? "bg-primary/5" : "bg-white")}>
                             <span className="text-[9px] text-muted-foreground truncate block max-w-[80px] md:max-w-[120px]">
