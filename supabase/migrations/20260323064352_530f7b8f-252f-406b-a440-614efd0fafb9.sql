@@ -1,0 +1,17 @@
+UPDATE chapters SET title = '부가가치세법 - 매출세액 계산구조' WHERE id = 'dfbdf66a-5b9c-52d6-915f-d3dc613e13dd';
+UPDATE chapters SET title = '부가가치세법 - 매입세액' WHERE id = '4339a9c1-c81b-5be0-ae84-b00a33f2ac51';
+UPDATE chapters SET title = '부가가치세법 - 겸영사업자의 안분계산' WHERE id = '171b0f03-b707-5913-b934-18eea40af43f';
+UPDATE chapters SET title = '부가가치세법 - 차가감납부세액' WHERE id = '3be66c2b-146a-5088-a96d-e9d6e531f738';
+UPDATE chapters SET title = '부가가치세법 - 간이과세' WHERE id = '673e8f18-27c5-5154-8058-724bb7d2b1ef';
+UPDATE chapters SET title = '소득세법 - 이자소득 및 배당소득' WHERE id = 'e464780c-dd35-5c9d-b15f-3da8c4bc2abd';
+UPDATE chapters SET title = '소득세법 - 사업소득' WHERE id = '8cc4df33-6f4c-584a-9cf0-6e527f897a37';
+UPDATE chapters SET title = '소득세법 - 근로소득' WHERE id = '4b9aeb1d-a035-5b5d-8da0-95b8164b2584';
+UPDATE chapters SET title = '소득세법 - 연금소득, 기타소득' WHERE id = '6d53a3f2-1d36-5634-b20f-3069b63dd85e';
+UPDATE chapters SET title = '소득세법 - 소득금액 계산의 특례' WHERE id = 'f2c88e9b-8623-5ff0-9804-395822c68215';
+UPDATE chapters SET title = '소득세법 - 종합소득과세표준의 계산' WHERE id = '84fef968-2455-5e3b-9a1d-9b2ee8ce047f';
+UPDATE chapters SET title = '소득세법 - 종합소득 차감납부세액의 계산' WHERE id = '0a14c943-7bf4-5f33-931a-6875c0ec42c8';
+UPDATE chapters SET title = '소득세법 - 퇴직소득' WHERE id = '9feb0adc-ba5d-5059-bb76-d6a12c1358a1';
+UPDATE chapters SET title = '소득세법 - 양도소득' WHERE id = '233a733e-8067-5d1a-acc6-16d9b4c62055';
+UPDATE chapters SET title = '소득세법 - 동업기업에 대한 조세특례' WHERE id = 'c95b9245-7226-5486-b3b4-f0e99c74a65d';
+UPDATE chapters SET title = '상속세 및 증여세법 - 상속세' WHERE id = '7eca7169-0e56-5592-be14-b1399e0f1061';
+UPDATE chapters SET title = '상속세 및 증여세법 - 증여세' WHERE id = '141272b8-f39b-5a17-946e-46f75baac140';
