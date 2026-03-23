@@ -43,6 +43,7 @@ interface FilterConfig {
   show_type_filters: boolean;
   show_star_filter: boolean;
   show_essential_filter: boolean;
+  show_exam_year_column: boolean;
 }
 
 export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyProp = false, initialChapterId, singleChapter = false, userId }: ReviewGridProps) {
@@ -62,7 +63,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
   const [skippedSet, setSkippedSet] = useState<Set<string>>(new Set());
   const [memos, setMemos] = useState<Record<string, string>>({});
-  const [filterConfig, setFilterConfig] = useState<FilterConfig>({ show_type_filters: true, show_star_filter: false, show_essential_filter: false });
+  const [filterConfig, setFilterConfig] = useState<FilterConfig>({ show_type_filters: true, show_star_filter: false, show_essential_filter: false, show_exam_year_column: false });
 
   // Fetch filter_config for this book
   useEffect(() => {
@@ -585,9 +586,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
               <thead>
                 <tr className="bg-[#fafafa]">
                   <th className={cn("z-10 bg-[#fafafa] px-0.5 py-2.5 text-center font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]", !isMobile && "sticky left-0 w-9 px-1")}>#</th>
-                  <th className={cn("z-10 bg-[#fafafa] px-0.5 py-2.5 text-left font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]", !isMobile && "sticky left-9 min-w-[80px] px-1")}>주제</th>
+                  <th className={cn("z-10 bg-[#fafafa] px-0.5 py-2.5 text-left font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]", !isMobile && "sticky left-9 min-w-[80px] px-1")}>{filterConfig.show_exam_year_column ? "기출" : "주제"}</th>
                   {!isMobile && (
-                    <th className="sticky left-[76px] z-10 bg-[#fafafa] min-w-[100px] px-2 py-2.5 text-left font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]">주제</th>
+                    <th className="sticky left-[76px] z-10 bg-[#fafafa] min-w-[100px] px-2 py-2.5 text-left font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]">{filterConfig.show_exam_year_column ? "기출" : "주제"}</th>
                   )}
                   {Array.from({ length: roundCount }, (_, i) => (
                     <th key={i} className="px-0.5 md:px-1 py-2.5 text-center font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] last:border-r-0 text-[10px]">
@@ -634,13 +635,19 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                           </td>
                           <td className={cn("z-10 px-0.5 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", !isMobile && "sticky left-9 w-10 min-w-[80px]", isActiveRow ? "bg-primary/5" : "bg-white")}>
                             <span className="text-[9px] text-muted-foreground truncate block max-w-[80px] md:max-w-[120px]">
-                              {q.topic || "–"}
+                              {filterConfig.show_exam_year_column
+                                ? (q.examYear ? `${q.examYear} 기출` : "–")
+                                : (q.topic || "–")}
                             </span>
                           </td>
                           {!isMobile && (
                             <td className={cn("sticky left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", isActiveRow ? "bg-primary/5" : "bg-white")}>
                               <div className="flex items-center gap-1">
-                                <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{q.topic || "–"}</span>
+                                <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
+                                  {filterConfig.show_exam_year_column
+                                    ? (q.examYear ? `${q.examYear} 기출` : "–")
+                                    : (q.topic || "–")}
+                                </span>
                                 {!readOnly && (
                                   <MemoPopover
                                     memo={memos[q.questionId] ?? ""}
