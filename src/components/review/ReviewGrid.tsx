@@ -546,7 +546,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
               <thead>
                 <tr className="bg-[#fafafa]">
                   <th className={cn("z-10 bg-[#fafafa] px-0.5 py-2.5 text-center font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]", !isMobile && "sticky left-0 w-9 px-1")}>#</th>
-                  <th className={cn("z-10 bg-[#fafafa] px-0.5 py-2.5 text-center font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]", !isMobile && "sticky left-9 w-10 px-1")}>유형</th>
+                  <th className={cn("z-10 bg-[#fafafa] px-0.5 py-2.5 text-left font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]", !isMobile && "sticky left-9 min-w-[80px] px-1")}>주제</th>
                   {!isMobile && (
                     <th className="sticky left-[76px] z-10 bg-[#fafafa] min-w-[100px] px-2 py-2.5 text-left font-semibold text-muted-foreground border-b border-r border-[hsl(0,0%,0%,0.06)] text-[10px]">주제</th>
                   )}
@@ -586,13 +586,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                               {q.questionNumber}
                             </span>
                           </td>
-                          <td className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-[hsl(0,0%,0%,0.06)]", !isMobile && "sticky left-9 w-10", isActiveRow ? "bg-primary/5" : "bg-white")}>
-                            <span className="text-[9px] text-muted-foreground">
-                              {q.questionType === "past_exam" && (
-                                <span className="text-primary/70 font-semibold">{q.examYear || "기출"}</span>
-                              )}
-                              {q.questionType === "practice" && <span className="font-semibold">{hasPastExam ? "실전" : "응용"}</span>}
-                              {q.questionType === "example" && <span className="font-semibold">{hasPastExam ? "예제" : "기본"}</span>}
+                          <td className={cn("z-10 px-0.5 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", !isMobile && "sticky left-9 w-10 min-w-[80px]", isActiveRow ? "bg-primary/5" : "bg-white")}>
+                            <span className="text-[9px] text-muted-foreground truncate block max-w-[80px] md:max-w-[120px]">
+                              {q.topic || (q.questionType === "past_exam" ? (q.examYear || "기출") : q.questionType === "practice" ? (hasPastExam ? "실전" : "응용") : (hasPastExam ? "예제" : "기본"))}
                             </span>
                           </td>
                           {!isMobile && (
