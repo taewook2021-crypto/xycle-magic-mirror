@@ -1,71 +1,39 @@
 
 
-## 김기동 재무회계연습 교재 데이터 Supabase 저장
+## 대시보드 이전 레이아웃 복원 계획
 
-### 데이터 요약
+현재 대시보드는 "교재 검색 + 필터 + 그리드 카드" 형태의 플랫 레이아웃입니다. 기존에 사용하던 컴포넌트들(DashboardHeader, DashboardHero, TodayStatsCard, SubjectProgressCard, LiveFeed 등)이 아직 파일로 남아있지만 Dashboard.tsx에서 사용되지 않고 있습니다.
 
-엑셀에서 파싱한 결과:
+### 복원할 레이아웃 구조
 
 ```text
-subjects
-├── 중급회계 (기존, id: a0000000-...-001)
-│   └── 재무회계연습 (김기동) ← NEW: Ch.1~19
-│       ├── Ch.1~10 (중급1권) — 기본+응용 합산 ~97문항
-│       └── Ch.11~19 (중급2권) — 기본+응용 합산 ~91문항
-│
-└── 고급회계 ← NEW subject
-    └── 재무회계연습 (김기동) ← NEW: Ch.20~23, ~68문항
+┌─────────────────────────────────┐
+│  DashboardHeader (D-day, 총풀이)  │
+├─────────────────────────────────┤
+│  TodayStatsCard (2×2 통계 그리드)  │
+├─────────────────────────────────┤
+│  SubjectProgressCard × N        │
+│  (과목별 교재 목록 + 진도율)       │
+├─────────────────────────────────┤
+│  교재 추가 버튼                   │
+├─────────────────────────────────┤
+│  LiveFeed (동차생 비교 피드)       │
+└─────────────────────────────────┘
 ```
 
-### 문항 매핑 규칙
+### 수정 대상
 
-- 각 챕터 내 **첫 번째 번호 세트** (1번부터 시작) → `question_type = 'example'` (기본)
-- **두 번째 번호 세트** (다시 1번부터 시작) → `question_type = 'practice'` (응용)
-- `topic` 컬럼 ← 주제 열 (예: "재고자산의 Cut-Off")
-- `exam_year` ← 비고 열 값 그대로 저장 (예: "2유"), 없으면 NULL
-- `correct_answer` ← 엑셀에 없으므로 NULL
-- `is_essential` ← false (기본값)
-- **난이도(하/중/상)** → 현재 스키마에 컬럼 없으므로 저장하지 않음 (나중에 추가)
+**Dashboard.tsx 1개 파일만 수정** — 나머지 페이지(Profile, Ranking 등)는 변경 없음
 
-### 구현 방식
+### 변경 내용
 
-1. **Python 스크립트**로 엑셀 파싱 → SQL INSERT문 자동 생성
-   - 챕터 타이틀, 문항 번호, 기본/응용 구분, 주제, 비고를 정확히 추출
-   - UUID는 deterministic하게 생성 (충돌 방지)
-
-2. **Supabase migration** 1개 파일로 실행:
-   - `INSERT INTO subjects` — 고급회계 과목 추가
-   - `INSERT INTO books` — 중급회계용 1권 + 고급회계용 1권
-   - `INSERT INTO chapters` — 23개 챕터
-   - `INSERT INTO questions` — ~256문항 (topic, exam_year, question_type 포함)
-
-3. 기존 시드 데이터(중급회계 연습/객관식 재무회계)와 UUID 충돌 없음
-
-### 문항 수 상세 (파싱 기준)
-
-| 챕터 | 기본 | 응용 | 합계 |
-|------|------|------|------|
-| Ch.1 | 3 | 4 | 7 |
-| Ch.2 | 2 | 2 | 4 |
-| Ch.3 | 4 | 7 | 11 |
-| Ch.4 | 6 | 5 | 11 |
-| Ch.5 | 3 | 3 | 6 |
-| Ch.6 | 3 | 3 | 6 |
-| Ch.7 | 3 | 4 | 7 |
-| Ch.8 | 5 | 5 | 10 |
-| Ch.9 | 4 | 3 | 7 |
-| Ch.10 | 5 | 7 | 12 |
-| Ch.11 | 6 | 5 | 11 |
-| Ch.12 | 3 | 4 | 7 |
-| Ch.13 | 5 | 4 | 9 |
-| Ch.14 | 5 | 4 | 9 |
-| Ch.15 | 5 | 4 | 9 |
-| Ch.16 | 4 | 6 | 10 |
-| Ch.17 | 5 | 3 | 8 |
-| Ch.18 | 6 | 4 | 10 |
-| Ch.19 | 1 | 2 | 3 |
-| Ch.20 | 10 | 6 | 16 |
-| Ch.21 | 5 | 6 | 11 |
-| Ch.22 | 4 | 5 | 9 |
-| Ch.23 | 6 | 20 | 26 |
+1. **기존 import 제거**: `Search`, `Plus`, `BookOpen`, `TrendingUp/Down/Minus`, `Progress`, `getSubjectColor` 등 현재 플랫 레이아웃 전용 import 제거
+2. **이전 컴포넌트 import 복원**: `DashboardHeader`, `getDDay`, `TodayStatsCard`, `SubjectProgressCard`, `LiveFeed`, `AddSubjectSheet` (교재 추가 시트)
+3. **레이아웃 복원**:
+   - 상단: `DashboardHeader` — D-day 카운트다운 + 총 풀이 수
+   - 중단: `TodayStatsCard` — 오늘 풀이, 이번 주, 연속 학습, 정답률 추이 (2×2)
+   - 과목별: `SubjectProgressCard` — 각 과목 아래 등록 교재 목록 + 진도율 바
+   - 교재 추가: 버튼 + `AddSubjectSheet` 연동
+   - 하단: `LiveFeed` — 수험생 비교 피드 (수험 상태 기반 비교 로직은 `useSocialFeed`에 이미 구현되어 있어 그대로 유지)
+4. **검색/필터/그라데이션 카드 UI 제거**: 현재의 검색바, 필터 pill, 그라데이션 썸네일 카드 그리드 전체 제거
 
