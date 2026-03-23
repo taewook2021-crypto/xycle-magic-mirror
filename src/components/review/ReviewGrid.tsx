@@ -635,13 +635,19 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                           </td>
                           <td className={cn("z-10 px-0.5 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", !isMobile && "sticky left-9 w-10 min-w-[80px]", isActiveRow ? "bg-primary/5" : "bg-white")}>
                             <span className="text-[9px] text-muted-foreground truncate block max-w-[80px] md:max-w-[120px]">
-                              {q.topic || "–"}
+                              {filterConfig.show_exam_year_column
+                                ? (q.examYear ? `${q.examYear} 기출` : "–")
+                                : (q.topic || "–")}
                             </span>
                           </td>
                           {!isMobile && (
                             <td className={cn("sticky left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", isActiveRow ? "bg-primary/5" : "bg-white")}>
                               <div className="flex items-center gap-1">
-                                <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{q.topic || "–"}</span>
+                                <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
+                                  {filterConfig.show_exam_year_column
+                                    ? (q.examYear ? `${q.examYear} 기출` : "–")
+                                    : (q.topic || "–")}
+                                </span>
                                 {!readOnly && (
                                   <MemoPopover
                                     memo={memos[q.questionId] ?? ""}
