@@ -147,7 +147,8 @@ export function useSocialFeed() {
       .map((entry) => {
         const chapterId = questionToChapter.get(entry.questionId);
         const chapter = chapterId ? chapterMap.get(chapterId) : null;
-        const bookTitle = chapter ? bookMap.get(chapter.bookId) ?? "교재" : "교재";
+        const bookInfo = chapter ? bookMap.get(chapter.bookId) : null;
+        const bookTitle = bookInfo?.title ?? "교재";
         const minutesAgo = Math.max(1, Math.round((now - new Date(entry.attemptedAt).getTime()) / 60000));
         const isLive = new Date(entry.attemptedAt).getTime() > twoHoursAgo;
 
