@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell";
-import { useGroupDetail, useGroupMembers, useLeaveGroup } from "@/hooks/useStudyGroup";
+import { useGroupDetail, useGroupMembers, useLeaveGroup, useDeleteGroup } from "@/hooks/useStudyGroup";
 import { useAuth } from "@/hooks/useAuth";
 import GroupRanking from "@/components/group/GroupRanking";
 import GroupProgress from "@/components/group/GroupProgress";
