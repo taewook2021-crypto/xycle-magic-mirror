@@ -129,6 +129,13 @@ export function useJoinGroup() {
       // Workaround: we'll query with the code. If RLS blocks it, we won't find.
       // We need to add a policy that allows reading by invite_code.
       // For MVP, let's just try — the user must know the code.
+      // Check 3-group limit
+      const { count: myGroupCount } = await supabase
+        .from("study_group_members")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user!.id);
+      if ((myGroupCount ?? 0) >= 3) throw new Error("최대 3개 그룹까지 가입할 수 있습니다.");
+
       const { data: group, error: findError } = await supabase
         .from("study_groups")
         .select("id, name, max_members")
