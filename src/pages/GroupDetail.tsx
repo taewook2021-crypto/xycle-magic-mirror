@@ -5,6 +5,7 @@ import { useGroupDetail, useGroupMembers, useLeaveGroup } from "@/hooks/useStudy
 import { useAuth } from "@/hooks/useAuth";
 import GroupRanking from "@/components/group/GroupRanking";
 import GroupProgress from "@/components/group/GroupProgress";
+import GroupFeed from "@/components/group/GroupFeed";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -16,12 +17,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Copy, LogOut, Trophy, BarChart3 } from "lucide-react";
+import { ArrowLeft, Copy, LogOut, Trophy, BarChart3, Activity } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 const TABS = [
   { key: "ranking", label: "랭킹", icon: Trophy },
+  { key: "feed", label: "피드", icon: Activity },
   { key: "progress", label: "진도", icon: BarChart3 },
 ] as const;
 
@@ -98,6 +100,7 @@ export default function GroupDetail() {
         {/* Tab content */}
         <div className="px-4 sm:px-6 mt-4">
           {tab === "ranking" && <GroupRanking members={members} />}
+          {tab === "feed" && <GroupFeed members={members} />}
           {tab === "progress" && <GroupProgress members={members} />}
         </div>
 
