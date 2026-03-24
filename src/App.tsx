@@ -13,6 +13,7 @@ import Ranking from "./pages/Ranking";
 import Profile from "./pages/Profile";
 import GroupDetail from "./pages/GroupDetail";
 import NotFound from "./pages/NotFound";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
