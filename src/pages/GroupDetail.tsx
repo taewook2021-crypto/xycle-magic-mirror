@@ -5,6 +5,7 @@ import { useGroupDetail, useGroupMembers, useLeaveGroup } from "@/hooks/useStudy
 import { useAuth } from "@/hooks/useAuth";
 import GroupRanking from "@/components/group/GroupRanking";
 import GroupProgress from "@/components/group/GroupProgress";
+import GroupFeed from "@/components/group/GroupFeed";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
