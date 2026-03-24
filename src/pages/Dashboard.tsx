@@ -1,12 +1,12 @@
 import { useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import { useDashboardData } from "@/hooks/useDashboardData";
-import { useSocialFeed } from "@/hooks/useSocialFeed";
+
 import { usePeerAvgProgress } from "@/hooks/usePeerAvgProgress";
 import DashboardHeader, { getDDay } from "@/components/dashboard/DashboardHeader";
 import TodayStatsCard from "@/components/dashboard/TodayStatsCard";
 import SubjectProgressCard from "@/components/dashboard/SubjectProgressCard";
-import LiveFeed from "@/components/dashboard/LiveFeed";
+
 import AddSubjectSheet from "@/components/dashboard/AddSubjectSheet";
 import { BookOpen, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function Dashboard() {
   const { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, loading, addBook } =
     useDashboardData();
-  const { liveFeedBooks } = useSocialFeed();
+  
   const { peerAvgMap, examStatus } = usePeerAvgProgress();
 
   const [activeTab, setActiveTab] = useState<"subjects" | "addBook">("subjects");
@@ -80,10 +80,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Live feed */}
-            {!loading && liveFeedBooks.length > 0 && (
-              <LiveFeed books={liveFeedBooks} />
-            )}
           </>
         ) : (
           <>
