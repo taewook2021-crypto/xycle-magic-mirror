@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { Pencil, Eye, LogOut, Users, User, GraduationCap } from "lucide-react";
+import GroupCard from "@/components/group/GroupCard";
 import { cn } from "@/lib/utils";
 
 const EXAM_STATUSES = [
