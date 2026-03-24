@@ -51,9 +51,15 @@ export default function GroupDetail() {
 
   const handleLeave = () => {
     if (!id) return;
-    leave.mutate(id, {
-      onSuccess: () => navigate("/profile"),
-    });
+    if (isOwner) {
+      deleteGroup.mutate(id, {
+        onSuccess: () => navigate("/profile"),
+      });
+    } else {
+      leave.mutate(id, {
+        onSuccess: () => navigate("/profile"),
+      });
+    }
   };
 
   return (
