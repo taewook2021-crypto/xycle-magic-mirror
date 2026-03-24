@@ -1,99 +1,73 @@
 
 
-## 스터디 그룹 기능 — 초대 코드 기반
+## Study Group 버그 수정 계획
 
-### 요약
-프로필 페이지에서 스터디 그룹을 생성/가입할 수 있는 기능을 추가합니다. 초대 코드를 공유해 그룹에 가입하고, 그룹 내에서 랭킹, 피드, 진도 비교, 간단한 메모 소통이 가능합니다.
+### 1. 그룹 삭제 로직 구현
 
----
+**현재 문제**: 오너가 "그룹 삭제" 버튼을 누르면 `useLeaveGroup`만 호출되어 멤버 레코드만 삭제되고, `study_groups` 테이블의 그룹은 고아 상태로 남음.
 
-### 1. DB 마이그레이션
+**수정 방법**:
+- `useStudyGroup.ts`에 `useDeleteGroup` 훅 추가 — `study_groups` 테이블에서 해당 그룹 DELETE (CASCADE로 멤버도 자동 삭제됨... 아닌데, FK가 없으므로 멤버 먼저 삭제 후 그룹 삭제)
+- `study_group_members`에 `group_id`로 전체 멤버 DELETE → `study_groups`에서 그룹 DELETE
+- `GroupDetail.tsx`에서 `isOwner`일 때 `useDeleteGroup` 호출하도록 분기 처리
 
-**`study_groups` 테이블**
-| 컬럼 | 타입 | 설명 |
-|------|------|------|
-| id | uuid PK | |
-| name | text | 그룹명 (최대 30자) |
-| invite_code | text UNIQUE | 6자리 영숫자 코드 |
-| owner_id | uuid | 생성자 |
-| max_members | int default 20 | 최대 인원 |
-| created_at | timestamptz | |
+### 2. 가입 시 3개 제한 서버 검증
 
-**`study_group_members` 테이블**
-| 컬럼 | 타입 | 설명 |
-|------|------|------|
-| id | uuid PK | |
-| group_id | uuid FK → study_groups | |
-| user_id | uuid | |
-| joined_at | timestamptz | |
-| UNIQUE(group_id, user_id) | | |
+**현재 문제**: UI에서만 버튼 숨김. `useJoinGroup`에서 현재 가입 그룹 수를 체크하지 않음.
 
-**`group_messages` 테이블**
-| 컬럼 | 타입 | 설명 |
-|------|------|------|
-| id | uuid PK | |
-| group_id | uuid FK → study_groups | |
-| user_id | uuid | 작성자 |
-| content | text | 메모/메시지 (최대 500자) |
-| created_at | timestamptz | |
+**수정 방법**:
+- `useJoinGroup`의 `mutationFn` 앞부분에서 `study_group_members`를 현재 유저 기준으로 count 조회
+- 3개 이상이면 에러 throw ("최대 3개 그룹까지 가입할 수 있습니다.")
 
-**RLS 정책**: 그룹 멤버만 해당 그룹 데이터 SELECT/INSERT 가능. `is_group_member(user_id, group_id)` security definer 함수로 재귀 방지.
+### 3. 닉네임 편집 카드 복원
 
-**초대 코드 생성 함수**: `generate_invite_code()` — 랜덤 6자리 영숫자 반환.
+**현재 문제**: `Profile.tsx`에 `handleSaveNickname` 로직과 `Pencil` import은 있지만 렌더링에 닉네임 편집 UI가 없음.
 
----
+**수정 방법**:
+- 수험 상태 카드 위에 닉네임 편집 카드 추가 (Pencil 아이콘 + Input + 저장 버튼)
+- 기존 `handleSaveNickname` 함수 그대로 활용
 
-### 2. 프로필 페이지 UI 추가
+### 4. 그룹 멤버용 RLS 정책 추가 (attempts, user_books)
 
-프로필 설정 카드 목록에 **"스터디 그룹"** 카드 추가:
-- 아이콘: `Users`
-- 내 그룹 목록 표시 (최대 3개 가입 가능)
-- **"그룹 만들기"** / **"코드로 가입"** 버튼
+**현재 문제**: `is_public = false`인 멤버의 attempts/user_books가 그룹 랭킹·피드·진도에서 조회 불가.
 
----
+**수정 방법** (SQL 마이그레이션):
+- `is_group_member` 함수를 활용하여 같은 그룹 소속 여부를 체크하는 security definer 함수 `is_in_same_group(_viewer uuid, _target uuid)` 생성
+- `attempts` 테이블에 SELECT 정책 추가: 같은 그룹 멤버면 조회 허용
+- `user_books` 테이블에 SELECT 정책 추가: 같은 그룹 멤버면 조회 허용
 
-### 3. 그룹 상세 페이지 (`/group/:id`)
+```sql
+CREATE OR REPLACE FUNCTION public.is_in_same_group(_viewer uuid, _target uuid)
+RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM study_group_members m1
+    JOIN study_group_members m2 ON m1.group_id = m2.group_id
+    WHERE m1.user_id = _viewer AND m2.user_id = _target
+  )
+$$;
 
-탭 구조로 4가지 핵심 기능 제공:
+CREATE POLICY "Group members can see each other attempts"
+  ON public.attempts FOR SELECT TO authenticated
+  USING (is_in_same_group(auth.uid(), user_id));
 
-```text
-┌─────────────────────────────────┐
-│ 📚 CPA 스터디 A반    [초대코드] │
-├──────┬──────┬──────┬────────────┤
-│ 랭킹 │ 피드 │ 진도 │   메모     │
-└──────┴──────┴──────┴────────────┘
+CREATE POLICY "Group members can see each other books"
+  ON public.user_books FOR SELECT TO authenticated
+  USING (is_in_same_group(auth.uid(), user_id));
 ```
 
-- **랭킹 탭**: 그룹 멤버의 교재별 풀이 수 순위 (기존 LiveFeed 로직 재활용)
-- **피드 탭**: 그룹 멤버의 최근 학습 활동 스트림
-- **진도 탭**: 그룹 멤버별 교재 진도율 비교 바 차트
-- **메모 탭**: 간단한 메시지 리스트 (채팅 수준은 아닌 메모보드)
+### 5. 그룹 피드에서 정오 여부 제거 확인
+
+현재 `GroupFeed.tsx`와 `GroupRanking.tsx`는 문제 수(`count`)만 표시하고 있으므로 추가 작업 불필요.
 
 ---
 
-### 4. 새 파일 목록
+### 수정 파일 요약
 
-| 파일 | 역할 |
-|------|------|
-| `src/hooks/useStudyGroup.ts` | 그룹 CRUD, 가입/탈퇴, 멤버 조회 |
-| `src/pages/GroupDetail.tsx` | 그룹 상세 페이지 (4탭) |
-| `src/components/group/GroupCard.tsx` | 프로필에 표시되는 그룹 카드 |
-| `src/components/group/CreateGroupSheet.tsx` | 그룹 생성 바텀시트 |
-| `src/components/group/JoinGroupSheet.tsx` | 코드 입력 가입 시트 |
-| `src/components/group/GroupRanking.tsx` | 그룹 내 랭킹 탭 |
-| `src/components/group/GroupFeed.tsx` | 그룹 피드 탭 |
-| `src/components/group/GroupProgress.tsx` | 진도 비교 탭 |
-| `src/components/group/GroupMemo.tsx` | 메모보드 탭 |
-
-**라우팅**: `App.tsx`에 `/group/:id` 추가, BottomNav는 변경 없음 (프로필에서 진입).
-
----
-
-### 5. 구현 순서
-
-1. DB 마이그레이션 (테이블 3개 + RLS + 헬퍼 함수)
-2. `useStudyGroup` 훅 구현
-3. 프로필 페이지에 그룹 카드 + 생성/가입 시트 추가
-4. 그룹 상세 페이지 4탭 구현
-5. 라우팅 연결
+| 파일 | 변경 내용 |
+|------|-----------|
+| `src/hooks/useStudyGroup.ts` | `useDeleteGroup` 추가, `useJoinGroup`에 3개 제한 검증 |
+| `src/pages/GroupDetail.tsx` | 오너일 때 삭제 로직 분기 |
+| `src/pages/Profile.tsx` | 닉네임 편집 카드 렌더링 복원 |
+| SQL 마이그레이션 | `is_in_same_group` 함수 + attempts/user_books RLS 정책 |
 
