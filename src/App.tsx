@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Review from "./pages/Review";
 import Ranking from "./pages/Ranking";
 import Profile from "./pages/Profile";
+import GroupDetail from "./pages/GroupDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
