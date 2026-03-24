@@ -12,6 +12,8 @@ export interface BookFeedItem {
   avgCount: number;
   peers: PeerEntry[];
   peerGroupLabel?: string;
+  totalPeerCount?: number;
+  myRank?: number;
 }
 
 export interface PeerEntry {
