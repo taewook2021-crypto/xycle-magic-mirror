@@ -61,7 +61,7 @@ export function useSocialFeed() {
   const { data: books } = useQuery({
     queryKey: ["social-books"],
     queryFn: async () => {
-      const { data } = await supabase.from("books").select("id, title, subject_id");
+      const { data } = await supabase.from("books").select("id, title, subject_id, user_count_offset");
       return data ?? [];
     },
   });
