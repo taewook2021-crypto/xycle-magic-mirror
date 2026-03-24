@@ -183,3 +183,32 @@ export function useLeaveGroup() {
     },
   });
 }
+
+export function useDeleteGroup() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (groupId: string) => {
+      // Delete all members first, then the group
+      await supabase
+        .from("study_group_members")
+        .delete()
+        .eq("group_id", groupId);
+      const { error } = await supabase
+        .from("study_groups")
+        .delete()
+        .eq("id", groupId)
+        .eq("owner_id", user!.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-groups"] });
+      qc.invalidateQueries({ queryKey: ["group-members"] });
+      qc.invalidateQueries({ queryKey: ["group-detail"] });
+      toast({ title: "그룹이 삭제되었습니다." });
+    },
+    onError: () => {
+      toast({ title: "그룹 삭제 실패", variant: "destructive" });
+    },
+  });
+}
