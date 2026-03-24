@@ -87,45 +87,67 @@ export default function Dashboard() {
           </>
         ) : (
           <>
-            {/* Add book list */}
+            {/* Add book list grouped by subject */}
             {loading ? (
               <div className="space-y-3">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <Skeleton key={i} className="h-16 w-full rounded-xl" />
                 ))}
               </div>
-            ) : (
-              <div className="space-y-2">
-                {allBooks
-                  .filter((b) => !userBookIds.has(b.id))
-                  .map((book) => (
-                    <button
-                      key={book.id}
-                      onClick={() => addBook(book.id)}
-                      className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-border bg-card text-left hover:bg-accent/40 transition-colors"
-                    >
-                      <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                        <BookOpen className="h-4 w-4 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">
-                          {book.title}
-                        </p>
-                        <p className="text-[11px] text-muted-foreground">
-                          {subjectMap.get(book.subjectId) || "기타"}
-                          {book.author && ` · ${book.author}`}
-                        </p>
-                      </div>
-                      <Plus className="h-4 w-4 text-muted-foreground shrink-0" />
-                    </button>
-                  ))}
-                {allBooks.filter((b) => !userBookIds.has(b.id)).length === 0 && (
+            ) : (() => {
+              const availableBooks = allBooks.filter((b) => !userBookIds.has(b.id));
+              // Group by subject
+              const grouped = new Map<string, { subjectName: string; books: typeof availableBooks }>();
+              for (const book of availableBooks) {
+                const subjectName = subjectMap.get(book.subjectId) || "기타";
+                if (!grouped.has(book.subjectId)) {
+                  grouped.set(book.subjectId, { subjectName, books: [] });
+                }
+                grouped.get(book.subjectId)!.books.push(book);
+              }
+
+              if (availableBooks.length === 0) {
+                return (
                   <p className="text-center py-8 text-sm text-muted-foreground">
                     추가할 수 있는 교재가 없습니다
                   </p>
-                )}
-              </div>
-            )}
+                );
+              }
+
+              return (
+                <div className="space-y-5">
+                  {Array.from(grouped.values()).map(({ subjectName, books: groupBooks }) => (
+                    <div key={subjectName}>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
+                        {subjectName}
+                      </p>
+                      <div className="space-y-2">
+                        {groupBooks.map((book) => (
+                          <button
+                            key={book.id}
+                            onClick={() => addBook(book.id)}
+                            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-border bg-card text-left hover:bg-accent/40 transition-colors"
+                          >
+                            <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                              <BookOpen className="h-4 w-4 text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">
+                                {book.title}
+                              </p>
+                              {book.author && (
+                                <p className="text-[11px] text-muted-foreground">{book.author}</p>
+                              )}
+                            </div>
+                            <Plus className="h-4 w-4 text-muted-foreground shrink-0" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </>
         )}
       </div>
