@@ -36,6 +36,7 @@ export default function GroupDetail() {
   const { data: group } = useGroupDetail(id);
   const { data: members = [] } = useGroupMembers(id);
   const leave = useLeaveGroup();
+  const deleteGroup = useDeleteGroup();
   const [tab, setTab] = useState<TabKey>("ranking");
   const [showLeave, setShowLeave] = useState(false);
 
