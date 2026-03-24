@@ -61,7 +61,7 @@ export function useSocialFeed() {
   const { data: books } = useQuery({
     queryKey: ["social-books"],
     queryFn: async () => {
-      const { data } = await supabase.from("books").select("id, title, subject_id");
+      const { data } = await supabase.from("books").select("id, title, subject_id, user_count_offset");
       return data ?? [];
     },
   });
@@ -105,8 +105,8 @@ export function useSocialFeed() {
   }, [questions]);
 
   const bookMap = useMemo(() => {
-    const m = new Map<string, string>();
-    books?.forEach((b) => m.set(b.id, b.title));
+    const m = new Map<string, { title: string; offset: number }>();
+    books?.forEach((b) => m.set(b.id, { title: b.title, offset: (b as any).user_count_offset ?? 0 }));
     return m;
   }, [books]);
 
@@ -147,7 +147,8 @@ export function useSocialFeed() {
       .map((entry) => {
         const chapterId = questionToChapter.get(entry.questionId);
         const chapter = chapterId ? chapterMap.get(chapterId) : null;
-        const bookTitle = chapter ? bookMap.get(chapter.bookId) ?? "교재" : "교재";
+        const bookInfo = chapter ? bookMap.get(chapter.bookId) : null;
+        const bookTitle = bookInfo?.title ?? "교재";
         const minutesAgo = Math.max(1, Math.round((now - new Date(entry.attemptedAt).getTime()) / 60000));
         const isLive = new Date(entry.attemptedAt).getTime() > twoHoursAgo;
 
@@ -190,7 +191,7 @@ export function useSocialFeed() {
       .filter((bookId) => bookUserCounts.has(bookId))
       .map((bookId) => {
         const userMap = bookUserCounts.get(bookId)!;
-        const peers: PeerEntry[] = Array.from(userMap.entries())
+        const allPeers: PeerEntry[] = Array.from(userMap.entries())
           .map(([uid, count]) => ({
             id: uid,
             name: profileMap.get(uid) ?? (uid === user?.id ? (profile?.display_name ?? "나") : "?"),
@@ -198,11 +199,14 @@ export function useSocialFeed() {
             isMe: uid === user?.id,
             isPublic: true,
           }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 10);
+          .sort((a, b) => b.count - a.count);
+
+        // Find my rank in the full list
+        const myRank = allPeers.findIndex((p) => p.isMe) + 1; // 0 if not found
+        // Take top 10
+        const peers = allPeers.slice(0, 10);
 
         const myCount = userMap.get(user?.id ?? "") ?? 0;
-        // Only compare with peers who have the same exam_status
         const otherCounts = Array.from(userMap.entries())
           .filter(([uid]) => uid !== user?.id && (!myExamStatus || examStatusMap.get(uid) === myExamStatus))
           .map(([, c]) => c);
@@ -211,12 +215,19 @@ export function useSocialFeed() {
           : 0;
         const peerGroupLabel = myExamStatus || "전체";
 
+        const bookInfo = bookMap.get(bookId);
+        const offset = bookInfo?.offset ?? 0;
+        const realUserCount = allPeers.length;
+        const totalPeerCount = realUserCount + offset;
+
         return {
-          bookTitle: bookMap.get(bookId) ?? "교재",
+          bookTitle: bookInfo?.title ?? "교재",
           myCount,
           avgCount,
           peers,
           peerGroupLabel,
+          totalPeerCount,
+          myRank: myRank > 0 ? myRank : undefined,
         };
       })
       .filter((b) => b.peers.length > 0);

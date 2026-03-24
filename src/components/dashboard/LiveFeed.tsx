@@ -12,6 +12,8 @@ export interface BookFeedItem {
   avgCount: number;
   peers: PeerEntry[];
   peerGroupLabel?: string;
+  totalPeerCount?: number;
+  myRank?: number;
 }
 
 export interface PeerEntry {
@@ -106,6 +108,9 @@ function BookSection({
   const diff = book.myCount - book.avgCount;
   const maxCount = Math.max(...book.peers.map((p) => p.count), 1);
 
+  // Separate top 10 and check if "me" is already inside
+  const meInTop = book.peers.some((p) => p.isMe);
+
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
@@ -126,9 +131,30 @@ function BookSection({
       </div>
       <div className="space-y-0.5">
         {book.peers.map((peer, i) => (
-          <PeerRow key={peer.id} peer={peer} rank={i + 1} maxCount={maxCount} onPeerClick={onPeerClick} />
+          <PeerRow key={peer.id} peer={peer} rank={peer.isMe && !meInTop ? (book.myRank ?? i + 1) : i + 1} maxCount={maxCount} onPeerClick={onPeerClick} />
         ))}
+        {/* Separator + my rank when I'm outside top 10 */}
+        {!meInTop && book.myRank && book.myRank > 10 && (
+          <>
+            <div className="flex items-center gap-2 py-1">
+              <span className="flex-1 border-t border-dashed border-border" />
+              <span className="text-[10px] text-muted-foreground">···</span>
+              <span className="flex-1 border-t border-dashed border-border" />
+            </div>
+            <PeerRow
+              peer={{ id: "me", name: "나", count: book.myCount, isMe: true }}
+              rank={book.myRank}
+              maxCount={maxCount}
+              onPeerClick={() => {}}
+            />
+          </>
+        )}
       </div>
+      {book.totalPeerCount != null && book.totalPeerCount > 0 && (
+        <p className="text-[10px] text-muted-foreground text-center pt-1">
+          {book.totalPeerCount}명이 풀고 있어요
+        </p>
+      )}
     </div>
   );
 }
