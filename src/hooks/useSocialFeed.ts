@@ -105,8 +105,8 @@ export function useSocialFeed() {
   }, [questions]);
 
   const bookMap = useMemo(() => {
-    const m = new Map<string, string>();
-    books?.forEach((b) => m.set(b.id, b.title));
+    const m = new Map<string, { title: string; offset: number }>();
+    books?.forEach((b) => m.set(b.id, { title: b.title, offset: (b as any).user_count_offset ?? 0 }));
     return m;
   }, [books]);
 
