@@ -80,10 +80,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Live feed */}
-            {!loading && liveFeedBooks.length > 0 && (
-              <LiveFeed books={liveFeedBooks} />
-            )}
           </>
         ) : (
           <>
