@@ -376,6 +376,9 @@ export default function Profile() {
             />
           </div>
 
+          {/* Study groups */}
+          <GroupCard />
+
           {/* Logout */}
           <button
             onClick={handleSignOut}

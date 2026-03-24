@@ -30,6 +30,7 @@ const App = () => (
               <Route path="/review/:bookId" element={<ProtectedRoute><Review /></ProtectedRoute>} />
               <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/group/:id" element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AuthProvider>
