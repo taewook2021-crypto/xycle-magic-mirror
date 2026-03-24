@@ -129,6 +129,13 @@ export function useJoinGroup() {
       // Workaround: we'll query with the code. If RLS blocks it, we won't find.
       // We need to add a policy that allows reading by invite_code.
       // For MVP, let's just try — the user must know the code.
+      // Check 3-group limit
+      const { count: myGroupCount } = await supabase
+        .from("study_group_members")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user!.id);
+      if ((myGroupCount ?? 0) >= 3) throw new Error("최대 3개 그룹까지 가입할 수 있습니다.");
+
       const { data: group, error: findError } = await supabase
         .from("study_groups")
         .select("id, name, max_members")
@@ -180,6 +187,35 @@ export function useLeaveGroup() {
       qc.invalidateQueries({ queryKey: ["my-groups"] });
       qc.invalidateQueries({ queryKey: ["group-members"] });
       toast({ title: "그룹에서 탈퇴했습니다." });
+    },
+  });
+}
+
+export function useDeleteGroup() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (groupId: string) => {
+      // Delete all members first, then the group
+      await supabase
+        .from("study_group_members")
+        .delete()
+        .eq("group_id", groupId);
+      const { error } = await supabase
+        .from("study_groups")
+        .delete()
+        .eq("id", groupId)
+        .eq("owner_id", user!.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-groups"] });
+      qc.invalidateQueries({ queryKey: ["group-members"] });
+      qc.invalidateQueries({ queryKey: ["group-detail"] });
+      toast({ title: "그룹이 삭제되었습니다." });
+    },
+    onError: () => {
+      toast({ title: "그룹 삭제 실패", variant: "destructive" });
     },
   });
 }

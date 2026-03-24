@@ -322,6 +322,40 @@ export default function Profile() {
         {/* Settings cards */}
         <div className="px-4 sm:px-6 mt-8 space-y-4">
 
+          {/* Nickname editor */}
+          <div
+            className="p-5 rounded-2xl bg-white transition-all"
+            style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <div className="h-10 w-10 rounded-xl bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
+                <Pencil className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">닉네임</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  다른 수험생에게 보이는 이름입니다.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Input
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                maxLength={20}
+                placeholder="닉네임 입력"
+                className="flex-1"
+              />
+              <Button
+                size="sm"
+                onClick={handleSaveNickname}
+                disabled={saving || nickname.trim() === profile?.display_name}
+              >
+                {saving ? "저장 중…" : "저장"}
+              </Button>
+            </div>
+          </div>
+
           {/* Exam status selector */}
           <div
             className="p-5 rounded-2xl bg-white transition-all"

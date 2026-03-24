@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell";
-import { useGroupDetail, useGroupMembers, useLeaveGroup } from "@/hooks/useStudyGroup";
+import { useGroupDetail, useGroupMembers, useLeaveGroup, useDeleteGroup } from "@/hooks/useStudyGroup";
 import { useAuth } from "@/hooks/useAuth";
 import GroupRanking from "@/components/group/GroupRanking";
 import GroupProgress from "@/components/group/GroupProgress";
@@ -36,6 +36,7 @@ export default function GroupDetail() {
   const { data: group } = useGroupDetail(id);
   const { data: members = [] } = useGroupMembers(id);
   const leave = useLeaveGroup();
+  const deleteGroup = useDeleteGroup();
   const [tab, setTab] = useState<TabKey>("ranking");
   const [showLeave, setShowLeave] = useState(false);
 
@@ -50,9 +51,15 @@ export default function GroupDetail() {
 
   const handleLeave = () => {
     if (!id) return;
-    leave.mutate(id, {
-      onSuccess: () => navigate("/profile"),
-    });
+    if (isOwner) {
+      deleteGroup.mutate(id, {
+        onSuccess: () => navigate("/profile"),
+      });
+    } else {
+      leave.mutate(id, {
+        onSuccess: () => navigate("/profile"),
+      });
+    }
   };
 
   return (
