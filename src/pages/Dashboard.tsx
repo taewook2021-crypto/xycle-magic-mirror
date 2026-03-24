@@ -6,7 +6,7 @@ import { usePeerAvgProgress } from "@/hooks/usePeerAvgProgress";
 import DashboardHeader, { getDDay } from "@/components/dashboard/DashboardHeader";
 import TodayStatsCard from "@/components/dashboard/TodayStatsCard";
 import SubjectProgressCard from "@/components/dashboard/SubjectProgressCard";
-import LiveFeed from "@/components/dashboard/LiveFeed";
+
 import AddSubjectSheet from "@/components/dashboard/AddSubjectSheet";
 import { BookOpen, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
