@@ -17,7 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Copy, LogOut, Trophy, BarChart3 } from "lucide-react";
+import { ArrowLeft, Copy, LogOut, Trophy, BarChart3, Activity } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
