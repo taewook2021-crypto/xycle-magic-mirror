@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function Dashboard() {
   const { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, loading, addBook } =
     useDashboardData();
-  const { liveFeedBooks } = useSocialFeed();
+  
   const { peerAvgMap, examStatus } = usePeerAvgProgress();
 
   const [activeTab, setActiveTab] = useState<"subjects" | "addBook">("subjects");
