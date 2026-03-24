@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 
 const TABS = [
   { key: "ranking", label: "랭킹", icon: Trophy },
+  { key: "feed", label: "피드", icon: Activity },
   { key: "progress", label: "진도", icon: BarChart3 },
 ] as const;
 
