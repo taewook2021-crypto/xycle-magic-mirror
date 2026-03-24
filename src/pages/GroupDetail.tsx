@@ -100,6 +100,7 @@ export default function GroupDetail() {
         {/* Tab content */}
         <div className="px-4 sm:px-6 mt-4">
           {tab === "ranking" && <GroupRanking members={members} />}
+          {tab === "feed" && <GroupFeed members={members} />}
           {tab === "progress" && <GroupProgress members={members} />}
         </div>
 
