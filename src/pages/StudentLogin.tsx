@@ -130,12 +130,21 @@ export default function StudentLogin() {
   }, [user, navigate]);
 
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin },
+      options: {
+        redirectTo: window.location.origin,
+        skipBrowserRedirect: true,
+      },
     });
     if (error) {
       toast({ title: "로그인 실패", description: error.message, variant: "destructive" });
+      return;
+    }
+    if (data?.url) {
+      // Open in new window to avoid disallowed_useragent errors
+      // in embedded webviews (Lovable preview, KakaoTalk, etc.)
+      window.open(data.url, "_blank", "noopener,noreferrer");
     }
   };
 
