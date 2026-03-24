@@ -58,10 +58,12 @@ const faqs = [
 ];
 
 const suggestionChips = [
-  "세무회계연습 법인세법",
-  "세무회계연습 소득세법",
-  "실전 동형모의고사",
-  "세법학개론",
+  "재무관리연습 8판",
+  "IFRS 중급회계연습",
+  "IFRS 고급회계연습",
+  "CPA 2차 최적서 원가관리회계",
+  "세무회계연습(법인세법)",
+  "세무회계연습(소득세법·부가세법·상증세법)",
 ];
 
 function FAQItem({ item, isOpen, onClick }: { item: typeof faqs[0]; isOpen: boolean; onClick: () => void }) {
