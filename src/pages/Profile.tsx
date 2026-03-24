@@ -413,6 +413,23 @@ export default function Profile() {
           {/* Study groups */}
           <GroupCard />
 
+          {/* Admin link - only for wiserlab1@gmail.com */}
+          {user?.email === "wiserlab1@gmail.com" && (
+            <button
+              onClick={() => navigate("/admin")}
+              className="w-full flex items-center gap-4 p-5 rounded-2xl bg-white transition-all hover:shadow-sm text-left group"
+              style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
+            >
+              <div className="h-10 w-10 rounded-xl bg-[hsl(var(--primary)/0.1)] flex items-center justify-center flex-shrink-0">
+                <ShieldCheck className="h-5 w-5 text-[hsl(var(--primary))]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">관리자 페이지</p>
+                <p className="text-xs text-muted-foreground mt-0.5">유저 목록 및 회독표 관리</p>
+              </div>
+            </button>
+          )}
+
           {/* Logout */}
           <button
             onClick={handleSignOut}
