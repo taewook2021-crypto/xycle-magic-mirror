@@ -24,16 +24,6 @@ export default function DashboardHeader({ dDay, totalAttempts }: DashboardHeader
         <span className="text-[11px] font-medium tracking-tight opacity-70">
           {EXAM_LABEL}
         </span>
-        <div className="flex items-center gap-4">
-          <button className="flex items-center gap-1 text-xs opacity-60 hover:opacity-90 transition-colors">
-            <BarChart3 className="h-3.5 w-3.5" />
-            통계
-          </button>
-          <button className="flex items-center gap-1 text-xs opacity-60 hover:opacity-90 transition-colors">
-            <CalendarDays className="h-3.5 w-3.5" />
-            플래너
-          </button>
-        </div>
       </div>
 
       {/* D-day */}
