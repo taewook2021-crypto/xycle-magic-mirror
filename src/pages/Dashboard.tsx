@@ -27,7 +27,7 @@ export default function Dashboard() {
   return (
     <AppShell>
       {/* Header */}
-      <DashboardHeader dDay={dDay} totalAttempts={totalAttempts} />
+      <DashboardHeader dDay={dDay} todayAttempts={todayAttempts} />
 
       <div className="px-4 sm:px-6 pt-5 pb-12 max-w-2xl mx-auto space-y-5">
         {/* Tabs */}

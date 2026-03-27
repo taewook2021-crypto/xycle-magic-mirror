@@ -188,5 +188,5 @@ export function useDashboardData() {
     await fetchData();
   }, [user, fetchData]);
 
-  return { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, loading, addBook };
+  return { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, todayAttempts, loading, addBook };
 }
