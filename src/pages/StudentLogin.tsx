@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import bungaejangLogo from "@/assets/bungaejang-logo.svg";
+import { Copy, ExternalLink } from "lucide-react";
 
 const features = [
   {
@@ -66,6 +67,23 @@ const suggestionChips = [
   "세무회계연습(소득세법·부가세법·상증세법)",
 ];
 
+const isInAppBrowser = () => {
+  const ua = navigator.userAgent || "";
+  return /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line|Twitter|Snapchat|YJApp|everytimeApp|DaumApps|wv\)/i.test(ua);
+};
+
+const getExternalBrowserUrl = () => {
+  const url = window.location.href;
+  const ua = navigator.userAgent || "";
+  // Android: use intent scheme to open in Chrome
+  if (/android/i.test(ua)) {
+    return `intent://${url.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
+  }
+  // iOS: use universal link trick — open in Safari via a redirect
+  // Unfortunately there's no guaranteed way on iOS, so we return null
+  return null;
+};
+
 function FAQItem({ item, isOpen, onClick }: { item: typeof faqs[0]; isOpen: boolean; onClick: () => void }) {
   return (
     <div
@@ -120,34 +138,28 @@ export default function StudentLogin() {
   const { toast } = useToast();
   const { user } = useAuth();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [inApp, setInApp] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setInApp(isInAppBrowser());
   }, []);
 
   useEffect(() => {
     if (user) navigate("/dashboard", { replace: true });
   }, [user, navigate]);
 
-  const isInAppBrowser = () => {
-    const ua = navigator.userAgent || "";
-    return /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line|Twitter|Snapchat|YJApp/i.test(ua);
-  };
-
   const handleGoogleLogin = async () => {
-    // If in-app browser, guide user to open in external browser
-    if (isInAppBrowser()) {
-      // Try to open in external browser (works on some in-app browsers)
-      const currentUrl = window.location.href;
-      // Android KakaoTalk supports intent scheme
-      if (/android/i.test(navigator.userAgent)) {
-        window.location.href = `intent://${currentUrl.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
+    if (inApp) {
+      const externalUrl = getExternalBrowserUrl();
+      if (externalUrl) {
+        window.location.href = externalUrl;
         return;
       }
-      // For iOS and others, copy URL and show guidance
       toast({
         title: "외부 브라우저에서 열어주세요",
-        description: "인앱 브라우저에서는 Google 로그인이 제한됩니다. Safari 또는 Chrome에서 접속해 주세요.",
+        description: "아래 배너에서 링크를 복사한 뒤 Safari 또는 Chrome에서 열어주세요.",
         variant: "destructive",
       });
       return;
@@ -165,6 +177,35 @@ export default function StudentLogin() {
     }
   };
 
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      toast({ title: "링크가 복사되었습니다", description: "Safari 또는 Chrome에 붙여넣기 해주세요." });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback
+      const input = document.createElement("input");
+      input.value = window.location.href;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      document.body.removeChild(input);
+      setCopied(true);
+      toast({ title: "링크가 복사되었습니다", description: "Safari 또는 Chrome에 붙여넣기 해주세요." });
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleOpenExternal = () => {
+    const externalUrl = getExternalBrowserUrl();
+    if (externalUrl) {
+      window.location.href = externalUrl;
+    } else {
+      handleCopyUrl();
+    }
+  };
+
   return (
     <div
       className="min-h-screen"
@@ -173,6 +214,54 @@ export default function StudentLogin() {
         background: "linear-gradient(180deg, #FFFFFF 0%, #F0C4EC 100%)",
       }}
     >
+      {/* ───── In-App Browser Banner ───── */}
+      <AnimatePresence>
+        {inApp && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="sticky top-0 z-[60] px-4 py-3"
+            style={{
+              background: "hsl(0 0% 13%)",
+              color: "hsl(0 0% 94%)",
+            }}
+          >
+            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+              <p className="text-sm text-center sm:text-left" style={{ fontFamily: "'Pretendard Variable', Pretendard, sans-serif" }}>
+                ⚠️ 인앱 브라우저에서는 Google 로그인이 제한됩니다.
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCopyUrl}
+                  className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all active:scale-95"
+                  style={{
+                    background: "hsl(0 0% 100% / 0.15)",
+                    color: "hsl(0 0% 94%)",
+                    border: "1px solid hsl(0 0% 100% / 0.2)",
+                  }}
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                  {copied ? "복사됨!" : "링크 복사"}
+                </button>
+                <button
+                  onClick={handleOpenExternal}
+                  className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all active:scale-95"
+                  style={{
+                    background: "hsl(304 56% 66%)",
+                    color: "hsl(0 0% 94%)",
+                  }}
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  외부 브라우저로 열기
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ───── Nav ───── */}
       <nav
         className="sticky top-0 z-50 py-3 px-4"
