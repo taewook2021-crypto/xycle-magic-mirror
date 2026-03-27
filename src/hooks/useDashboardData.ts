@@ -43,6 +43,7 @@ export function useDashboardData() {
   const [userBooks, setUserBooks] = useState<UserBookInfo[]>([]);
   const [allBooks, setAllBooks] = useState<AvailableBook[]>([]);
   const [totalAttempts, setTotalAttempts] = useState(0);
+  const [todayAttempts, setTodayAttempts] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {

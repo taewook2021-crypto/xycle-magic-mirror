@@ -16,7 +16,7 @@ export function getDDay() {
 
 export const EXAM_LABEL = "2026 CPA 2차 · 6.27-28";
 
-export default function DashboardHeader({ dDay, totalAttempts }: DashboardHeaderProps) {
+export default function DashboardHeader({ dDay, todayAttempts }: DashboardHeaderProps) {
   return (
     <div className="bg-primary text-primary-foreground px-5 pt-6 pb-8 rounded-b-2xl">
       {/* Top row */}
@@ -37,12 +37,12 @@ export default function DashboardHeader({ dDay, totalAttempts }: DashboardHeader
       </div>
 
       <div className="text-center">
-        <p className="text-[11px] opacity-50 mb-0.5 tracking-wide">총 풀이</p>
+        <p className="text-[11px] opacity-50 mb-0.5 tracking-wide">오늘 풀이</p>
         <p
           className="text-lg font-medium tracking-tight leading-none"
           style={{ fontFamily: "'IBM Plex Mono', monospace" }}
         >
-          {totalAttempts.toLocaleString()}
+          {todayAttempts.toLocaleString()}
           <span className="text-sm opacity-60 ml-1">문제</span>
         </p>
       </div>
