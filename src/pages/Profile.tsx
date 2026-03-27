@@ -402,6 +402,9 @@ export default function Profile() {
             />
           </div>
 
+          {/* Dark mode toggle */}
+          <DarkModeToggle />
+
           {/* Study groups */}
           <GroupCard />
 
