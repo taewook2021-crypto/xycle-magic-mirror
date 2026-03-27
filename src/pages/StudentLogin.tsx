@@ -236,9 +236,9 @@ export default function StudentLogin() {
               wordBreak: "keep-all",
             }}
           >
-            다른 동차생들은 나보다 잘하고 있나,
+            오늘 동차생 평균 18문제,
             <br />
-            궁금하지 않으신가요?
+            나는?
           </motion.h1>
 
           {/* Subtitle */}
