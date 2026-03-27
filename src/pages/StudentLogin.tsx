@@ -129,22 +129,39 @@ export default function StudentLogin() {
     if (user) navigate("/dashboard", { replace: true });
   }, [user, navigate]);
 
+  const isInAppBrowser = () => {
+    const ua = navigator.userAgent || "";
+    return /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line|Twitter|Snapchat|YJApp/i.test(ua);
+  };
+
   const handleGoogleLogin = async () => {
+    // If in-app browser, guide user to open in external browser
+    if (isInAppBrowser()) {
+      // Try to open in external browser (works on some in-app browsers)
+      const currentUrl = window.location.href;
+      // Android KakaoTalk supports intent scheme
+      if (/android/i.test(navigator.userAgent)) {
+        window.location.href = `intent://${currentUrl.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
+        return;
+      }
+      // For iOS and others, copy URL and show guidance
+      toast({
+        title: "외부 브라우저에서 열어주세요",
+        description: "인앱 브라우저에서는 Google 로그인이 제한됩니다. Safari 또는 Chrome에서 접속해 주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: window.location.origin,
-        skipBrowserRedirect: true,
       },
     });
     if (error) {
       toast({ title: "로그인 실패", description: error.message, variant: "destructive" });
       return;
-    }
-    if (data?.url) {
-      // Open in new window to avoid disallowed_useragent errors
-      // in embedded webviews (Lovable preview, KakaoTalk, etc.)
-      window.open(data.url, "_blank", "noopener,noreferrer");
     }
   };
 
