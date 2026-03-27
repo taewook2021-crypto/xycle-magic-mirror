@@ -628,7 +628,7 @@ export default function Ranking() {
                       <div className="w-8 flex items-center justify-center flex-shrink-0">
                         {getRankIcon(i)}
                       </div>
-                      <div className="h-9 w-9 rounded-full bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
+                      <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
                         <User className="h-4 w-4 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -642,6 +642,24 @@ export default function Ranking() {
                         <span className="text-sm font-bold text-foreground">{r.pct}%</span>
                         <p className="text-[10px] text-muted-foreground">{r.solved}/{r.total}</p>
                       </div>
+                      {!r.isMe && (
+                        <span
+                          role="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!myKudosToday.includes(r.userId)) {
+                              kudosMutation.mutate({ receiverId: r.userId, name: r.name });
+                            }
+                          }}
+                          className={cn(
+                            "flex-shrink-0 text-lg cursor-pointer transition-opacity",
+                            myKudosToday.includes(r.userId) ? "opacity-40" : "opacity-100 hover:scale-110"
+                          )}
+                          title={myKudosToday.includes(r.userId) ? "오늘 응원함" : "응원하기"}
+                        >
+                          👏
+                        </span>
+                      )}
                     </button>
                   ))}
                 </div>
