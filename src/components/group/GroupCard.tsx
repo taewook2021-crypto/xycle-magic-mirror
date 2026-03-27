@@ -16,7 +16,7 @@ export default function GroupCard() {
   return (
     <>
       <div
-        className="p-5 rounded-2xl bg-white transition-all"
+        className="p-5 rounded-2xl bg-card transition-all"
         style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
       >
         <div className="flex items-center gap-4 mb-4">

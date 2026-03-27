@@ -18,7 +18,7 @@ import Admin from "./pages/Admin";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+  <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} storageKey="xycle-theme">
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />

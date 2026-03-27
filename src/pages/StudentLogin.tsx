@@ -292,7 +292,7 @@ export default function StudentLogin() {
               {suggestionChips.map((chip) => (
                 <span
                   key={chip}
-                  className="rounded-full px-4 py-2 text-sm cursor-default transition-colors hover:bg-white/80"
+                  className="rounded-full px-4 py-2 text-sm cursor-default transition-colors hover:bg-card/80"
                   style={{
                     border: "1px solid hsl(0 0% 0% / 0.1)",
                     color: "hsl(0 0% 25%)",

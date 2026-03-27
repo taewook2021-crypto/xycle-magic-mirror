@@ -394,11 +394,11 @@ export default function Ranking() {
             placeholder="닉네임으로 검색"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-10 pl-10 pr-4 rounded-full border border-border/60 bg-white text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-border transition-colors"
+            className="w-full h-10 pl-10 pr-4 rounded-full border border-border/60 bg-card text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-border transition-colors"
           />
           {searchResults.length > 0 && (
             <div
-              className="absolute z-20 top-full mt-2 w-full rounded-2xl overflow-hidden bg-white"
+              className="absolute z-20 top-full mt-2 w-full rounded-2xl overflow-hidden bg-card"
               style={{ border: "1px solid hsl(0 0% 0% / 0.08)", boxShadow: "0 4px 20px hsl(0 0% 0% / 0.08)" }}
             >
               {searchResults.map((p) => (
@@ -480,7 +480,7 @@ export default function Ranking() {
                       "shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border",
                       sortBy === o.value
                         ? "bg-[#DA77D1] text-white border-[#DA77D1]"
-                        : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+                        : "bg-card text-muted-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
                     )}
                   >
                     <o.icon className="h-3 w-3" />
@@ -500,7 +500,7 @@ export default function Ranking() {
                       key={r.userId}
                       onClick={() => handleUserClick(r.userId)}
                       className={cn(
-                        "w-full flex items-center gap-4 p-4 rounded-2xl bg-white transition-all hover:shadow-sm text-left",
+                        "w-full flex items-center gap-4 p-4 rounded-2xl bg-card transition-all hover:shadow-sm text-left",
                         r.isMe && "ring-2 ring-[#DA77D1]/30"
                       )}
                       style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
@@ -536,7 +536,7 @@ export default function Ranking() {
                     "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border",
                     selectedBook === "all"
                       ? "bg-[#DA77D1] text-white border-[#DA77D1]"
-                      : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+                      : "bg-card text-muted-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
                   )}
                 >
                   교재 선택
@@ -549,7 +549,7 @@ export default function Ranking() {
                       "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border whitespace-nowrap",
                       selectedBook === b.id
                         ? "bg-[#DA77D1] text-white border-[#DA77D1]"
-                        : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+                        : "bg-card text-muted-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
                     )}
                   >
                     {b.title}
@@ -568,7 +568,7 @@ export default function Ranking() {
                       key={r.userId}
                       onClick={() => handleUserClick(r.userId)}
                       className={cn(
-                        "w-full flex items-center gap-4 p-4 rounded-2xl bg-white transition-all hover:shadow-sm text-left",
+                        "w-full flex items-center gap-4 p-4 rounded-2xl bg-card transition-all hover:shadow-sm text-left",
                         r.isMe && "ring-2 ring-[#DA77D1]/30"
                       )}
                       style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}

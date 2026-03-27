@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { Pencil, Eye, LogOut, Users, User, GraduationCap, ShieldCheck } from "lucide-react";
+import DarkModeToggle from "@/components/DarkModeToggle";
 import GroupCard from "@/components/group/GroupCard";
 import { cn } from "@/lib/utils";
 
@@ -315,7 +316,7 @@ export default function Profile() {
 
           {/* Nickname editor */}
           <div
-            className="p-5 rounded-2xl bg-white transition-all"
+            className="p-5 rounded-2xl bg-card transition-all"
             style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
           >
             <div className="flex items-center gap-4 mb-4">
@@ -349,7 +350,7 @@ export default function Profile() {
 
           {/* Exam status selector */}
           <div
-            className="p-5 rounded-2xl bg-white transition-all"
+            className="p-5 rounded-2xl bg-card transition-all"
             style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
           >
             <div className="flex items-center gap-4 mb-4">
@@ -382,7 +383,7 @@ export default function Profile() {
           </div>
 
           <div
-            className="flex items-center gap-4 p-5 rounded-2xl bg-white transition-all hover:shadow-sm"
+            className="flex items-center gap-4 p-5 rounded-2xl bg-card transition-all hover:shadow-sm"
             style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
           >
             <div className="h-10 w-10 rounded-xl bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
@@ -401,6 +402,9 @@ export default function Profile() {
             />
           </div>
 
+          {/* Dark mode toggle */}
+          <DarkModeToggle />
+
           {/* Study groups */}
           <GroupCard />
 
@@ -408,7 +412,7 @@ export default function Profile() {
           {user?.email === "wiserlab1@gmail.com" && (
             <button
               onClick={() => navigate("/admin")}
-              className="w-full flex items-center gap-4 p-5 rounded-2xl bg-white transition-all hover:shadow-sm text-left group"
+              className="w-full flex items-center gap-4 p-5 rounded-2xl bg-card transition-all hover:shadow-sm text-left group"
               style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
             >
               <div className="h-10 w-10 rounded-xl bg-[hsl(var(--primary)/0.1)] flex items-center justify-center flex-shrink-0">
@@ -424,7 +428,7 @@ export default function Profile() {
           {/* Logout */}
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center gap-4 p-5 rounded-2xl bg-white transition-all hover:shadow-sm text-left group"
+            className="w-full flex items-center gap-4 p-5 rounded-2xl bg-card transition-all hover:shadow-sm text-left group"
             style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
           >
             <div className="h-10 w-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">

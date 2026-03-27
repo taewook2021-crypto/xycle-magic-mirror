@@ -495,7 +495,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
               "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
               sectionFilter === f.key
                 ? "bg-[#DA77D1] text-white border-[#DA77D1]"
-                : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+                : "bg-card text-muted-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
             )}
           >
             {f.label}
@@ -509,7 +509,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
               "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
               examYearFilter
                 ? "bg-[#DA77D1] text-white border-[#DA77D1]"
-                : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+                : "bg-card text-muted-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
             )}
           >
             ★ 2유
@@ -523,7 +523,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
               "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
               essentialOnly
                 ? "bg-[#DA77D1] text-white border-[#DA77D1]"
-                : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+                : "bg-card text-muted-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
             )}
           >
             ★ 필수
@@ -535,7 +535,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
             "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
             memoOnly
               ? "bg-[#DA77D1] text-white border-[#DA77D1]"
-              : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+              : "bg-card text-muted-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
           )}
         >
           📝
@@ -546,7 +546,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
             "h-auto px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap w-auto min-w-0 gap-1 [&>svg]:h-3 [&>svg]:w-3 border",
             resultFilter !== "off"
               ? "bg-[#DA77D1] text-white border-[#DA77D1]"
-              : "bg-white text-[#555] border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+              : "bg-card text-muted-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
           )}>
             <SelectValue />
           </SelectTrigger>
@@ -569,7 +569,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
       {filtered.length === 0 ? (
         <div className="text-center py-8 text-xs text-muted-foreground">해당 유형의 문항이 없습니다.</div>
       ) : (
-        <div className={cn("rounded-2xl overflow-hidden bg-white border border-[hsl(0,0%,0%,0.08)]", activeCell && "mb-16")}
+        <div className={cn("rounded-2xl overflow-hidden bg-card border border-[hsl(0,0%,0%,0.08)]", activeCell && "mb-16")}
           style={{ boxShadow: "0 1px 3px hsl(0 0% 0% / 0.04)" }}
         >
           <div className={isMobile ? "overflow-hidden" : "overflow-x-auto"}>
@@ -614,7 +614,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                       return (
                         <tr key={q.questionId} className={cn("transition-colors", isSkipped && "opacity-40", isActiveRow ? "bg-primary/5" : "hover:bg-accent/20")}>
                           <td
-                            className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-[hsl(0,0%,0%,0.06)] cursor-pointer select-none", !isMobile && "sticky left-0 w-9 px-1", isActiveRow ? "bg-primary/5" : "bg-white")}
+                            className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-[hsl(0,0%,0%,0.06)] cursor-pointer select-none", !isMobile && "sticky left-0 w-9 px-1", isActiveRow ? "bg-primary/5" : "bg-card")}
                             onClick={() => toggleSkip(q.questionId)}
                           >
                             <div className="flex flex-col items-center leading-none gap-0">
@@ -633,7 +633,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                               )}
                             </div>
                           </td>
-                          <td className={cn("z-10 px-0.5 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", !isMobile && "sticky left-9 w-10 min-w-[80px]", isActiveRow ? "bg-primary/5" : "bg-white")}>
+                          <td className={cn("z-10 px-0.5 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", !isMobile && "sticky left-9 w-10 min-w-[80px]", isActiveRow ? "bg-primary/5" : "bg-card")}>
                             <span className="text-[9px] text-muted-foreground truncate block max-w-[80px] md:max-w-[120px]">
                               {filterConfig.show_exam_year_column
                                 ? (q.examYear ? `${q.examYear} 기출` : "–")
@@ -641,7 +641,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                             </span>
                           </td>
                           {!isMobile && (
-                            <td className={cn("sticky left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", isActiveRow ? "bg-primary/5" : "bg-white")}>
+                            <td className={cn("sticky left-[76px] z-10 min-w-[100px] px-2 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", isActiveRow ? "bg-primary/5" : "bg-card")}>
                               <div className="flex items-center gap-1">
                                 <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
                                   {filterConfig.show_exam_year_column
