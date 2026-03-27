@@ -1,4 +1,4 @@
-import { BarChart3, CalendarDays } from "lucide-react";
+
 
 interface DashboardHeaderProps {
   dDay: number;
