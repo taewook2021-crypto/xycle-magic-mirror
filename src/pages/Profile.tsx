@@ -23,8 +23,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Pencil, Eye, LogOut, Users, User, GraduationCap, ShieldCheck, Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Pencil, Eye, LogOut, Users, User, GraduationCap, ShieldCheck } from "lucide-react";
+import DarkModeToggle from "@/components/DarkModeToggle";
 import GroupCard from "@/components/group/GroupCard";
 import { cn } from "@/lib/utils";
 
