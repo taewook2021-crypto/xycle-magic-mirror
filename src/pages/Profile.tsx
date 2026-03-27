@@ -60,7 +60,7 @@ export default function Profile() {
     }
   }, [profile]);
 
-  const avatarUrl = profile?.avatar_url ?? user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
+  // Avatar photos hidden for anonymity — always show default icon
   const displayName = (profile?.display_name && profile.display_name !== "사용자") ? profile.display_name : "사용자";
   const joinedDate = user?.created_at
     ? new Date(user.created_at).toLocaleDateString("ko-KR", { year: "numeric", month: "long" })
@@ -268,18 +268,9 @@ export default function Profile() {
           <div className="flex items-end gap-4 sm:gap-6">
             {/* Avatar */}
             <div className="h-24 w-24 sm:h-28 sm:w-28 rounded-full border-4 border-white bg-[#f4f4f5] flex-shrink-0 overflow-hidden">
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={displayName}
-                  className="h-full w-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="h-full w-full flex items-center justify-center">
-                  <User className="h-10 w-10 text-muted-foreground" />
-                </div>
-              )}
+              <div className="h-full w-full flex items-center justify-center">
+                <User className="h-10 w-10 text-muted-foreground" />
+              </div>
             </div>
 
             {/* Name & meta */}
@@ -481,11 +472,7 @@ export default function Profile() {
                   className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors text-left"
                 >
                   <div className="h-10 w-10 rounded-full bg-muted flex-shrink-0 overflow-hidden flex items-center justify-center">
-                    {f.avatar_url ? (
-                      <img src={f.avatar_url} alt={f.display_name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
-                    ) : (
-                      <User className="h-4 w-4 text-muted-foreground" />
-                    )}
+                    <User className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-foreground truncate">{f.display_name}</p>
@@ -518,11 +505,7 @@ export default function Profile() {
                   className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors text-left"
                 >
                   <div className="h-10 w-10 rounded-full bg-muted flex-shrink-0 overflow-hidden flex items-center justify-center">
-                    {f.avatar_url ? (
-                      <img src={f.avatar_url} alt={f.display_name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
-                    ) : (
-                      <User className="h-4 w-4 text-muted-foreground" />
-                    )}
+                    <User className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-foreground truncate">{f.display_name}</p>
