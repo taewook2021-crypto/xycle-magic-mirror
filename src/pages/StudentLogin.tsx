@@ -143,7 +143,14 @@ export default function StudentLogin() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    setInApp(isInAppBrowser());
+    if (isInAppBrowser()) {
+      setInApp(true);
+      // Force redirect to external browser immediately
+      const externalUrl = getExternalBrowserUrl();
+      if (externalUrl) {
+        window.location.href = externalUrl;
+      }
+    }
   }, []);
 
   useEffect(() => {
