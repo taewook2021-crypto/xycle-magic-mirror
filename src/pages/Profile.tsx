@@ -60,7 +60,7 @@ export default function Profile() {
     }
   }, [profile]);
 
-  const avatarUrl = profile?.avatar_url ?? user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
+  // Avatar photos hidden for anonymity — always show default icon
   const displayName = (profile?.display_name && profile.display_name !== "사용자") ? profile.display_name : "사용자";
   const joinedDate = user?.created_at
     ? new Date(user.created_at).toLocaleDateString("ko-KR", { year: "numeric", month: "long" })
