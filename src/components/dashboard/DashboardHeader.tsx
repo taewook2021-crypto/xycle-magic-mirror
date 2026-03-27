@@ -2,7 +2,7 @@
 
 interface DashboardHeaderProps {
   dDay: number;
-  totalAttempts: number;
+  todayAttempts: number;
 }
 
 const D_DAY_TARGET = new Date("2026-06-27");
