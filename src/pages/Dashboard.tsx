@@ -12,7 +12,7 @@ import { BookOpen, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
-  const { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, loading, addBook } =
+  const { subjectProgress, bookProgress, userBooks, allBooks, todayAttempts, loading, addBook } =
     useDashboardData();
   
   const { peerAvgMap, examStatus } = usePeerAvgProgress();
@@ -27,7 +27,7 @@ export default function Dashboard() {
   return (
     <AppShell>
       {/* Header */}
-      <DashboardHeader dDay={dDay} totalAttempts={totalAttempts} />
+      <DashboardHeader dDay={dDay} todayAttempts={todayAttempts} />
 
       <div className="px-4 sm:px-6 pt-5 pb-12 max-w-2xl mx-auto space-y-5">
         {/* Tabs */}

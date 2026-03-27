@@ -43,6 +43,7 @@ export function useDashboardData() {
   const [userBooks, setUserBooks] = useState<UserBookInfo[]>([]);
   const [allBooks, setAllBooks] = useState<AvailableBook[]>([]);
   const [totalAttempts, setTotalAttempts] = useState(0);
+  const [todayAttempts, setTodayAttempts] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
@@ -151,6 +152,11 @@ export function useDashboardData() {
 
     setTotalAttempts(attempts?.length || 0);
 
+    // Today's attempts
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayCount = attempts?.filter((a) => a.attempted_at.slice(0, 10) === todayStr).length || 0;
+    setTodayAttempts(todayCount);
+
     // User books
     const { data: userBooksRaw } = await supabase
       .from("user_books")
@@ -182,5 +188,5 @@ export function useDashboardData() {
     await fetchData();
   }, [user, fetchData]);
 
-  return { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, loading, addBook };
+  return { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, todayAttempts, loading, addBook };
 }
