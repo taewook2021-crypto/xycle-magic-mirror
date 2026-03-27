@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import AppShell from "@/components/layout/AppShell";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus, Target, Hash, CheckCircle, Calendar, Search, Eye, Lock } from "lucide-react";
+import { Trophy, Flame, BookOpen, User, UserPlus, UserMinus, Target, Hash, CheckCircle, Calendar, Search, Eye, Lock, Hand } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import PeerReviewSheet from "@/components/dashboard/PeerReviewSheet";
@@ -98,11 +98,45 @@ export default function Ranking() {
     },
   });
 
+  const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
+
   const todayStart = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     return d.toISOString();
   }, []);
+
+  // Kudos: which users I already sent kudos to today
+  const { data: myKudosToday = [] } = useQuery({
+    queryKey: ["ranking-kudos-sent-today", user?.id, todayStr],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("kudos")
+        .select("receiver_id")
+        .eq("sender_id", user!.id)
+        .eq("created_date", todayStr);
+      return (data ?? []).map((k) => k.receiver_id);
+    },
+    enabled: !!user,
+  });
+
+  const kudosMutation = useMutation({
+    mutationFn: async ({ receiverId, name }: { receiverId: string; name: string }) => {
+      const { error } = await supabase
+        .from("kudos")
+        .insert({ sender_id: user!.id, receiver_id: receiverId, created_date: todayStr });
+      if (error) throw error;
+      return name;
+    },
+    onSuccess: (name) => {
+      queryClient.invalidateQueries({ queryKey: ["ranking-kudos-sent-today"] });
+      queryClient.invalidateQueries({ queryKey: ["peer-kudos-count"] });
+      toast({ title: `${name}님에게 응원을 보냈습니다 👏` });
+    },
+    onError: () => {
+      toast({ title: "이미 오늘 응원을 보냈습니다." });
+    },
+  });
 
   const { data: todayAttempts } = useQuery({
     queryKey: ["ranking-today-attempts", todayStart],
@@ -508,7 +542,7 @@ export default function Ranking() {
                       <div className="w-8 flex items-center justify-center flex-shrink-0">
                         {getRankIcon(i)}
                       </div>
-                      <div className="h-9 w-9 rounded-full bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
+                      <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
                         <User className="h-4 w-4 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -519,6 +553,24 @@ export default function Ranking() {
                         {r.examStatus && <p className="text-[11px] text-muted-foreground">{r.examStatus}</p>}
                       </div>
                       <span className="text-sm font-bold text-foreground">{r.label}</span>
+                      {!r.isMe && (
+                        <span
+                          role="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!myKudosToday.includes(r.userId)) {
+                              kudosMutation.mutate({ receiverId: r.userId, name: r.name });
+                            }
+                          }}
+                          className={cn(
+                            "flex-shrink-0 text-lg cursor-pointer transition-opacity",
+                            myKudosToday.includes(r.userId) ? "opacity-40" : "opacity-100 hover:scale-110"
+                          )}
+                          title={myKudosToday.includes(r.userId) ? "오늘 응원함" : "응원하기"}
+                        >
+                          👏
+                        </span>
+                      )}
                     </button>
                   ))}
                 </div>
@@ -576,7 +628,7 @@ export default function Ranking() {
                       <div className="w-8 flex items-center justify-center flex-shrink-0">
                         {getRankIcon(i)}
                       </div>
-                      <div className="h-9 w-9 rounded-full bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
+                      <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
                         <User className="h-4 w-4 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -590,6 +642,24 @@ export default function Ranking() {
                         <span className="text-sm font-bold text-foreground">{r.pct}%</span>
                         <p className="text-[10px] text-muted-foreground">{r.solved}/{r.total}</p>
                       </div>
+                      {!r.isMe && (
+                        <span
+                          role="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!myKudosToday.includes(r.userId)) {
+                              kudosMutation.mutate({ receiverId: r.userId, name: r.name });
+                            }
+                          }}
+                          className={cn(
+                            "flex-shrink-0 text-lg cursor-pointer transition-opacity",
+                            myKudosToday.includes(r.userId) ? "opacity-40" : "opacity-100 hover:scale-110"
+                          )}
+                          title={myKudosToday.includes(r.userId) ? "오늘 응원함" : "응원하기"}
+                        >
+                          👏
+                        </span>
+                      )}
                     </button>
                   ))}
                 </div>
