@@ -152,6 +152,30 @@ export type Database = {
         }
         Relationships: []
       }
+      kudos: {
+        Row: {
+          created_at: string
+          created_date: string
+          id: string
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_date?: string
+          id?: string
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          created_date?: string
+          id?: string
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
