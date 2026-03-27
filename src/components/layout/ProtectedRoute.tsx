@@ -16,7 +16,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   if (!user) return <Navigate to="/" replace />;
 
   // Show nickname setup if profile hasn't been configured yet
-  const needsSetup = profile && (!profile.display_name || profile.display_name === "사용자") && !profile.exam_status;
+  const needsSetup = profile && ((!profile.display_name || profile.display_name === "사용자") || !profile.exam_status);
 
   if (needsSetup) {
     return (
