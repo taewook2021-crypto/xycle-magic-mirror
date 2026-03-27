@@ -268,18 +268,9 @@ export default function Profile() {
           <div className="flex items-end gap-4 sm:gap-6">
             {/* Avatar */}
             <div className="h-24 w-24 sm:h-28 sm:w-28 rounded-full border-4 border-white bg-[#f4f4f5] flex-shrink-0 overflow-hidden">
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={displayName}
-                  className="h-full w-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="h-full w-full flex items-center justify-center">
-                  <User className="h-10 w-10 text-muted-foreground" />
-                </div>
-              )}
+              <div className="h-full w-full flex items-center justify-center">
+                <User className="h-10 w-10 text-muted-foreground" />
+              </div>
             </div>
 
             {/* Name & meta */}
