@@ -98,11 +98,45 @@ export default function Ranking() {
     },
   });
 
+  const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
+
   const todayStart = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     return d.toISOString();
   }, []);
+
+  // Kudos: which users I already sent kudos to today
+  const { data: myKudosToday = [] } = useQuery({
+    queryKey: ["ranking-kudos-sent-today", user?.id, todayStr],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("kudos")
+        .select("receiver_id")
+        .eq("sender_id", user!.id)
+        .eq("created_date", todayStr);
+      return (data ?? []).map((k) => k.receiver_id);
+    },
+    enabled: !!user,
+  });
+
+  const kudosMutation = useMutation({
+    mutationFn: async ({ receiverId, name }: { receiverId: string; name: string }) => {
+      const { error } = await supabase
+        .from("kudos")
+        .insert({ sender_id: user!.id, receiver_id: receiverId, created_date: todayStr });
+      if (error) throw error;
+      return name;
+    },
+    onSuccess: (name) => {
+      queryClient.invalidateQueries({ queryKey: ["ranking-kudos-sent-today"] });
+      queryClient.invalidateQueries({ queryKey: ["peer-kudos-count"] });
+      toast({ title: `${name}님에게 응원을 보냈습니다 👏` });
+    },
+    onError: () => {
+      toast({ title: "이미 오늘 응원을 보냈습니다." });
+    },
+  });
 
   const { data: todayAttempts } = useQuery({
     queryKey: ["ranking-today-attempts", todayStart],
