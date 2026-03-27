@@ -1,15 +1,22 @@
 
 
-## LiveFeed 컴포넌트 제거
-
-대시보드 하단의 "오늘의 동차생 풀이량" 섹션(`LiveFeed`)을 제거합니다.
+## 로그인 페이지 헤딩 텍스트 변경
 
 ### 변경 사항
 
-**`src/pages/Dashboard.tsx`**
-- `LiveFeed` import 제거
-- `useSocialFeed` import 및 호출 제거
-- LiveFeed 렌더링 블록 (83~86줄) 삭제
+**`src/pages/StudentLogin.tsx` (239~241줄)**
 
-총 3줄 삭제 + import 정리로 완료되는 간단한 작업입니다.
+현재:
+```
+다른 동차생들은 나보다 잘하고 있나,
+궁금하지 않으신가요?
+```
+
+변경:
+```
+오늘 동차생 평균 18문제,
+나는?
+```
+
+한 줄 수정으로 완료.
 
