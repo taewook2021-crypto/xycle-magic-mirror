@@ -1,23 +1,38 @@
 
 
-## 이승철 세무회계연습 메타데이터 업데이트 + 김종길 필수문제 — 완료
+## 이승철 세무회계연습 — 문제순서 유지 + 분류 필터
 
-### 완료된 작업
+### 문제
+현재 회독표는 `sectionFilter === "all"`일 때 문항을 유형별(기본→유예→동차)로 **재정렬**하여 그룹 헤더와 함께 표시합니다. 이승철 교재에서는 문제번호 순서(1→n)를 유지하면서, 주제 열에 기본/유예/동차를 표시하고, 필터 버튼으로 특정 유형만 보기/숨기기만 하면 됩니다.
 
-#### 작업 1: 이승철 법인세법 메타데이터 업데이트 ✅
-- 227문항 question_type (기본/동차/유예) + is_essential 업데이트 완료
-- filter_config에 type_labels 반영: `{"example": "기본", "past_exam": "동차", "practice": "유예"}`
+### 변경 사항
 
-#### 작업 2: 이승철 소·부·상 메타데이터 + 누락 문항 추가 ✅
-- 213문항 기존 메타데이터 업데이트 완료
-- 48문항 신규 추가 (사업소득 11, 근로·연금·기타 8, 종합소득공제 2, 과세표준·매출세액 17, 증여세 10)
-- 총 261문항으로 확장
-- filter_config 업데이트 완료
+**1. ReviewGrid.tsx 코드 수정**
 
-#### 작업 3: 김종길 재무관리연습 8판 필수문제 표시 ✅
-- PDF 기반 191개 필수문제 is_essential = true 설정
-- filter_config에 show_essential_filter: true 추가
-- 기존 유형 필터(예제/기출/실전)는 유지
+- `FilterConfig` 인터페이스에 `group_by_type?: boolean` 추가 (기본값 `true`)
+- `visualOrder` useMemo: `group_by_type === false`이면 유형별 재정렬 없이 `filtered` 순서 그대로 사용
+- `groupedByType()`: `group_by_type === false`이면 단일 그룹 반환 (그룹 헤더 미표시)
+- 유형 필터 버튼은 그대로 동작 (선택 시 해당 유형만 필터링)
 
-#### ReviewGrid type_labels 지원 ✅
-- 이전에 이미 구현 완료 — 추가 코드 변경 없음
+**2. DB 업데이트 (insert tool)**
+
+이승철 두 교재의 `filter_config` 업데이트:
+```json
+{
+  "show_type_filters": true,
+  "show_essential_filter": true,
+  "show_star_filter": false,
+  "group_by_type": false,
+  "type_labels": {"example": "기본", "past_exam": "동차", "practice": "유예"}
+}
+```
+- `show_type_filters: true` → 기본/동차/유예 필터 버튼 활성화
+- `group_by_type: false` → 문제번호 순서 유지, 그룹 헤더 없음
+
+### 수정 파일
+
+| 대상 | 변경 |
+|------|------|
+| `src/components/review/ReviewGrid.tsx` | `group_by_type` 플래그 지원 (3곳 수정) |
+| DB `books` 테이블 | 이승철 2교재 filter_config UPDATE |
+
