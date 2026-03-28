@@ -439,24 +439,31 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   // Detect if this book uses past_exam type — if not, use 기본/응용 labels
   const hasPastExam = questions.some((q) => q.questionType === "past_exam");
 
-  const sectionFilters: { key: SectionFilter; label: string }[] = hasPastExam
+  const sectionFilters: { key: SectionFilter; label: string }[] = filterConfig.type_labels
     ? [
         { key: "all", label: "전체" },
-        { key: "example", label: "예제" },
-        { key: "past_exam", label: "기출" },
-        { key: "practice", label: "실전" },
+        ...Object.entries(filterConfig.type_labels).map(([key, label]) => ({ key: key as SectionFilter, label })),
       ]
-    : [
-        { key: "all", label: "전체" },
-        { key: "example", label: "기본" },
-        { key: "practice", label: "응용" },
-      ];
+    : hasPastExam
+      ? [
+          { key: "all", label: "전체" },
+          { key: "example", label: "예제" },
+          { key: "past_exam", label: "기출" },
+          { key: "practice", label: "실전" },
+        ]
+      : [
+          { key: "all", label: "전체" },
+          { key: "example", label: "기본" },
+          { key: "practice", label: "응용" },
+        ];
 
   // Group by type
   const groupedByType = () => {
     if (sectionFilter !== "all" || resultFilter !== "off") return [{ type: sectionFilter !== "all" ? sectionFilter : "all", rows: filtered }];
     const groups: { type: string; rows: QuestionRow[] }[] = [];
-    const typeOrder: QuestionType[] = hasPastExam ? ["example", "past_exam", "practice"] : ["example", "practice"];
+    const typeOrder: QuestionType[] = filterConfig.type_labels
+      ? (Object.keys(filterConfig.type_labels) as QuestionType[])
+      : hasPastExam ? ["example", "past_exam", "practice"] : ["example", "practice"];
     for (const t of typeOrder) {
       const rows = filtered.filter((q) => q.questionType === t);
       if (rows.length > 0) groups.push({ type: t, rows });
@@ -464,9 +471,11 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
     return groups;
   };
 
-  const typeLabels: Record<string, string> = hasPastExam
-    ? { example: "예제", past_exam: "기출문제", practice: "실전연습" }
-    : { example: "기본문제", practice: "응용문제" };
+  const typeLabels: Record<string, string> = filterConfig.type_labels
+    ? filterConfig.type_labels
+    : hasPastExam
+      ? { example: "예제", past_exam: "기출문제", practice: "실전연습" }
+      : { example: "기본문제", practice: "응용문제" };
 
   const activeQuestion = activeCell ? questions[activeCell.qIdx] : undefined;
 
