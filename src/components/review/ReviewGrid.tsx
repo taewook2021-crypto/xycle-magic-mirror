@@ -98,9 +98,11 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   });
 
   // Build visual order: grouped by type (example → past_exam → practice), matching render order
+  // When group_by_type is false, keep original question_number order
+  const groupByType = filterConfig.group_by_type !== false;
   const visualOrder = useMemo(() => {
     const order: number[] = [];
-    if (sectionFilter !== "all") {
+    if (sectionFilter !== "all" || !groupByType) {
       for (const q of filtered) order.push(questions.indexOf(q));
     } else {
       const typeOrder: QuestionType[] = ["example", "past_exam", "practice"];
@@ -111,7 +113,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
       }
     }
     return order;
-  }, [filtered, questions, sectionFilter]);
+  }, [filtered, questions, sectionFilter, groupByType]);
 
   // Keep filteredGlobalIndices as alias for backward compat
   const filteredGlobalIndices = visualOrder;
