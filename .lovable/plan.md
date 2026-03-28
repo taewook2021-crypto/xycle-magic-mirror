@@ -1,47 +1,37 @@
 
 
-## Kudos(응원) 기능 추가
+## '원가관리회계연습 2판 / 이승우' 교재 추가
 
 ### 개요
-유저가 다른 유저에게 "응원" 버튼을 눌러 kudos를 보낼 수 있는 기능. 랭킹 페이지의 프로필 카드와 랭킹 리스트에서 사용.
+PDF 회독표에서 추출한 데이터를 기반으로, 원가관리회계 과목에 이승우 교재를 추가합니다. 총 195문항, 12개 챕터(11장 + 부록).
 
-### 1. DB 테이블 생성 (마이그레이션)
+### 데이터 구조 (PDF에서 추출)
 
-`kudos` 테이블:
-- `id` uuid PK
-- `sender_id` uuid (보내는 사람)
-- `receiver_id` uuid (받는 사람)
-- `created_at` timestamptz default now()
-- unique(sender_id, receiver_id, created_at::date) → 하루에 같은 사람에게 1번만
+| 챕터 | 제목 | 문항 수 |
+|------|------|---------|
+| 1 | 간접원가배분 및 활동기준원가계산 | 13 |
+| 2 | 개별원가계산 | 4 |
+| 3 | 종합원가계산 | 20 |
+| 4 | 결합원가계산 | 10 |
+| 5 | 전부·변동·초변동원가계산 | 10 |
+| 6 | CVP분석 | 28 |
+| 7 | 의사결정과 관련원가 | 30 |
+| 8 | 표준원가 | 25 |
+| 9 | 판매부문·투자중심점의 성과평가 | 10 |
+| 10 | 사내대체거래 | 17 |
+| 11 | 전략적 원가관리 | 19 |
+| 부록 | 부록 | 9 |
+| **합계** | | **195** |
 
-RLS 정책:
-- SELECT: authenticated, `true` (누구나 kudos 수 조회 가능)
-- INSERT: authenticated, `sender_id = auth.uid()`
-- DELETE: 없음 (취소 불가)
+### 구현
 
-### 2. PeerProfileCard에 응원 버튼 추가
+**SQL 마이그레이션 1건** — `books`, `chapters`, `questions` 테이블에 INSERT:
 
-`src/components/ranking/PeerProfileCard.tsx`:
-- 팔로우/회독표 버튼 옆에 👏 응원 버튼 추가
-- 오늘 이미 보냈으면 비활성화 + "응원함 ✓" 표시
-- 받은 총 kudos 수를 팔로워/팔로잉 옆에 표시
+- **books**: `subject_id = '54e4b9a1-998f-4584-b56a-3c954808d94f'` (원가관리회계), title = '원가관리회계연습 2판', author = '이승우', display_order = 3
+- **chapters**: 12개 챕터 (chapter_number 1~11 + 부록은 12)
+- **questions**: 195문항, 각 챕터별 순차 번호 (중요도 A→B→C 순서로 1번부터 연속 번호)
+- `filter_config`: `{"show_type_filters": false, "show_star_filter": false}` (기존 임세진 연습서와 동일)
+- 모든 question_type = 'example', is_essential = false (메타데이터 없음)
 
-### 3. 랭킹 리스트 행에 응원 버튼 추가
-
-`src/pages/Ranking.tsx`:
-- 각 랭킹 행 우측에 작은 👏 버튼 (프로필 카드 안 열고도 바로 응원 가능)
-- 오늘 이미 보낸 유저는 버튼 색상 변경
-- 자기 자신 행에는 받은 kudos 수만 표시
-
-### 4. 토스트 피드백
-
-응원 성공 시 `"{이름}님에게 응원을 보냈습니다 👏"` 토스트
-
-### 수정 파일 요약
-
-| 파일 | 변경 |
-|------|------|
-| SQL 마이그레이션 | `kudos` 테이블 + RLS |
-| `src/components/ranking/PeerProfileCard.tsx` | 응원 버튼 + 받은 kudos 수 표시 |
-| `src/pages/Ranking.tsx` | 랭킹 행에 인라인 응원 버튼, kudos 쿼리/뮤테이션 추가 |
+코드 변경은 없습니다. 기존 시스템이 자동으로 새 교재를 인식합니다.
 
