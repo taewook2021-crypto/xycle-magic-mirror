@@ -45,6 +45,7 @@ interface FilterConfig {
   show_essential_filter: boolean;
   show_exam_year_column: boolean;
   type_labels?: Record<string, string>;
+  group_by_type?: boolean;
 }
 
 export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyProp = false, initialChapterId, singleChapter = false, userId }: ReviewGridProps) {
@@ -97,9 +98,11 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   });
 
   // Build visual order: grouped by type (example → past_exam → practice), matching render order
+  // When group_by_type is false, keep original question_number order
+  const groupByType = filterConfig.group_by_type !== false;
   const visualOrder = useMemo(() => {
     const order: number[] = [];
-    if (sectionFilter !== "all") {
+    if (sectionFilter !== "all" || !groupByType) {
       for (const q of filtered) order.push(questions.indexOf(q));
     } else {
       const typeOrder: QuestionType[] = ["example", "past_exam", "practice"];
@@ -110,7 +113,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
       }
     }
     return order;
-  }, [filtered, questions, sectionFilter]);
+  }, [filtered, questions, sectionFilter, groupByType]);
 
   // Keep filteredGlobalIndices as alias for backward compat
   const filteredGlobalIndices = visualOrder;
@@ -459,7 +462,8 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
 
   // Group by type
   const groupedByType = () => {
-    if (sectionFilter !== "all" || resultFilter !== "off") return [{ type: sectionFilter !== "all" ? sectionFilter : "all", rows: filtered }];
+    // When group_by_type is false, return single group (no type headers)
+    if (!groupByType || sectionFilter !== "all" || resultFilter !== "off") return [{ type: sectionFilter !== "all" ? sectionFilter : "all", rows: filtered }];
     const groups: { type: string; rows: QuestionRow[] }[] = [];
     const typeOrder: QuestionType[] = filterConfig.type_labels
       ? (Object.keys(filterConfig.type_labels) as QuestionType[])
