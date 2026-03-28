@@ -1,0 +1,1 @@
+UPDATE books SET filter_config = '{"show_type_filters": true, "show_essential_filter": true, "show_star_filter": false, "group_by_type": false, "type_labels": {"example": "기본", "past_exam": "동차", "practice": "유예"}}'::jsonb WHERE id IN ('beeb92b6-3c01-4ec3-bc95-c9d6f1cb0a3f', '01cd0689-5744-4f76-815d-1c6a2214ea55')
