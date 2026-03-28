@@ -462,7 +462,8 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
 
   // Group by type
   const groupedByType = () => {
-    if (sectionFilter !== "all" || resultFilter !== "off") return [{ type: sectionFilter !== "all" ? sectionFilter : "all", rows: filtered }];
+    // When group_by_type is false, return single group (no type headers)
+    if (!groupByType || sectionFilter !== "all" || resultFilter !== "off") return [{ type: sectionFilter !== "all" ? sectionFilter : "all", rows: filtered }];
     const groups: { type: string; rows: QuestionRow[] }[] = [];
     const typeOrder: QuestionType[] = filterConfig.type_labels
       ? (Object.keys(filterConfig.type_labels) as QuestionType[])
