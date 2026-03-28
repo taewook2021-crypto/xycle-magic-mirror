@@ -1,60 +1,87 @@
 
 
-## 이승철 세무회계연습 메타데이터 업데이트 + 필터 시스템 확장
+## 이승철 세무회계연습 + 김종길 필수문제 업데이트
 
-### 현재 상태
-- 이승철 법인세법 (`beeb92b6...`): 11장, 227문항 — 모두 `question_type='example'`, `is_essential=false`
-- 이승철 소·부·상 (`01cd0689...`): 18장, 213문항 — 동일
-- 김종길 재무관리연습 8판 (`d1000000...`): 405문항, question_type 구분 있음 (예제178/기출179/실전48), 하지만 `is_essential` 미반영
+### 작업 요약
 
-### 작업 1: 필터 시스템에 커스텀 라벨 지원 추가
+3가지 작업을 수행합니다:
 
-`ReviewGrid.tsx`에서 `filter_config`에 `type_labels` 옵션을 추가하여, 교재마다 다른 필터 라벨을 표시할 수 있도록 합니다.
+1. **이승철 세무회계연습 메타데이터 업데이트** (Excel 기반)
+2. **이승철 소·부·상 누락 문항 추가** (~49문항)
+3. **김종길 재무관리연습 8판 필수문제 표시** (PDF 기반)
 
-**filter_config 예시:**
-```json
-{
-  "show_type_filters": true,
-  "show_essential_filter": true,
-  "type_labels": { "example": "기본", "past_exam": "동차", "practice": "유예" }
-}
-```
+---
 
-변경 파일: `src/components/review/ReviewGrid.tsx`
-- `FilterConfig` 인터페이스에 `type_labels?: Record<string, string>` 추가
-- `sectionFilters` 및 `typeLabels` 생성 시 `filterConfig.type_labels`가 있으면 해당 라벨 사용
-- 그룹 헤더(예제/기출문제/실전연습)도 커스텀 라벨 적용
+### 작업 1: 이승철 법인세법 메타데이터 업데이트
 
-### 작업 2: 이승철 교재 문항 메타데이터 업데이트
+Excel 데이터와 DB 문항 수가 모든 장에서 정확히 일치합니다 (총 227문항).
 
-PDF에서 추출한 분류(기본/동차/유예)와 필수(O) 데이터를 기존 문항에 반영합니다.
+| Excel | DB 챕터 | 문항 수 |
+|-------|--------|--------|
+| 1-1장 | ch1 법인세법 총론 | 3 |
+| 1-2장 | ch2 익금 | 23 |
+| 1-3장 | ch3 손금 | 36 |
+| ... | ... | ... |
+| 1-11장 | ch11 기타사항 | 12 |
 
-- **매핑**: 기본 → `example`, 동차 → `past_exam`, 유예 → `practice`
-- **is_essential**: O 표시 → `true`
-- PDF 파싱 스크립트로 각 장별 문항 데이터를 추출 후, SQL UPDATE 실행
-- **filter_config 업데이트**: 두 교재 모두
-  ```json
-  {
-    "show_type_filters": true,
-    "show_essential_filter": true,
-    "show_star_filter": false,
-    "type_labels": { "example": "기본", "past_exam": "동차", "practice": "유예" }
-  }
-  ```
+- 각 문항의 `question_type` (기본→example, 동차→past_exam, 유예→practice) UPDATE
+- 각 문항의 `is_essential` (O→true) UPDATE
+- `filter_config` 업데이트
 
-### 작업 3: 김종길 재무관리연습 8판 필수 필터 추가
+### 작업 2: 이승철 소·부·상 메타데이터 + 누락 문항 추가
 
-필수문제 리스트를 다시 제공해주시면:
-- 해당 문항들의 `is_essential = true`로 UPDATE
-- filter_config에 `"show_essential_filter": true` 추가
-- 기존 유형 필터(예제/기출/실전)는 유지
+DB에 213문항, Excel에 ~262문항. 5개 챕터에서 49문항 부족:
 
-### 수정 파일 요약
+| Excel | DB 챕터 | DB 수 | Excel 수 | 차이 |
+|-------|--------|-------|---------|-----|
+| 2-3장 | ch2 사업소득 | 5 | 16 | +11 |
+| 2-4장 | ch3 근로·연금·기타 | 16 | 24 | +8 |
+| 2-6장 | ch5 종합소득공제 | 5 | 7 | +2 |
+| 3-4장 | ch12 과세표준·매출세액 | 12 | 29 | +17 |
+| 4-2장 | ch17 증여세 | 9 | 19 | +10 |
 
-| 파일 | 변경 |
+- 매칭되는 기존 문항: `question_type` + `is_essential` UPDATE
+- 누락 문항: 해당 챕터에 신규 INSERT
+- `filter_config` 업데이트
+
+### 작업 3: 김종길 재무관리연습 8판 필수문제 표시
+
+PDF에서 추출한 필수 문제 목록 (챕터별 예제/기출/실전 번호):
+
+| 챕터 | 기출 | 실전 | 예제 |
+|------|------|------|------|
+| 1 | 2,3 | - | - |
+| 2 | 2,5,7 | 2,7,10 | - |
+| 3 | 2 | 1,3 | - |
+| ... | ... | ... | ... |
+| 17 | 2,3,4,5 | 1,2,4 | - |
+
+- 해당 문항들의 `is_essential = true` UPDATE
+- `filter_config`에 `"show_essential_filter": true` 추가
+
+---
+
+### 구현 방식
+
+**Python 스크립트**로 Excel을 파싱하여 SQL 생성 후, insert tool로 실행합니다:
+
+1. Excel 파싱 → 이승철 법인세법 227문항 UPDATE SQL 생성 + 실행
+2. Excel 파싱 → 이승철 소·부·상 기존 문항 UPDATE + 49문항 INSERT SQL 생성 + 실행
+3. 김종길 필수문제 UPDATE SQL 생성 + 실행 (PDF 데이터는 이미 파싱 완료)
+4. 3개 교재 `filter_config` UPDATE
+
+### 코드 변경
+
+`ReviewGrid.tsx`의 `type_labels` 지원은 이전 작업에서 이미 추가 완료. 추가 코드 변경 없음.
+
+### 수정 요약
+
+| 대상 | 작업 |
 |------|------|
-| `src/components/review/ReviewGrid.tsx` | FilterConfig에 type_labels 지원 추가 |
-| SQL (insert tool) | 이승철 두 교재 440문항 question_type + is_essential UPDATE |
-| SQL (insert tool) | 이승철 두 교재 filter_config UPDATE |
-| SQL (insert tool) | 김종길 필수문항 is_essential UPDATE + filter_config UPDATE (리스트 제공 후) |
+| 이승철 법인세법 227문항 | question_type + is_essential UPDATE |
+| 이승철 소·부·상 ~213문항 | question_type + is_essential UPDATE |
+| 이승철 소·부·상 ~49문항 | 신규 INSERT |
+| 이승철 2교재 filter_config | type_labels + 필터 설정 UPDATE |
+| 김종길 ~200문항 | is_essential = true UPDATE |
+| 김종길 filter_config | show_essential_filter 추가 UPDATE |
 
