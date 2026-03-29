@@ -1,6 +1,5 @@
 import BottomNav from "./BottomNav";
 import SideNav from "./SideNav";
-import KakaoFloatingButton from "../KakaoFloatingButton";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -10,7 +9,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <main className="max-w-4xl mx-auto">{children}</main>
       </div>
       <BottomNav />
-      <KakaoFloatingButton />
     </div>
   );
 }
