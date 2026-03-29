@@ -626,6 +626,20 @@ export default function StudentLogin() {
         <img src={bungaejangLogo} alt="분개장" className="h-5 opacity-40" />
       </footer>
 
+      {/* ───── KakaoTalk floating button ───── */}
+      <a
+        href="https://pf.kakao.com/_uSAyn"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-[#FEE500] shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+        aria-label="카카오톡 문의"
+        title="분개장 카카오톡 채널로 문의하기"
+      >
+        <svg viewBox="0 0 24 24" className="h-6 w-6 text-[#3C1E1E]" fill="currentColor">
+          <path d="M12 3C6.48 3 2 6.58 2 10.94c0 2.8 1.86 5.27 4.66 6.67-.15.53-.96 3.4-.99 3.62 0 0-.02.17.09.24.11.06.24.01.24.01.32-.04 3.7-2.44 4.28-2.86.55.08 1.13.12 1.72.12 5.52 0 10-3.58 10-7.94S17.52 3 12 3z"/>
+        </svg>
+      </a>
+
     </div>
   );
 }
