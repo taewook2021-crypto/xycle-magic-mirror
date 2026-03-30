@@ -211,6 +211,7 @@ export type Database = {
           exam_year: string | null
           id: string
           is_essential: boolean
+          is_priority: boolean
           question_number: number
           question_type: string
           sub_topic_id: string | null
@@ -223,6 +224,7 @@ export type Database = {
           exam_year?: string | null
           id?: string
           is_essential?: boolean
+          is_priority?: boolean
           question_number: number
           question_type?: string
           sub_topic_id?: string | null
@@ -235,6 +237,7 @@ export type Database = {
           exam_year?: string | null
           id?: string
           is_essential?: boolean
+          is_priority?: boolean
           question_number?: number
           question_type?: string
           sub_topic_id?: string | null
