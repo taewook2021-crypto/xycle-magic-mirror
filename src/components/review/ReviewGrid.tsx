@@ -46,6 +46,7 @@ interface FilterConfig {
   show_exam_year_column: boolean;
   type_labels?: Record<string, string>;
   group_by_type?: boolean;
+  essential_label?: string;
 }
 
 export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyProp = false, initialChapterId, singleChapter = false, userId }: ReviewGridProps) {
@@ -540,7 +541,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                 : "bg-card text-muted-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
             )}
           >
-            ★ 필수
+            {filterConfig.essential_label || '★ 필수'}
           </button>
         )}
         <button
@@ -632,10 +633,10 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                               <span className={cn(
                                 "font-medium text-[11px] transition-all",
                                 isSkipped && "line-through decoration-2 text-muted-foreground",
-                                !isSkipped && q.isEssential ? "text-primary font-bold" : !isSkipped ? "text-foreground" : "",
+                                !isSkipped && q.isEssential ? "text-orange-500 font-bold" : !isSkipped ? "text-foreground" : "",
                                 !isSkipped && "hover:text-muted-foreground/70"
                               )}>
-                                {q.isEssential ? "★" : ""}{q.questionNumber}
+                                {q.questionNumber}
                               </span>
                               {q.examYear && q.examYear !== '2유' && (
                                 <span className="text-[7px] text-orange-500 font-medium leading-none">
