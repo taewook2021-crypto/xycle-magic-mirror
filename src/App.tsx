@@ -12,6 +12,7 @@ import Review from "./pages/Review";
 import Ranking from "./pages/Ranking";
 import Profile from "./pages/Profile";
 import GroupDetail from "./pages/GroupDetail";
+import Groups from "./pages/Groups";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 
