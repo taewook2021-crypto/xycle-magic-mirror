@@ -197,6 +197,70 @@ export function useLeaveGroup() {
   });
 }
 
+export function usePublicGroups(search: string) {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["public-groups", search],
+    queryFn: async () => {
+      let query = supabase
+        .from("study_groups")
+        .select("*")
+        .eq("is_public", true)
+        .order("created_at", { ascending: false });
+      if (search.trim()) {
+        query = query.ilike("name", `%${search.trim()}%`);
+      }
+      const { data } = await query;
+      return (data ?? []) as StudyGroup[];
+    },
+    enabled: !!user,
+  });
+}
+
+export function useJoinGroupById() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (groupId: string) => {
+      const { count: myGroupCount } = await supabase
+        .from("study_group_members")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user!.id);
+      if ((myGroupCount ?? 0) >= 3) throw new Error("최대 3개 그룹까지 가입할 수 있습니다.");
+
+      const { data: group } = await supabase
+        .from("study_groups")
+        .select("id, name, max_members")
+        .eq("id", groupId)
+        .single();
+      if (!group) throw new Error("그룹을 찾을 수 없습니다.");
+
+      const { count } = await supabase
+        .from("study_group_members")
+        .select("*", { count: "exact", head: true })
+        .eq("group_id", groupId);
+      if ((count ?? 0) >= group.max_members) throw new Error("그룹 인원이 가득 찼습니다.");
+
+      const { error } = await supabase
+        .from("study_group_members")
+        .insert({ group_id: groupId, user_id: user!.id });
+      if (error) {
+        if (error.code === "23505") throw new Error("이미 가입된 그룹입니다.");
+        throw error;
+      }
+      return group;
+    },
+    onSuccess: (group) => {
+      qc.invalidateQueries({ queryKey: ["my-groups"] });
+      qc.invalidateQueries({ queryKey: ["public-groups"] });
+      toast({ title: `'${group.name}' 그룹에 가입했습니다!` });
+    },
+    onError: (err: Error) => {
+      toast({ title: err.message, variant: "destructive" });
+    },
+  });
+}
+
 export function useDeleteGroup() {
   const { user } = useAuth();
   const qc = useQueryClient();
