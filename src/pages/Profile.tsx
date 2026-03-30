@@ -26,7 +26,6 @@ import { toast } from "@/hooks/use-toast";
 import { Pencil, Eye, LogOut, Users, User, GraduationCap, ShieldCheck, MessageCircle, StickyNote, Trash2, ChevronDown } from "lucide-react";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import { cn } from "@/lib/utils";
-import { cn } from "@/lib/utils";
 
 const EXAM_STATUSES = [
   { value: "초시생", label: "초시생" },
