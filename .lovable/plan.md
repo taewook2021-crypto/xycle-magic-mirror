@@ -1,38 +1,47 @@
 
 
-## 이승철 세무회계연습 — 문제순서 유지 + 분류 필터
+## 홍상연 원가관리회계 연습서 전체 데이터 DB 추가
 
-### 문제
-현재 회독표는 `sectionFilter === "all"`일 때 문항을 유형별(기본→유예→동차)로 **재정렬**하여 그룹 헤더와 함께 표시합니다. 이승철 교재에서는 문제번호 순서(1→n)를 유지하면서, 주제 열에 기본/유예/동차를 표시하고, 필터 버튼으로 특정 유형만 보기/숨기기만 하면 됩니다.
+### 개요
+홍상연 원가관리회계 연습서(15개 단원, 약 150문항)를 DB에 새로 삽입합니다. 이전 시도에서 실제 INSERT가 실행되지 않아 데이터가 없는 상태입니다.
 
-### 변경 사항
+### 데이터 구조
 
-**1. ReviewGrid.tsx 코드 수정**
+| 단원 | 기본 | 심화 | 합계 |
+|------|------|------|------|
+| 1. 제조원가의 흐름 및 간접원가 배부 | 5 | 4 | 9 |
+| 2. 활동기준원가계산(ABC) | 6 | 3 | 9 |
+| 3. 종합원가계산 | 11 | 5 | 16 |
+| 4. 결합원가계산 | 8 | 5 | 13 |
+| 5. 표준원가계산 | 6 | 6 | 12 |
+| 6. 전부·변동·초변동원가계산 | 11 | 4 | 15 |
+| 7. 원가의 추정과 CVP 분석 | 9 | 8 | 17 |
+| 8. 관련원가와 의사결정 | 13 | 6 | 19 |
+| 9. 대체가격 | 7 | 4 | 11 |
+| 10. 종합예산 | 3 | 1 | 4 |
+| 11. 책임회계와 성과평가 | 5 | 2 | 7 |
+| 12. 자본예산 | 2 | 1 | 3 |
+| 13. 불확실성하의 의사결정 | 3 | 2 | 5 |
+| 14. 새로운 관리회계시스템 | 3 | 4 | 7 |
+| 15. 전략적 성과평가 | 5 | 3 | 8 |
+| **합계** | **97** | **58** | **155** |
 
-- `FilterConfig` 인터페이스에 `group_by_type?: boolean` 추가 (기본값 `true`)
-- `visualOrder` useMemo: `group_by_type === false`이면 유형별 재정렬 없이 `filtered` 순서 그대로 사용
-- `groupedByType()`: `group_by_type === false`이면 단일 그룹 반환 (그룹 헤더 미표시)
-- 유형 필터 버튼은 그대로 동작 (선택 시 해당 유형만 필터링)
+### 실행 계획
 
-**2. DB 업데이트 (insert tool)**
+**1. DB INSERT (insert tool 사용)**
+- `books` 테이블: 1건 (subject_id: 원가관리회계, author: 홍상연, display_order: 3)
+- `filter_config`: `{"show_type_filters": true, "group_by_type": false, "type_labels": {"example": "기본", "practice": "심화"}}`
+- `chapters` 테이블: 15건
+- `questions` 테이블: 155건 (기본→example, 심화→practice, topic에 문제명 저장)
 
-이승철 두 교재의 `filter_config` 업데이트:
-```json
-{
-  "show_type_filters": true,
-  "show_essential_filter": true,
-  "show_star_filter": false,
-  "group_by_type": false,
-  "type_labels": {"example": "기본", "past_exam": "동차", "practice": "유예"}
-}
-```
-- `show_type_filters: true` → 기본/동차/유예 필터 버튼 활성화
-- `group_by_type: false` → 문제번호 순서 유지, 그룹 헤더 없음
+**2. 코드 변경 없음**
+- ReviewGrid의 `group_by_type` 지원은 이미 구현 완료
 
-### 수정 파일
+### 수정 대상
 
-| 대상 | 변경 |
+| 대상 | 작업 |
 |------|------|
-| `src/components/review/ReviewGrid.tsx` | `group_by_type` 플래그 지원 (3곳 수정) |
-| DB `books` 테이블 | 이승철 2교재 filter_config UPDATE |
+| DB `books` | INSERT 1건 |
+| DB `chapters` | INSERT 15건 |
+| DB `questions` | INSERT 155건 |
 
