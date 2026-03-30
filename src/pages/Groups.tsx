@@ -12,8 +12,7 @@ const MAX_GROUPS = 3;
 
 export default function Groups() {
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
-  const { data: publicGroups = [], isLoading: loadingPublic } = usePublicGroups(search);
+  const { data: publicGroups = [], isLoading: loadingPublic } = usePublicGroups("");
   const { data: myGroups = [], isLoading: loadingMy } = useMyGroups();
   const joinById = useJoinGroupById();
   const [createOpen, setCreateOpen] = useState(false);
