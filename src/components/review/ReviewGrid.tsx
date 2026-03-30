@@ -653,7 +653,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                               <span className={cn(
                                 "font-medium text-[11px] transition-all",
                                 isSkipped && "line-through decoration-2 text-muted-foreground",
-                                !isSkipped && q.isEssential ? "text-orange-500 font-bold" : !isSkipped ? "text-foreground" : "",
+                                !isSkipped && q.isPriority ? "text-blue-500 font-bold" : !isSkipped && q.isEssential ? "text-orange-500 font-bold" : !isSkipped ? "text-foreground" : "",
                                 !isSkipped && "hover:text-muted-foreground/70"
                               )}>
                                 {q.questionNumber}
