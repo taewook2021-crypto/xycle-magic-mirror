@@ -10,6 +10,8 @@ export interface StudyGroup {
   owner_id: string;
   max_members: number;
   created_at: string;
+  is_public?: boolean;
+  description?: string | null;
 }
 
 export interface GroupMember {
