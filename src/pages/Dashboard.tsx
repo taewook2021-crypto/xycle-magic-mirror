@@ -21,7 +21,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers" with { type: "not-used" };
+
 
 export default function Dashboard() {
   const { subjectProgress, bookProgress, userBooks, allBooks, todayAttempts, loading, addBook, removeBook, reorderBooks } =
