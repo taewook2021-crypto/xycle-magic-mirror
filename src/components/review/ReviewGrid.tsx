@@ -550,6 +550,20 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
             {filterConfig.essential_label || '★ 필수'}
           </button>
         )}
+        {/* Priority filter */}
+        {filterConfig.show_priority_filter && (
+          <button
+            onClick={() => { setPriorityOnly((v) => !v); setActiveCell(null); }}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
+              priorityOnly
+                ? "bg-[#3B82F6] text-white border-[#3B82F6]"
+                : "bg-card text-muted-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+            )}
+          >
+            {filterConfig.priority_label || '최필수'}
+          </button>
+        )}
         <button
           onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
           className={cn(
