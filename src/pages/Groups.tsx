@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell";
 import { usePublicGroups, useJoinGroupById, useMyGroups, StudyGroup } from "@/hooks/useStudyGroup";
-import { ArrowLeft, Search, Users, UserPlus, Check, ChevronRight, Plus, KeyRound } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { ArrowLeft, Users, UserPlus, Check, ChevronRight, Plus, KeyRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CreateGroupSheet from "@/components/group/CreateGroupSheet";
 import JoinGroupSheet from "@/components/group/JoinGroupSheet";
@@ -12,8 +11,7 @@ const MAX_GROUPS = 3;
 
 export default function Groups() {
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
-  const { data: publicGroups = [], isLoading: loadingPublic } = usePublicGroups(search);
+  const { data: publicGroups = [], isLoading: loadingPublic } = usePublicGroups("");
   const { data: myGroups = [], isLoading: loadingMy } = useMyGroups();
   const joinById = useJoinGroupById();
   const [createOpen, setCreateOpen] = useState(false);
@@ -91,24 +89,14 @@ export default function Groups() {
 
         {/* Public Groups */}
         <div className="px-4 sm:px-6">
-          <p className="text-sm font-semibold text-foreground mb-2">공개 그룹 찾기</p>
-
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="그룹 이름으로 검색"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 rounded-xl"
-            />
-          </div>
+          <p className="text-sm font-semibold text-foreground mb-3">공개 그룹</p>
 
           <div className="space-y-2">
             {loadingPublic ? (
               <p className="text-xs text-muted-foreground text-center py-6">불러오는 중…</p>
             ) : publicNotJoined.length === 0 ? (
               <p className="text-xs text-muted-foreground text-center py-6">
-                {search ? "검색 결과가 없습니다." : "새로운 공개 그룹이 없습니다."}
+                새로운 공개 그룹이 없습니다.
               </p>
             ) : (
               publicNotJoined.map((g) => (
