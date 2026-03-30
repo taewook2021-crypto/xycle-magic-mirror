@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useCreateGroup } from "@/hooks/useStudyGroup";
 
 interface Props {
@@ -11,17 +13,24 @@ interface Props {
 
 export default function CreateGroupSheet({ open, onOpenChange }: Props) {
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
   const create = useCreateGroup();
 
   const handleSubmit = () => {
     const trimmed = name.trim();
     if (!trimmed || trimmed.length > 30) return;
-    create.mutate(trimmed, {
-      onSuccess: () => {
-        setName("");
-        onOpenChange(false);
-      },
-    });
+    create.mutate(
+      { name: trimmed, is_public: isPublic, description: description.trim() || undefined },
+      {
+        onSuccess: () => {
+          setName("");
+          setDescription("");
+          setIsPublic(false);
+          onOpenChange(false);
+        },
+      }
+    );
   };
 
   return (
@@ -37,6 +46,23 @@ export default function CreateGroupSheet({ open, onOpenChange }: Props) {
             onChange={(e) => setName(e.target.value)}
             maxLength={30}
           />
+          <Input
+            placeholder="그룹 소개 한줄 (선택)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            maxLength={100}
+          />
+          <div className="flex items-center justify-between">
+            <Label htmlFor="public-toggle" className="text-sm text-foreground">
+              공개 그룹으로 만들기
+            </Label>
+            <Switch id="public-toggle" checked={isPublic} onCheckedChange={setIsPublic} />
+          </div>
+          {isPublic && (
+            <p className="text-[11px] text-muted-foreground -mt-2">
+              공개 그룹은 누구나 검색하고 바로 가입할 수 있습니다.
+            </p>
+          )}
           <Button
             className="w-full rounded-xl"
             onClick={handleSubmit}

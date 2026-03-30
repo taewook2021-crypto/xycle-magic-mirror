@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, Plus, KeyRound, ChevronRight } from "lucide-react";
+import { Users, Plus, KeyRound, ChevronRight, Search } from "lucide-react";
 import { useMyGroups, StudyGroup } from "@/hooks/useStudyGroup";
 import CreateGroupSheet from "./CreateGroupSheet";
 import JoinGroupSheet from "./JoinGroupSheet";
@@ -79,6 +79,15 @@ export default function GroupCard() {
             </button>
           )}
         </div>
+
+        {/* Browse public groups */}
+        <button
+          onClick={() => navigate("/groups")}
+          className="w-full flex items-center justify-center gap-1.5 py-2 mt-2 rounded-xl text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
+        >
+          <Search className="h-4 w-4" />
+          공개 그룹 찾기
+        </button>
       </div>
 
       <CreateGroupSheet open={createOpen} onOpenChange={setCreateOpen} />

@@ -292,24 +292,30 @@ export type Database = {
       study_groups: {
         Row: {
           created_at: string
+          description: string | null
           id: string
           invite_code: string
+          is_public: boolean
           max_members: number
           name: string
           owner_id: string
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
           invite_code?: string
+          is_public?: boolean
           max_members?: number
           name: string
           owner_id: string
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
           invite_code?: string
+          is_public?: boolean
           max_members?: number
           name?: string
           owner_id?: string

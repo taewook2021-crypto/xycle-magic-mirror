@@ -12,6 +12,7 @@ import Review from "./pages/Review";
 import Ranking from "./pages/Ranking";
 import Profile from "./pages/Profile";
 import GroupDetail from "./pages/GroupDetail";
+import Groups from "./pages/Groups";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 
@@ -32,6 +33,7 @@ const App = () => (
               <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/group/:id" element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
+              <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
