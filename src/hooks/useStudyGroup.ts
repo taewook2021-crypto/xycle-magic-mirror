@@ -92,11 +92,15 @@ export function useCreateGroup() {
   const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (name: string) => {
-      // Create group
+    mutationFn: async (opts: { name: string; is_public?: boolean; description?: string }) => {
       const { data: group, error } = await supabase
         .from("study_groups")
-        .insert({ name, owner_id: user!.id })
+        .insert({
+          name: opts.name,
+          owner_id: user!.id,
+          is_public: opts.is_public ?? false,
+          description: opts.description || null,
+        })
         .select()
         .single();
       if (error) throw error;
