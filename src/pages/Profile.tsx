@@ -35,6 +35,133 @@ const EXAM_STATUSES = [
   { value: "N시생", label: "N시생" },
 ];
 
+function MyMemosCard({ userId }: { userId?: string }) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [expanded, setExpanded] = useState(false);
+
+  const { data: memos = [], isLoading } = useQuery({
+    queryKey: ["my-memos", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_question_memos")
+        .select("id, content, question_id, updated_at")
+        .eq("user_id", userId!)
+        .order("updated_at", { ascending: false });
+      if (error || !data?.length) return [];
+
+      const questionIds = data.map((m) => m.question_id);
+      const { data: questions } = await supabase
+        .from("questions")
+        .select("id, question_number, chapter_id")
+        .in("id", questionIds);
+
+      const chapterIds = [...new Set(questions?.map((q) => q.chapter_id) ?? [])];
+      const { data: chapters } = await supabase
+        .from("chapters")
+        .select("id, chapter_number, title, book_id")
+        .in("id", chapterIds);
+
+      const bookIds = [...new Set(chapters?.map((c) => c.book_id) ?? [])];
+      const { data: books } = await supabase
+        .from("books")
+        .select("id, title")
+        .in("id", bookIds);
+
+      const qMap = new Map(questions?.map((q) => [q.id, q]) ?? []);
+      const cMap = new Map(chapters?.map((c) => [c.id, c]) ?? []);
+      const bMap = new Map(books?.map((b) => [b.id, b]) ?? []);
+
+      return data.map((m) => {
+        const q = qMap.get(m.question_id);
+        const c = q ? cMap.get(q.chapter_id) : undefined;
+        const b = c ? bMap.get(c.book_id) : undefined;
+        return {
+          ...m,
+          question_number: q?.question_number,
+          chapter_number: c?.chapter_number,
+          chapter_title: c?.title,
+          book_id: c?.book_id,
+          book_title: b?.title,
+        };
+      });
+    },
+    enabled: !!userId,
+  });
+
+  const deleteMemo = async (memoId: string) => {
+    await supabase.from("user_question_memos").delete().eq("id", memoId);
+    queryClient.invalidateQueries({ queryKey: ["my-memos"] });
+    toast({ title: "메모가 삭제되었습니다." });
+  };
+
+  return (
+    <div
+      className="rounded-2xl bg-card transition-all"
+      style={{ border: "1px solid hsl(0 0% 0% / 0.08)" }}
+    >
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center gap-4 p-5 text-left"
+      >
+        <div className="h-10 w-10 rounded-xl bg-[#f4f4f5] flex items-center justify-center flex-shrink-0">
+          <StickyNote className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold text-foreground">내 메모</p>
+            {memos.length > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-primary text-primary-foreground">
+                {memos.length}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            모든 교재의 메모를 한 곳에서 확인합니다.
+          </p>
+        </div>
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 text-muted-foreground transition-transform duration-200",
+            expanded && "rotate-180"
+          )}
+        />
+      </button>
+
+      {expanded && (
+        <div className="px-5 pb-4 space-y-1">
+          {isLoading ? (
+            <p className="text-xs text-muted-foreground text-center py-4">불러오는 중…</p>
+          ) : memos.length === 0 ? (
+            <p className="text-xs text-muted-foreground text-center py-4">작성한 메모가 없습니다.</p>
+          ) : (
+            memos.map((m: any) => (
+              <div
+                key={m.id}
+                className="flex items-start gap-2 p-3 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer group"
+                onClick={() => m.book_id && navigate(`/review/${m.book_id}`)}
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] text-muted-foreground truncate">
+                    {m.book_title} &gt; Ch.{m.chapter_number} 문제{m.question_number}
+                  </p>
+                  <p className="text-sm text-foreground truncate mt-0.5">{m.content}</p>
+                </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); deleteMemo(m.id); }}
+                  className="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-destructive/10 transition-all shrink-0 mt-0.5"
+                >
+                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Profile() {
   const { user, profile, setProfile, signOut } = useAuth();
   const navigate = useNavigate();
