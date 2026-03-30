@@ -160,8 +160,9 @@ export function useDashboardData() {
     // User books
     const { data: userBooksRaw } = await supabase
       .from("user_books")
-      .select("id, book_id")
-      .eq("user_id", user.id);
+      .select("id, book_id, display_order")
+      .eq("user_id", user.id)
+      .order("display_order");
 
     if (userBooksRaw && booksFull) {
       const bMap = new Map(booksFull.map((b) => [b.id, b]));
