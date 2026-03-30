@@ -185,9 +185,26 @@ export function useDashboardData() {
 
   const addBook = useCallback(async (bookId: string) => {
     if (!user) return;
-    await supabase.from("user_books").insert({ user_id: user.id, book_id: bookId });
+    const maxOrder = userBooks.reduce((max, b) => Math.max(max, 0), 0);
+    await supabase.from("user_books").insert({ user_id: user.id, book_id: bookId, display_order: maxOrder + 1 });
     await fetchData();
-  }, [user, fetchData]);
+  }, [user, fetchData, userBooks]);
 
-  return { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, todayAttempts, loading, addBook };
+  const removeBook = useCallback(async (userBookId: string) => {
+    if (!user) return;
+    await supabase.from("user_books").delete().eq("id", userBookId).eq("user_id", user.id);
+    setUserBooks((prev) => prev.filter((b) => b.id !== userBookId));
+  }, [user]);
+
+  const reorderBooks = useCallback(async (reorderedBooks: UserBookInfo[]) => {
+    if (!user) return;
+    setUserBooks(reorderedBooks);
+    // Update display_order in DB
+    const updates = reorderedBooks.map((b, i) =>
+      supabase.from("user_books").update({ display_order: i }).eq("id", b.id).eq("user_id", user.id)
+    );
+    await Promise.all(updates);
+  }, [user]);
+
+  return { subjectProgress, bookProgress, userBooks, allBooks, totalAttempts, todayAttempts, loading, addBook, removeBook, reorderBooks };
 }
