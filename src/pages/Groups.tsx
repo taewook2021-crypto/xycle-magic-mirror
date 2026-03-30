@@ -97,7 +97,7 @@ export default function Groups() {
               <p className="text-xs text-muted-foreground text-center py-6">불러오는 중…</p>
             ) : publicNotJoined.length === 0 ? (
               <p className="text-xs text-muted-foreground text-center py-6">
-                {search ? "검색 결과가 없습니다." : "새로운 공개 그룹이 없습니다."}
+                새로운 공개 그룹이 없습니다.
               </p>
             ) : (
               publicNotJoined.map((g) => (
