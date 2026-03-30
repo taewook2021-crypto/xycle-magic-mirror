@@ -25,7 +25,6 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { Pencil, Eye, LogOut, Users, User, GraduationCap, ShieldCheck, MessageCircle, StickyNote, Trash2, ChevronDown } from "lucide-react";
 import DarkModeToggle from "@/components/DarkModeToggle";
-import GroupCard from "@/components/group/GroupCard";
 import { cn } from "@/lib/utils";
 
 const EXAM_STATUSES = [
@@ -535,8 +534,7 @@ export default function Profile() {
           {/* Dark mode toggle */}
           <DarkModeToggle />
 
-          {/* Study groups */}
-          <GroupCard />
+          {/* Study groups moved to /groups tab */}
 
           {/* Admin link - only for wiserlab1@gmail.com */}
           {user?.email === "wiserlab1@gmail.com" && (
