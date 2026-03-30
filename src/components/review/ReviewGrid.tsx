@@ -733,6 +733,60 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
           onNavigate={navigate}
         />
       )}
+
+      {/* Mobile memo modal */}
+      {mobileMemoQuestionId && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setMobileMemoQuestionId(null)}>
+          <div className="w-full max-w-lg bg-card rounded-t-2xl p-4 pb-8 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-foreground">
+                문제 {questions.find(q => q.questionId === mobileMemoQuestionId)?.questionNumber} 메모
+              </span>
+              <button onClick={() => setMobileMemoQuestionId(null)} className="text-muted-foreground text-xs px-2 py-1">닫기</button>
+            </div>
+            <MobileMemoEditor
+              questionId={mobileMemoQuestionId}
+              memo={memos[mobileMemoQuestionId] ?? ""}
+              onSave={(content) => {
+                saveMemo(mobileMemoQuestionId, content);
+                setMobileMemoQuestionId(null);
+              }}
+              onDelete={() => {
+                saveMemo(mobileMemoQuestionId, "");
+                setMobileMemoQuestionId(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function MobileMemoEditor({ questionId, memo, onSave, onDelete }: { questionId: string; memo: string; onSave: (content: string) => void; onDelete: () => void }) {
+  const [value, setValue] = useState(memo);
+  const ref = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => { setTimeout(() => ref.current?.focus(), 100); }, []);
+  const hasMemo = memo.trim().length > 0;
+  return (
+    <>
+      <textarea
+        ref={ref}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="메모를 입력하세요..."
+        className="w-full h-24 text-sm bg-transparent border border-border rounded-lg p-3 resize-none focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground/50"
+      />
+      <div className="flex justify-end mt-2 gap-2">
+        {hasMemo && (
+          <button onClick={onDelete} className="text-xs px-3 py-1.5 rounded text-destructive hover:bg-destructive/10 transition-colors">
+            삭제
+          </button>
+        )}
+        <button onClick={() => onSave(value.trim())} className="text-xs px-3 py-1.5 rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+          저장
+        </button>
+      </div>
+    </>
   );
 }
