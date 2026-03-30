@@ -737,7 +737,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
       {/* Mobile memo modal */}
       {mobileMemoQuestionId && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setMobileMemoQuestionId(null)}>
-          <div className="w-full max-w-lg bg-card rounded-t-2xl p-4 pb-8 shadow-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-lg bg-card rounded-t-2xl p-4 pb-24 md:pb-8 shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-semibold text-foreground">
                 문제 {questions.find(q => q.questionId === mobileMemoQuestionId)?.questionNumber} 메모
