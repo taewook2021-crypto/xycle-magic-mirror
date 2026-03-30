@@ -535,8 +535,7 @@ export default function Profile() {
           {/* Dark mode toggle */}
           <DarkModeToggle />
 
-          {/* Study groups */}
-          <GroupCard />
+          {/* Study groups moved to /groups tab */}
 
           {/* Admin link - only for wiserlab1@gmail.com */}
           {user?.email === "wiserlab1@gmail.com" && (
