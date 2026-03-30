@@ -16,6 +16,7 @@ interface QuestionRow {
   questionNumber: number;
   questionType: QuestionType;
   isEssential: boolean;
+  isPriority: boolean;
   examYear: string | null;
   topic: string | null;
   rounds: { result: CellResult; date?: string }[];
@@ -43,10 +44,12 @@ interface FilterConfig {
   show_type_filters: boolean;
   show_star_filter: boolean;
   show_essential_filter: boolean;
+  show_priority_filter?: boolean;
   show_exam_year_column: boolean;
   type_labels?: Record<string, string>;
   group_by_type?: boolean;
   essential_label?: string;
+  priority_label?: string;
 }
 
 export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyProp = false, initialChapterId, singleChapter = false, userId }: ReviewGridProps) {
@@ -60,6 +63,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   const [loading, setLoading] = useState(!singleChapter);
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>("all");
   const [essentialOnly, setEssentialOnly] = useState(false);
+  const [priorityOnly, setPriorityOnly] = useState(false);
   const [examYearFilter, setExamYearFilter] = useState(false);
   const [memoOnly, setMemoOnly] = useState(false);
   const [resultFilter, setResultFilter] = useState<string>("off");
@@ -86,6 +90,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   const filtered = questions.filter((q) => {
     if (sectionFilter !== "all" && q.questionType !== sectionFilter) return false;
     if (essentialOnly && !q.isEssential) return false;
+    if (priorityOnly && !q.isPriority) return false;
     if (examYearFilter && q.examYear !== '2유') return false;
     if (memoOnly && !(memos[q.questionId]?.trim())) return false;
     if (resultFilter !== "off") {
@@ -232,6 +237,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
           questionNumber: q.question_number,
           questionType: q.question_type as QuestionType,
           isEssential: q.is_essential,
+          isPriority: q.is_priority ?? false,
           examYear: q.exam_year,
           topic: q.topic,
           rounds: Array.from({ length: roundCount }, (_, i) => existing[i] ?? { result: null }),
@@ -544,6 +550,20 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
             {filterConfig.essential_label || '★ 필수'}
           </button>
         )}
+        {/* Priority filter */}
+        {filterConfig.show_priority_filter && (
+          <button
+            onClick={() => { setPriorityOnly((v) => !v); setActiveCell(null); }}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap border",
+              priorityOnly
+                ? "bg-[#3B82F6] text-white border-[#3B82F6]"
+                : "bg-card text-muted-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
+            )}
+          >
+            {filterConfig.priority_label || '최필수'}
+          </button>
+        )}
         <button
           onClick={() => { setMemoOnly((v) => !v); setActiveCell(null); }}
           className={cn(
@@ -633,7 +653,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                               <span className={cn(
                                 "font-medium text-[11px] transition-all",
                                 isSkipped && "line-through decoration-2 text-muted-foreground",
-                                !isSkipped && q.isEssential ? "text-orange-500 font-bold" : !isSkipped ? "text-foreground" : "",
+                                !isSkipped && q.isPriority ? "text-blue-500 font-bold" : !isSkipped && q.isEssential ? "text-orange-500 font-bold" : !isSkipped ? "text-foreground" : "",
                                 !isSkipped && "hover:text-muted-foreground/70"
                               )}>
                                 {q.questionNumber}
