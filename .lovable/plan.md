@@ -1,53 +1,38 @@
 
 
-## 최필수(is_priority) 문제 데이터 입력
+## 프로필 — 내 메모 모아보기 기능
 
 ### 개요
-이미지에서 "예제"를 모두 제외하고 "문제" 번호만 추출하여 `is_priority = true`로 UPDATE합니다. 문제 번호는 DB의 `question_number`에 직접 대응됩니다.
+프로필 페이지에 "내 메모" 섹션을 추가하여, 모든 교재에 작성한 메모를 한 곳에서 확인/삭제할 수 있게 합니다. 메모를 클릭하면 해당 교재의 회독표로 이동합니다.
 
-### 추출된 최필수 문제 목록 (문제 번호만)
+### UI 구성
+- 프로필 설정 카드들 사이(공개 설정 아래, 다크모드 위)에 "내 메모" 카드 추가
+- 카드 헤더: StickyNote 아이콘 + "내 메모" + 메모 개수 배지
+- 클릭하면 아코디언/확장 형태로 메모 목록 표시
+- 각 메모 항목: **교재명 > Ch.N 문제번호** + 메모 내용 미리보기 (1줄) + 삭제 버튼
+- 메모 클릭 시 `/review/{bookId}` 로 이동
+- 메모가 없으면 "작성한 메모가 없습니다" 안내
 
-| 강의순서 | Chapter | 문제 번호 | 개수 |
-|---------|---------|----------|------|
-| 1 | 3 종합원가 | 2,3,5,6,7,8,9,10,11,12,13,14,15,16,17 | 15 |
-| 2 | 4 결합원가 | 2,3,4,5,6,9,10,11,12 | 9 |
-| 3 | 13 표준원가 | 2,3,7,14,16,17,18,20,21,25,26,27 | 12 |
-| 4 | 5 변동원가 | 2,3,4,5,6,9,10,12,13,14,16 | 11 |
-| 5 | 2 개별원가 | 1,4,5,7,8,11,12,13,14,15 | 10 |
-| 6 | 6 ABC | 1,3,4,6,7,8,9,12 | 8 |
-| 7 | 7 원가추정 | 6 | 1 |
-| 8 | 8 CVP | 2,3,4,7,12,14,15,17,18,19,20,21,24,25 | 14 |
-| 9 | 9 관련원가 | 1,2,3,4,5,8,10,13,14,15,16,18,19,20,21,23,24,26 | 18 |
-| 10 | 15 대체가격 | 1,2,3,4,6,8,9,10,11,12,14,16 | 12 |
-| 11 | 11 불확실성 | 1,2,3,6,9 | 5 |
-| 12 | 12 종합예산 | 1,4 | 2 |
-| 13 | 14 판매/투자 | 2,4,8 | 3 |
-| 14 | 16 전략적 원가 | 5,6,7,13,15,17,18,19 | 8 |
-| 15 | 17 전략적 성과 | 1,14 | 2 |
-| - | 10 자본예산 | (목록에 없음) | 0 |
-
-**총 130개 문제**
-
-### 구현
-
-1개 DB migration으로 처리:
-
+### 데이터 조회
 ```sql
--- 해당 book의 모든 questions에서 is_priority를 먼저 초기화
-UPDATE questions SET is_priority = false
-WHERE chapter_id IN (SELECT id FROM chapters WHERE book_id = '266af2bc-d010-496a-8c0d-a6cc80718666');
-
--- 챕터별 UPDATE
-UPDATE questions SET is_priority = true
-WHERE chapter_id = 'b2c00003-...' AND question_number IN (2,3,5,...);
--- (15개 챕터에 대해 반복)
+SELECT m.*, q.question_number, q.chapter_id, 
+       c.chapter_number, c.title as chapter_title, c.book_id,
+       b.title as book_title
+FROM user_question_memos m
+JOIN questions q ON m.question_id = q.id
+JOIN chapters c ON q.chapter_id = c.id
+JOIN books b ON c.book_id = b.id
+WHERE m.user_id = auth.uid()
+ORDER BY m.updated_at DESC
 ```
 
-코드 변경 없음 — UI는 이미 `is_priority` 필터와 파란색 스타일링을 지원합니다.
+DB 변경 없음 — 기존 `user_question_memos` 테이블 그대로 사용.
 
 ### 수정 대상
 
-| 대상 | 작업 |
+| 파일 | 작업 |
 |------|------|
-| DB migration | 130개 문제에 `is_priority = true` 설정 |
+| `src/pages/Profile.tsx` | "내 메모" 카드 섹션 추가. 메모 목록 쿼리 + UI 렌더링 + 삭제 기능 + 클릭 시 회독표 이동 |
+
+코드 변경 1개 파일.
 
