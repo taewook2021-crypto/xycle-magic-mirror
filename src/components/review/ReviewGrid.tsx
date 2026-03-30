@@ -236,6 +236,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
           questionNumber: q.question_number,
           questionType: q.question_type as QuestionType,
           isEssential: q.is_essential,
+          isPriority: q.is_priority ?? false,
           examYear: q.exam_year,
           topic: q.topic,
           rounds: Array.from({ length: roundCount }, (_, i) => existing[i] ?? { result: null }),
