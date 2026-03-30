@@ -402,18 +402,21 @@ export type Database = {
         Row: {
           book_id: string
           created_at: string
+          display_order: number
           id: string
           user_id: string
         }
         Insert: {
           book_id: string
           created_at?: string
+          display_order?: number
           id?: string
           user_id: string
         }
         Update: {
           book_id?: string
           created_at?: string
+          display_order?: number
           id?: string
           user_id?: string
         }

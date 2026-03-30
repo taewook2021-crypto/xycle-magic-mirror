@@ -1,20 +1,32 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import AppShell from "@/components/layout/AppShell";
 import { useDashboardData } from "@/hooks/useDashboardData";
-
 import { usePeerAvgProgress } from "@/hooks/usePeerAvgProgress";
 import DashboardHeader, { getDDay } from "@/components/dashboard/DashboardHeader";
-import TodayStatsCard from "@/components/dashboard/TodayStatsCard";
 import SubjectProgressCard from "@/components/dashboard/SubjectProgressCard";
-
 import AddSubjectSheet from "@/components/dashboard/AddSubjectSheet";
 import { BookOpen, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+
+
 export default function Dashboard() {
-  const { subjectProgress, bookProgress, userBooks, allBooks, todayAttempts, loading, addBook } =
+  const { subjectProgress, bookProgress, userBooks, allBooks, todayAttempts, loading, addBook, removeBook, reorderBooks } =
     useDashboardData();
-  
+
   const { peerAvgMap, examStatus } = usePeerAvgProgress();
 
   const [activeTab, setActiveTab] = useState<"subjects" | "addBook">("subjects");
@@ -24,9 +36,33 @@ export default function Dashboard() {
   const userBookIds = new Set(userBooks.map((b) => b.bookId));
   const subjectMap = new Map(subjectProgress.map((s) => [s.id, s.name]));
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  );
+
+  // All sortable IDs for DndContext
+  const sortableIds = useMemo(() => userBooks.map((b) => b.id), [userBooks]);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = userBooks.findIndex((b) => b.id === active.id);
+    const newIndex = userBooks.findIndex((b) => b.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    // Check they're in the same subject
+    if (userBooks[oldIndex].subjectId !== userBooks[newIndex].subjectId) return;
+
+    const reordered = [...userBooks];
+    const [moved] = reordered.splice(oldIndex, 1);
+    reordered.splice(newIndex, 0, moved);
+    reorderBooks(reordered);
+  };
+
   return (
     <AppShell>
-      {/* Header */}
       <DashboardHeader dDay={dDay} todayAttempts={todayAttempts} />
 
       <div className="px-4 sm:px-6 pt-5 pb-12 max-w-2xl mx-auto space-y-5">
@@ -56,7 +92,6 @@ export default function Dashboard() {
 
         {activeTab === "subjects" ? (
           <>
-            {/* Subject progress cards */}
             {loading ? (
               <div className="space-y-4">
                 {Array.from({ length: 3 }).map((_, i) => (
@@ -64,26 +99,29 @@ export default function Dashboard() {
                 ))}
               </div>
             ) : (
-              <div className="space-y-1">
-                {subjectProgress.map((subject, index) => (
-                  <SubjectProgressCard
-                    key={subject.id}
-                    subjectId={subject.id}
-                    name={subject.name}
-                    colorIndex={index}
-                    userBooks={userBooks}
-                    bookProgress={bookProgress}
-                    peerAvgMap={peerAvgMap}
-                    examStatus={examStatus}
-                  />
-                ))}
-              </div>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-1">
+                    {subjectProgress.map((subject, index) => (
+                      <SubjectProgressCard
+                        key={subject.id}
+                        subjectId={subject.id}
+                        name={subject.name}
+                        colorIndex={index}
+                        userBooks={userBooks}
+                        bookProgress={bookProgress}
+                        peerAvgMap={peerAvgMap}
+                        examStatus={examStatus}
+                        onDeleteBook={removeBook}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             )}
-
           </>
         ) : (
           <>
-            {/* Add book list grouped by subject */}
             {loading ? (
               <div className="space-y-3">
                 {Array.from({ length: 4 }).map((_, i) => (
@@ -92,7 +130,6 @@ export default function Dashboard() {
               </div>
             ) : (() => {
               const availableBooks = allBooks.filter((b) => !userBookIds.has(b.id));
-              // Group by subject
               const grouped = new Map<string, { subjectName: string; books: typeof availableBooks }>();
               for (const book of availableBooks) {
                 const subjectName = subjectMap.get(book.subjectId) || "기타";
@@ -148,7 +185,6 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Add subject sheet */}
       <AddSubjectSheet
         open={showAddSheet}
         onOpenChange={setShowAddSheet}
