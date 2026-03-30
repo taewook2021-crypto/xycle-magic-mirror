@@ -1,38 +1,36 @@
 
 
-## 프로필 — 내 메모 모아보기 기능
+## 공개 그룹 목록 페이지 추가
 
 ### 개요
-프로필 페이지에 "내 메모" 섹션을 추가하여, 모든 교재에 작성한 메모를 한 곳에서 확인/삭제할 수 있게 합니다. 메모를 클릭하면 해당 교재의 회독표로 이동합니다.
+별도의 `/groups` 페이지를 만들어 공개 그룹을 브라우징하고 바로 가입할 수 있게 합니다. 기존 초대 코드 방식은 유지하면서, 공개 그룹은 코드 없이 원클릭 가입이 가능합니다.
 
-### UI 구성
-- 프로필 설정 카드들 사이(공개 설정 아래, 다크모드 위)에 "내 메모" 카드 추가
-- 카드 헤더: StickyNote 아이콘 + "내 메모" + 메모 개수 배지
-- 클릭하면 아코디언/확장 형태로 메모 목록 표시
-- 각 메모 항목: **교재명 > Ch.N 문제번호** + 메모 내용 미리보기 (1줄) + 삭제 버튼
-- 메모 클릭 시 `/review/{bookId}` 로 이동
-- 메모가 없으면 "작성한 메모가 없습니다" 안내
+### DB 변경
 
-### 데이터 조회
-```sql
-SELECT m.*, q.question_number, q.chapter_id, 
-       c.chapter_number, c.title as chapter_title, c.book_id,
-       b.title as book_title
-FROM user_question_memos m
-JOIN questions q ON m.question_id = q.id
-JOIN chapters c ON q.chapter_id = c.id
-JOIN books b ON c.book_id = b.id
-WHERE m.user_id = auth.uid()
-ORDER BY m.updated_at DESC
-```
+| 변경 | 내용 |
+|------|------|
+| `study_groups` 테이블 | `is_public boolean NOT NULL DEFAULT false` 컬럼 추가 |
+| `study_groups` 테이블 | `description text` 컬럼 추가 (그룹 소개 한줄) |
+| RLS 정책 | 공개 그룹 SELECT 정책 추가: `is_public = true`이면 누구나 조회 가능 |
 
-DB 변경 없음 — 기존 `user_question_memos` 테이블 그대로 사용.
-
-### 수정 대상
+### UI 변경
 
 | 파일 | 작업 |
 |------|------|
-| `src/pages/Profile.tsx` | "내 메모" 카드 섹션 추가. 메모 목록 쿼리 + UI 렌더링 + 삭제 기능 + 클릭 시 회독표 이동 |
+| `CreateGroupSheet.tsx` | 공개/비공개 스위치 + 그룹 설명 입력란 추가 |
+| 새 `src/pages/Groups.tsx` | 공개 그룹 목록 페이지. 검색, 멤버 수, 설명 표시. "가입" 버튼으로 즉시 가입 |
+| `GroupCard.tsx` | "공개 그룹 찾기" 버튼 추가 → `/groups`로 이동 |
+| `App.tsx` | `/groups` 라우트 추가 |
+| `useStudyGroup.ts` | `usePublicGroups()` 훅 추가 (공개 그룹 목록 조회) |
+| `GroupDetail.tsx` | 그룹 설명 표시, 소유자가 공개/비공개 전환 가능 |
 
-코드 변경 1개 파일.
+### 공개 그룹 목록 페이지 구성
+- 상단: 뒤로가기 + "스터디 그룹 찾기" 타이틀
+- 검색바: 그룹명으로 필터링
+- 그룹 카드 리스트: 그룹명, 설명, 멤버 수/최대 인원, "가입" 버튼
+- 이미 가입한 그룹은 "가입됨" 표시
+- 3개 그룹 가입 제한 안내
+
+### 가입 흐름
+공개 그룹 → "가입" 버튼 → 기존 `useJoinGroup` 로직 재활용 (초대 코드 대신 group_id로 직접 insert) → 즉시 가입 완료
 
