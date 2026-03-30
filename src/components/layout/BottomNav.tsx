@@ -1,11 +1,12 @@
 import { useLocation } from "react-router-dom";
-import { LayoutDashboard, Trophy, UserCircle } from "lucide-react";
+import { LayoutDashboard, Trophy, UserCircle, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
 
 const tabs = [
   { path: "/dashboard", icon: LayoutDashboard, label: "대시보드" },
   { path: "/ranking", icon: Trophy, label: "랭킹" },
+  { path: "/groups", icon: Users, label: "스터디" },
   { path: "/profile", icon: UserCircle, label: "프로필" },
 ] as const;
 

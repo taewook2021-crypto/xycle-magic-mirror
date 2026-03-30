@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Trophy, UserCircle, LogOut, PanelLeftClose, PanelLeft } from "lucide-react";
+import { LayoutDashboard, Trophy, UserCircle, Users, LogOut, PanelLeftClose, PanelLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { NavLink } from "@/components/NavLink";
@@ -9,6 +9,7 @@ import bungaejangLogo from "@/assets/bungaejang-logo.svg";
 const tabs = [
   { path: "/dashboard", icon: LayoutDashboard, label: "대시보드" },
   { path: "/ranking", icon: Trophy, label: "랭킹" },
+  { path: "/groups", icon: Users, label: "스터디" },
   { path: "/profile", icon: UserCircle, label: "프로필" },
 ] as const;
 
