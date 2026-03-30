@@ -402,6 +402,9 @@ export default function Profile() {
             />
           </div>
 
+          {/* My memos */}
+          <MyMemosCard userId={user?.id} />
+
           {/* Dark mode toggle */}
           <DarkModeToggle />
 
