@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
-import { ChevronRight, BookOpen, GripVertical } from "lucide-react";
+import { ChevronRight, BookOpen, GripVertical, Trash2 } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { UserBookInfo, BookProgress } from "@/hooks/useDashboardData";
