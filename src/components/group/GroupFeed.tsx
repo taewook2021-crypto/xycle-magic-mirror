@@ -1,9 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { GroupMember } from "@/hooks/useStudyGroup";
-import { User, BookOpen } from "lucide-react";
-import { format, startOfDay, isToday, isYesterday } from "date-fns";
+import { User, BookOpen, Heart } from "lucide-react";
+import { format, isToday, isYesterday } from "date-fns";
 import { ko } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 interface Props {
   members: GroupMember[];
@@ -13,20 +15,73 @@ interface DayActivity {
   userId: string;
   name: string;
   avatarUrl: string | null;
-  date: string; // YYYY-MM-DD
+  date: string;
   books: { bookTitle: string; chapters: string[]; count: number }[];
   totalCount: number;
 }
 
 export default function GroupFeed({ members }: Props) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const memberIds = members.map((m) => m.user_id);
+  const memberKey = memberIds.sort().join(",");
+
+  // Fetch today's kudos sent by me to group members
+  const { data: myTodayKudos = [] } = useQuery({
+    queryKey: ["group-kudos-sent", user?.id, memberKey],
+    queryFn: async () => {
+      if (!user) return [];
+      const today = new Date().toISOString().slice(0, 10);
+      const { data } = await supabase
+        .from("kudos")
+        .select("receiver_id")
+        .eq("sender_id", user.id)
+        .eq("created_date", today)
+        .in("receiver_id", memberIds);
+      return (data ?? []).map((k: any) => k.receiver_id as string);
+    },
+    enabled: !!user && memberIds.length > 0,
+  });
+
+  // Fetch kudos counts for today per member
+  const { data: todayKudosCounts = new Map<string, number>() } = useQuery({
+    queryKey: ["group-kudos-counts", memberKey],
+    queryFn: async () => {
+      const today = new Date().toISOString().slice(0, 10);
+      const { data } = await supabase
+        .from("kudos")
+        .select("receiver_id")
+        .eq("created_date", today)
+        .in("receiver_id", memberIds);
+      const counts = new Map<string, number>();
+      (data ?? []).forEach((k: any) => {
+        counts.set(k.receiver_id, (counts.get(k.receiver_id) ?? 0) + 1);
+      });
+      return counts;
+    },
+    enabled: memberIds.length > 0,
+  });
+
+  const sendKudos = useMutation({
+    mutationFn: async (receiverId: string) => {
+      if (!user) throw new Error("Not logged in");
+      const { error } = await supabase.from("kudos").insert({
+        sender_id: user.id,
+        receiver_id: receiverId,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["group-kudos-sent"] });
+      queryClient.invalidateQueries({ queryKey: ["group-kudos-counts"] });
+    },
+  });
 
   const { data: feed = [], isLoading } = useQuery({
-    queryKey: ["group-feed", memberIds.sort().join(",")],
+    queryKey: ["group-feed", memberKey],
     queryFn: async () => {
       if (!memberIds.length) return [];
 
-      // Get recent attempts (last 7 days worth)
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -65,7 +120,6 @@ export default function GroupFeed({ members }: Props) {
       const bookMap = new Map((books ?? []).map((b: any) => [b.id, b.title]));
       const profileMap = new Map(members.map((m) => [m.user_id, m.profile]));
 
-      // Group by user + date -> book -> chapters
       const dayMap = new Map<string, {
         userId: string;
         date: string;
@@ -104,7 +158,6 @@ export default function GroupFeed({ members }: Props) {
         bc.count++;
       }
 
-      // Convert to array
       const result: DayActivity[] = [...dayMap.values()].map((d) => {
         const prof = profileMap.get(d.userId);
         return {
@@ -121,7 +174,6 @@ export default function GroupFeed({ members }: Props) {
         };
       });
 
-      // Sort by date desc, then totalCount desc
       return result.sort((a, b) => {
         const dateCmp = b.date.localeCompare(a.date);
         if (dateCmp !== 0) return dateCmp;
@@ -143,7 +195,6 @@ export default function GroupFeed({ members }: Props) {
     );
   }
 
-  // Group feed items by date for section headers
   const dateGroups = new Map<string, DayActivity[]>();
   for (const item of feed) {
     if (!dateGroups.has(item.date)) dateGroups.set(item.date, []);
@@ -165,38 +216,63 @@ export default function GroupFeed({ members }: Props) {
             {formatDateLabel(date)}
           </p>
           <div className="space-y-1">
-            {items.map((item) => (
-              <div
-                key={`${item.userId}-${item.date}`}
-                className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/30 transition-colors"
-              >
-                <div className="h-8 w-8 rounded-full bg-muted flex-shrink-0 overflow-hidden flex items-center justify-center mt-0.5">
-                  {item.avatarUrl ? (
-                    <img src={item.avatarUrl} alt={item.name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
-                  ) : (
-                    <User className="h-4 w-4 text-muted-foreground" />
+            {items.map((item) => {
+              const isMe = item.userId === user?.id;
+              const alreadySent = myTodayKudos.includes(item.userId);
+              const kudosCount = todayKudosCounts.get(item.userId) ?? 0;
+
+              return (
+                <div
+                  key={`${item.userId}-${item.date}`}
+                  className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/30 transition-colors"
+                >
+                  <div className="h-8 w-8 rounded-full bg-muted flex-shrink-0 overflow-hidden flex items-center justify-center mt-0.5">
+                    {item.avatarUrl ? (
+                      <img src={item.avatarUrl} alt={item.name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <User className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-foreground">
+                      <span className="font-semibold">{item.name}</span>
+                      <span className="text-muted-foreground ml-1.5">{item.totalCount}문제</span>
+                    </p>
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {item.books.map((b) => (
+                        <span
+                          key={b.bookTitle}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-[11px] text-foreground"
+                        >
+                          <BookOpen className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                          <span className="font-medium truncate max-w-[120px]">{b.bookTitle}</span>
+                          <span className="text-muted-foreground">· {b.count}문제</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Kudos button — only show for other members, only on today's items */}
+                  {!isMe && isToday(new Date(item.date + "T00:00:00")) && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!alreadySent) sendKudos.mutate(item.userId);
+                      }}
+                      disabled={alreadySent || sendKudos.isPending}
+                      className={cn(
+                        "flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition-colors flex-shrink-0 mt-0.5",
+                        alreadySent
+                          ? "bg-primary/10 text-primary cursor-default"
+                          : "bg-muted hover:bg-primary/10 hover:text-primary text-muted-foreground"
+                      )}
+                    >
+                      <Heart className={cn("h-3.5 w-3.5", alreadySent && "fill-primary")} />
+                      {kudosCount > 0 && <span>{kudosCount}</span>}
+                    </button>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-foreground">
-                    <span className="font-semibold">{item.name}</span>
-                    <span className="text-muted-foreground ml-1.5">{item.totalCount}문제</span>
-                  </p>
-                  <div className="flex flex-wrap gap-1.5 mt-1.5">
-                    {item.books.map((b) => (
-                      <span
-                        key={b.bookTitle}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-[11px] text-foreground"
-                      >
-                        <BookOpen className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                        <span className="font-medium truncate max-w-[120px]">{b.bookTitle}</span>
-                        <span className="text-muted-foreground">· {b.count}문제</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       ))}

@@ -1,28 +1,41 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { GroupMember } from "@/hooks/useStudyGroup";
-import { User, Trophy } from "lucide-react";
+import { User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { startOfWeek } from "date-fns";
 
 interface Props {
   members: GroupMember[];
 }
 
+type Period = "all" | "week";
+
 export default function GroupRanking({ members }: Props) {
   const { user } = useAuth();
+  const [period, setPeriod] = useState<Period>("all");
   const memberIds = members.map((m) => m.user_id);
 
+  const mondayISO = startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString();
+
   const { data: ranking = [] } = useQuery({
-    queryKey: ["group-ranking", memberIds.sort().join(",")],
+    queryKey: ["group-ranking", memberIds.sort().join(","), period],
     queryFn: async () => {
       if (!memberIds.length) return [];
-      // Get attempt counts per user
-      const { data } = await supabase
+
+      let query = supabase
         .from("attempts")
         .select("user_id")
         .in("user_id", memberIds);
-      
+
+      if (period === "week") {
+        query = query.gte("attempted_at", mondayISO);
+      }
+
+      const { data } = await query;
+
       const counts = new Map<string, number>();
       (data ?? []).forEach((a: any) => {
         counts.set(a.user_id, (counts.get(a.user_id) ?? 0) + 1);
@@ -44,7 +57,28 @@ export default function GroupRanking({ members }: Props) {
   const medals = ["🥇", "🥈", "🥉"];
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
+      {/* Period toggle */}
+      <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
+        {([
+          { key: "all" as Period, label: "전체" },
+          { key: "week" as Period, label: "이번 주" },
+        ]).map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setPeriod(key)}
+            className={cn(
+              "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+              period === key
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       {ranking.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-10">멤버가 없습니다.</p>
       ) : (
