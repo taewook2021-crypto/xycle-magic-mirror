@@ -74,7 +74,9 @@ export default function GroupDetail() {
             <h1 className="text-lg font-bold text-foreground truncate">
               {group?.name ?? "그룹"}
             </h1>
-            <p className="text-xs text-muted-foreground">{members.length}명</p>
+            <p className="text-xs text-muted-foreground">
+              {members.length}명{group?.description ? ` · ${group.description}` : ""}
+            </p>
           </div>
           <button
             onClick={copyCode}

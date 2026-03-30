@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, Plus, KeyRound, ChevronRight } from "lucide-react";
+import { Users, Plus, KeyRound, ChevronRight, Search } from "lucide-react";
 import { useMyGroups, StudyGroup } from "@/hooks/useStudyGroup";
 import CreateGroupSheet from "./CreateGroupSheet";
 import JoinGroupSheet from "./JoinGroupSheet";
