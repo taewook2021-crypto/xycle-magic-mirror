@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -68,6 +68,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   const [memoOnly, setMemoOnly] = useState(false);
   const [resultFilter, setResultFilter] = useState<string>("off");
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
+  const [mobileMemoQuestionId, setMobileMemoQuestionId] = useState<string | null>(null);
   const [skippedSet, setSkippedSet] = useState<Set<string>>(new Set());
   const [memos, setMemos] = useState<Record<string, string>>({});
   const [filterConfig, setFilterConfig] = useState<FilterConfig>({ show_type_filters: true, show_star_filter: false, show_essential_filter: false, show_exam_year_column: false });
@@ -647,7 +648,18 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                         <tr key={q.questionId} className={cn("transition-colors", isSkipped && "opacity-40", isActiveRow ? "bg-primary/5" : "hover:bg-accent/20")}>
                           <td
                             className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-[hsl(0,0%,0%,0.06)] cursor-pointer select-none", !isMobile && "sticky left-0 w-9 px-1", isActiveRow ? "bg-primary/5" : "bg-card")}
-                            onClick={() => toggleSkip(q.questionId)}
+                            onClick={() => {
+                              if (!readOnly && isMobile) {
+                                setMobileMemoQuestionId(q.questionId);
+                              } else {
+                                toggleSkip(q.questionId);
+                              }
+                            }}
+                            onDoubleClick={() => {
+                              if (!readOnly && !isMobile) {
+                                setMobileMemoQuestionId(q.questionId);
+                              }
+                            }}
                           >
                             <div className="flex flex-col items-center leading-none gap-0">
                               <span className={cn(
@@ -662,6 +674,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                                 <span className="text-[7px] text-orange-500 font-medium leading-none">
                                   {q.examYear}
                                 </span>
+                              )}
+                              {isMobile && memos[q.questionId]?.trim() && (
+                                <span className="w-1 h-1 rounded-full bg-primary mt-0.5" />
                               )}
                             </div>
                           </td>
@@ -718,6 +733,60 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
           onNavigate={navigate}
         />
       )}
+
+      {/* Mobile memo modal */}
+      {mobileMemoQuestionId && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setMobileMemoQuestionId(null)}>
+          <div className="w-full max-w-lg bg-card rounded-t-2xl p-4 pb-8 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-foreground">
+                문제 {questions.find(q => q.questionId === mobileMemoQuestionId)?.questionNumber} 메모
+              </span>
+              <button onClick={() => setMobileMemoQuestionId(null)} className="text-muted-foreground text-xs px-2 py-1">닫기</button>
+            </div>
+            <MobileMemoEditor
+              questionId={mobileMemoQuestionId}
+              memo={memos[mobileMemoQuestionId] ?? ""}
+              onSave={(content) => {
+                saveMemo(mobileMemoQuestionId, content);
+                setMobileMemoQuestionId(null);
+              }}
+              onDelete={() => {
+                saveMemo(mobileMemoQuestionId, "");
+                setMobileMemoQuestionId(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function MobileMemoEditor({ questionId, memo, onSave, onDelete }: { questionId: string; memo: string; onSave: (content: string) => void; onDelete: () => void }) {
+  const [value, setValue] = useState(memo);
+  const ref = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => { setTimeout(() => ref.current?.focus(), 100); }, []);
+  const hasMemo = memo.trim().length > 0;
+  return (
+    <>
+      <textarea
+        ref={ref}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="메모를 입력하세요..."
+        className="w-full h-24 text-sm bg-transparent border border-border rounded-lg p-3 resize-none focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground/50"
+      />
+      <div className="flex justify-end mt-2 gap-2">
+        {hasMemo && (
+          <button onClick={onDelete} className="text-xs px-3 py-1.5 rounded text-destructive hover:bg-destructive/10 transition-colors">
+            삭제
+          </button>
+        )}
+        <button onClick={() => onSave(value.trim())} className="text-xs px-3 py-1.5 rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+          저장
+        </button>
+      </div>
+    </>
   );
 }
