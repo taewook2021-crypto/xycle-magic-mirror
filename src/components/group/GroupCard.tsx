@@ -79,6 +79,15 @@ export default function GroupCard() {
             </button>
           )}
         </div>
+
+        {/* Browse public groups */}
+        <button
+          onClick={() => navigate("/groups")}
+          className="w-full flex items-center justify-center gap-1.5 py-2 mt-2 rounded-xl text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
+        >
+          <Search className="h-4 w-4" />
+          공개 그룹 찾기
+        </button>
       </div>
 
       <CreateGroupSheet open={createOpen} onOpenChange={setCreateOpen} />
