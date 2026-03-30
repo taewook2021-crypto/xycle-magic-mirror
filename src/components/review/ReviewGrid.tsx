@@ -16,6 +16,7 @@ interface QuestionRow {
   questionNumber: number;
   questionType: QuestionType;
   isEssential: boolean;
+  isPriority: boolean;
   examYear: string | null;
   topic: string | null;
   rounds: { result: CellResult; date?: string }[];
