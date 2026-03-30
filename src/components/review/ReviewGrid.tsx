@@ -541,7 +541,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                 : "bg-card text-muted-foreground border-[hsl(0,0%,0%,0.1)] hover:bg-[#f9f9f9]"
             )}
           >
-            ★ 필수
+            {filterConfig.essential_label || '★ 필수'}
           </button>
         )}
         <button
