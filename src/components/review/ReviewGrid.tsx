@@ -648,7 +648,18 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                         <tr key={q.questionId} className={cn("transition-colors", isSkipped && "opacity-40", isActiveRow ? "bg-primary/5" : "hover:bg-accent/20")}>
                           <td
                             className={cn("z-10 px-0.5 py-0 text-center border-b border-r border-[hsl(0,0%,0%,0.06)] cursor-pointer select-none", !isMobile && "sticky left-0 w-9 px-1", isActiveRow ? "bg-primary/5" : "bg-card")}
-                            onClick={() => toggleSkip(q.questionId)}
+                            onClick={() => {
+                              if (!readOnly && isMobile) {
+                                setMobileMemoQuestionId(q.questionId);
+                              } else {
+                                toggleSkip(q.questionId);
+                              }
+                            }}
+                            onDoubleClick={() => {
+                              if (!readOnly && !isMobile) {
+                                setMobileMemoQuestionId(q.questionId);
+                              }
+                            }}
                           >
                             <div className="flex flex-col items-center leading-none gap-0">
                               <span className={cn(
@@ -663,6 +674,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                                 <span className="text-[7px] text-orange-500 font-medium leading-none">
                                   {q.examYear}
                                 </span>
+                              )}
+                              {isMobile && memos[q.questionId]?.trim() && (
+                                <span className="w-1 h-1 rounded-full bg-primary mt-0.5" />
                               )}
                             </div>
                           </td>
