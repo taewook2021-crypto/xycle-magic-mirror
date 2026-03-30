@@ -68,6 +68,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   const [memoOnly, setMemoOnly] = useState(false);
   const [resultFilter, setResultFilter] = useState<string>("off");
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
+  const [mobileMemoQuestionId, setMobileMemoQuestionId] = useState<string | null>(null);
   const [skippedSet, setSkippedSet] = useState<Set<string>>(new Set());
   const [memos, setMemos] = useState<Record<string, string>>({});
   const [filterConfig, setFilterConfig] = useState<FilterConfig>({ show_type_filters: true, show_star_filter: false, show_essential_filter: false, show_exam_year_column: false });
