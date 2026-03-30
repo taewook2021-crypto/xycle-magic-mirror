@@ -4,7 +4,6 @@ import AppShell from "@/components/layout/AppShell";
 import { usePublicGroups, useJoinGroupById, useMyGroups, StudyGroup } from "@/hooks/useStudyGroup";
 import { ArrowLeft, Users, UserPlus, Check, ChevronRight, Plus, KeyRound } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { cn } from "@/lib/utils";
 import CreateGroupSheet from "@/components/group/CreateGroupSheet";
 import JoinGroupSheet from "@/components/group/JoinGroupSheet";
 
