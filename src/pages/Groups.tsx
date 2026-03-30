@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell";
 import { usePublicGroups, useJoinGroupById, useMyGroups, StudyGroup } from "@/hooks/useStudyGroup";
-import { ArrowLeft, Search, Users, UserPlus, Check, ChevronRight, Plus, KeyRound } from "lucide-react";
+import { ArrowLeft, Users, UserPlus, Check, ChevronRight, Plus, KeyRound } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import CreateGroupSheet from "@/components/group/CreateGroupSheet";
