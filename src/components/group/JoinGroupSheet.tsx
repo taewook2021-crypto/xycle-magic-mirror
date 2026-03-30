@@ -26,7 +26,7 @@ export default function JoinGroupSheet({ open, onOpenChange }: Props) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-2xl px-5 pb-8">
+      <SheetContent side="bottom" className="rounded-t-2xl px-5 pb-24 md:pb-8">
         <SheetHeader>
           <SheetTitle className="text-base font-bold">코드로 가입</SheetTitle>
         </SheetHeader>
