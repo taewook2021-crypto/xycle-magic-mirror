@@ -44,10 +44,12 @@ interface FilterConfig {
   show_type_filters: boolean;
   show_star_filter: boolean;
   show_essential_filter: boolean;
+  show_priority_filter?: boolean;
   show_exam_year_column: boolean;
   type_labels?: Record<string, string>;
   group_by_type?: boolean;
   essential_label?: string;
+  priority_label?: string;
 }
 
 export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyProp = false, initialChapterId, singleChapter = false, userId }: ReviewGridProps) {
