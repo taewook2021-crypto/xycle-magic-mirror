@@ -91,17 +91,7 @@ export default function Groups() {
 
         {/* Public Groups */}
         <div className="px-4 sm:px-6">
-          <p className="text-sm font-semibold text-foreground mb-2">공개 그룹 찾기</p>
-
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="그룹 이름으로 검색"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 rounded-xl"
-            />
-          </div>
+          <p className="text-sm font-semibold text-foreground mb-3">공개 그룹</p>
 
           <div className="space-y-2">
             {loadingPublic ? (
