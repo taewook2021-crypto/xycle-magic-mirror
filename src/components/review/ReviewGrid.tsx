@@ -90,6 +90,7 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
   const filtered = questions.filter((q) => {
     if (sectionFilter !== "all" && q.questionType !== sectionFilter) return false;
     if (essentialOnly && !q.isEssential) return false;
+    if (priorityOnly && !q.isPriority) return false;
     if (examYearFilter && q.examYear !== '2유') return false;
     if (memoOnly && !(memos[q.questionId]?.trim())) return false;
     if (resultFilter !== "off") {
