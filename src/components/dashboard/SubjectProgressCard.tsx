@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
-import { ChevronRight, BookOpen, GripVertical } from "lucide-react";
+import { ChevronRight, BookOpen, GripVertical, Trash2 } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { UserBookInfo, BookProgress } from "@/hooks/useDashboardData";
@@ -54,12 +54,19 @@ function SortableBookItem({ book, bp, color, peerAvg, examStatus, onDelete }: So
       <SwipeableBookItem onDelete={() => onDelete(book.id)}>
         <div
           onClick={() => navigate(`/review/${book.bookId}`)}
-          className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-accent/50 transition-colors space-y-1.5 cursor-pointer"
+          className="group/book w-full text-left px-3 py-2.5 rounded-lg hover:bg-accent/50 transition-colors space-y-1.5 cursor-pointer"
         >
           <div className="flex items-center gap-2">
             <BookOpen className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
             <span className="text-sm text-foreground truncate flex-1">{book.title}</span>
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(book.id); }}
+              className="hidden sm:flex p-1 opacity-0 group-hover/book:opacity-100 transition-opacity text-destructive hover:text-destructive/80"
+              title="삭제"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
             <div
               {...attributes}
               {...listeners}
