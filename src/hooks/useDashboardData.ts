@@ -93,12 +93,14 @@ export function useDashboardData() {
     );
 
     const { data: chapters } = await supabase.from("chapters").select("id, book_id");
-    const { data: questions } = await supabase.from("questions").select("id, chapter_id");
+    const questions = await fetchAllRows<{ id: string; chapter_id: string }>(
+      "questions", "id, chapter_id"
+    );
 
-    const { data: attempts } = await supabase
-      .from("attempts")
-      .select("id, question_id, is_correct, result, attempted_at")
-      .eq("user_id", user.id);
+    const attempts = await fetchAllRows<{ id: string; question_id: string; is_correct: boolean; result: string; attempted_at: string }>(
+      "attempts", "id, question_id, is_correct, result, attempted_at",
+      (q) => q.eq("user_id", user.id)
+    );
 
     // Maps
     const chapterToBook = new Map<string, string>();
