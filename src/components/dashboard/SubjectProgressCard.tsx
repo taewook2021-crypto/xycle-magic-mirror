@@ -79,7 +79,7 @@ function SortableBookItem({ book, bp, color, peerAvg, examStatus, onDelete }: So
           <Progress
             value={progress}
             className="h-1.5"
-            style={{ ["--progress-color" as string]: `hsl(${color})` }}
+            progressColor={`hsl(${color})`}
           />
           <div className="flex items-center justify-between">
             <span className="text-[11px] text-muted-foreground tabular-nums">
