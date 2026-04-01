@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/supabaseHelpers";
 import { useAuth } from "@/hooks/useAuth";
 import type { ActivityItem } from "@/components/dashboard/ActivityStream";
 import type { BookFeedItem, PeerEntry } from "@/components/dashboard/LiveFeed";
@@ -45,8 +46,9 @@ export function useSocialFeed() {
   const { data: questions } = useQuery({
     queryKey: ["social-questions"],
     queryFn: async () => {
-      const { data } = await supabase.from("questions").select("id, chapter_id");
-      return data ?? [];
+      return await fetchAllRows<{ id: string; chapter_id: string }>(
+        "questions", "id, chapter_id"
+      );
     },
   });
 

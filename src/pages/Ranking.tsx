@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAllRows } from "@/lib/supabaseHelpers";
 import { useAuth } from "@/hooks/useAuth";
 import AppShell from "@/components/layout/AppShell";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -171,18 +172,18 @@ export default function Ranking() {
   const { data: allAttempts } = useQuery({
     queryKey: ["ranking-all-attempts"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("attempts")
-        .select("user_id, question_id, attempted_at");
-      return data ?? [];
+      return await fetchAllRows<{ user_id: string; question_id: string; attempted_at: string }>(
+        "attempts", "user_id, question_id, attempted_at"
+      );
     },
   });
 
   const { data: questions } = useQuery({
     queryKey: ["ranking-questions"],
     queryFn: async () => {
-      const { data } = await supabase.from("questions").select("id, chapter_id");
-      return data ?? [];
+      return await fetchAllRows<{ id: string; chapter_id: string }>(
+        "questions", "id, chapter_id"
+      );
     },
   });
 
