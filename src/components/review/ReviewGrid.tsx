@@ -680,9 +680,9 @@ export default function ReviewGrid({ bookId, roundCount = 3, readOnly: readOnlyP
                               )}
                             </div>
                           </td>
-                          <td className={cn("z-10 px-0.5 py-0 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", !isMobile && "sticky left-9 min-w-[120px] px-1", isActiveRow ? "bg-primary/5" : "bg-card")}>
+                          <td className={cn("z-10 px-0.5 py-0.5 text-left border-b border-r border-[hsl(0,0%,0%,0.06)]", !isMobile && "sticky left-9 min-w-[120px] px-1", isActiveRow ? "bg-primary/5" : "bg-card")}>
                             <div className="flex items-center gap-1">
-                              <span className="text-[9px] text-muted-foreground block max-w-[80px] md:max-w-[140px] overflow-x-auto whitespace-nowrap scrollbar-none">
+                              <span className="text-[9px] text-muted-foreground block whitespace-normal break-keep leading-tight">
                                 {filterConfig.show_exam_year_column
                                   ? (q.examYear ? `${q.examYear} 기출` : "–")
                                   : (q.topic || "–")}
