@@ -2,6 +2,26 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
+async function fetchAllRows<T>(
+  table: string,
+  query: string,
+  filters?: (q: any) => any,
+  pageSize = 1000
+): Promise<T[]> {
+  const all: T[] = [];
+  let from = 0;
+  while (true) {
+    let q = supabase.from(table).select(query).range(from, from + pageSize - 1);
+    if (filters) q = filters(q);
+    const { data } = await q;
+    if (!data || data.length === 0) break;
+    all.push(...(data as T[]));
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+  return all;
+}
+
 export interface SubjectProgress {
   id: string;
   name: string;
@@ -73,12 +93,14 @@ export function useDashboardData() {
     );
 
     const { data: chapters } = await supabase.from("chapters").select("id, book_id");
-    const { data: questions } = await supabase.from("questions").select("id, chapter_id");
+    const questions = await fetchAllRows<{ id: string; chapter_id: string }>(
+      "questions", "id, chapter_id"
+    );
 
-    const { data: attempts } = await supabase
-      .from("attempts")
-      .select("id, question_id, is_correct, result, attempted_at")
-      .eq("user_id", user.id);
+    const attempts = await fetchAllRows<{ id: string; question_id: string; is_correct: boolean; result: string; attempted_at: string }>(
+      "attempts", "id, question_id, is_correct, result, attempted_at",
+      (q) => q.eq("user_id", user.id)
+    );
 
     // Maps
     const chapterToBook = new Map<string, string>();
