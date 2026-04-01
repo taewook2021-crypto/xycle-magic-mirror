@@ -1,58 +1,43 @@
 
 
-## 그룹 기능 강화 — 4단계 로드맵
+## 대시보드 진도/정답률 오류 수정
 
-전체 기능을 한번에 구현하면 너무 크므로, 임팩트 순서대로 4단계로 나눕니다. 이번 승인에서는 **1~2단계(피드 응원 + 주간 리더보드)** 를 먼저 구현합니다.
+### 원인
+Supabase는 기본적으로 쿼리당 **최대 1,000행**만 반환합니다.
+- `questions` 테이블: **3,414행** → 1,000행만 가져옴
+- `attempts` 테이블: **5,575행** → 1,000행만 가져옴
 
----
+`useDashboardData.ts`에서 이 두 테이블을 `.select()`로 전체 조회하지만, 1,000행 제한에 걸려 이승철 세무회계 등 후반부 교재의 문제 수가 0 또는 축소 계산됩니다.
 
-### 1단계: 피드 응원 (Kudos in Group Feed)
+### 해결 방법
 
-기존 `kudos` 테이블을 그대로 활용. 그룹 피드의 각 멤버 활동 항목에 👏 버튼 추가.
+**`src/hooks/useDashboardData.ts` 수정** — 1,000행 초과 테이블에 대해 페이지네이션 적용
 
-- 하루에 같은 사람에게 1번만 응원 가능 (기존 DB 제약 활용)
-- 버튼 클릭 → `kudos` insert → optimistic UI 업데이트
-- 오늘 이미 보낸 응원은 버튼 비활성화 + 색상 변경
+1. `questions` 조회: `range()`를 사용하여 1,000행씩 반복 fetch하는 헬퍼 함수 도입
+2. `attempts` 조회: 동일하게 페이지네이션 적용 (user_id 필터가 있지만, 활발한 사용자는 5,000건 이상)
+3. 기존 로직(맵 구성, 통계 계산)은 변경 없음 — 데이터만 완전하게 불러오면 됨
+
+```typescript
+// 헬퍼 함수 예시
+async function fetchAll(table, query, pageSize = 1000) {
+  let all = [];
+  let from = 0;
+  while (true) {
+    const { data } = await supabase.from(table).select(query).range(from, from + pageSize - 1);
+    if (!data || data.length === 0) break;
+    all.push(...data);
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+  return all;
+}
+```
+
+### 수정 파일
 
 | 파일 | 작업 |
 |------|------|
-| `src/components/group/GroupFeed.tsx` | 각 피드 항목에 👏 응원 버튼 추가, kudos 조회/insert 로직 |
+| `src/hooks/useDashboardData.ts` | `questions`, `attempts` 조회에 페이지네이션 헬퍼 적용 |
 
-DB 변경 없음.
-
----
-
-### 2단계: 주간 리더보드
-
-현재 랭킹 탭은 전체 누적. "이번 주" 탭을 추가하여 월요일~일요일 기준 문제 풀이 수로 랭킹.
-
-- 랭킹 탭 상단에 "전체 | 이번 주" 세그먼트 컨트롤 추가
-- 이번 주 = 가장 최근 월요일 00:00 이후 attempts만 카운트
-- 매주 자동 리셋 (쿼리 기반, DB 변경 없음)
-
-| 파일 | 작업 |
-|------|------|
-| `src/components/group/GroupRanking.tsx` | 전체/이번주 토글 + 주간 필터 쿼리 추가 |
-
-DB 변경 없음.
-
----
-
-### 3단계: 주간 챌린지 (다음 구현)
-
-그룹장이 "이번 주 목표 200문제" 같은 챌린지 설정. 멤버 전체의 합산 진행률 표시.
-
-- `group_challenges` 테이블 신설 (target_count, start_date, end_date, group_id)
-- 그룹 상세 페이지 상단에 챌린지 진행 바 표시
-- 그룹장만 생성/수정 가능
-
-### 4단계: 공개 그룹 탐색 (이전 플랜 재활용)
-
-이전에 승인된 공개 그룹 목록 페이지 플랜 그대로 구현.
-
----
-
-### 이번 구현 범위: 1단계 + 2단계
-
-수정 파일 2개, DB 변경 없음. 기존 테이블과 데이터만 활용합니다.
+코드 변경 1개 파일, DB 변경 없음.
 
