@@ -45,8 +45,9 @@ export function useSocialFeed() {
   const { data: questions } = useQuery({
     queryKey: ["social-questions"],
     queryFn: async () => {
-      const { data } = await supabase.from("questions").select("id, chapter_id");
-      return data ?? [];
+      return await fetchAllRows<{ id: string; chapter_id: string }>(
+        "questions", "id, chapter_id"
+      );
     },
   });
 
