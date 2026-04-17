@@ -38,6 +38,8 @@ function MyMemosCard({ userId }: { userId?: string }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(false);
+  const [expandedMemoId, setExpandedMemoId] = useState<string | null>(null);
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string | "all">("all");
 
   const { data: memos = [], isLoading } = useQuery({
     queryKey: ["my-memos", userId],
@@ -64,17 +66,25 @@ function MyMemosCard({ userId }: { userId?: string }) {
       const bookIds = [...new Set(chapters?.map((c) => c.book_id) ?? [])];
       const { data: books } = await supabase
         .from("books")
-        .select("id, title")
+        .select("id, title, subject_id")
         .in("id", bookIds);
+
+      const subjectIds = [...new Set(books?.map((b) => b.subject_id) ?? [])];
+      const { data: subjects } = await supabase
+        .from("subjects")
+        .select("id, name")
+        .in("id", subjectIds);
 
       const qMap = new Map(questions?.map((q) => [q.id, q]) ?? []);
       const cMap = new Map(chapters?.map((c) => [c.id, c]) ?? []);
       const bMap = new Map(books?.map((b) => [b.id, b]) ?? []);
+      const sMap = new Map(subjects?.map((s) => [s.id, s]) ?? []);
 
       return data.map((m) => {
         const q = qMap.get(m.question_id);
         const c = q ? cMap.get(q.chapter_id) : undefined;
         const b = c ? bMap.get(c.book_id) : undefined;
+        const s = b ? sMap.get(b.subject_id) : undefined;
         return {
           ...m,
           question_number: q?.question_number,
@@ -82,6 +92,8 @@ function MyMemosCard({ userId }: { userId?: string }) {
           chapter_title: c?.title,
           book_id: c?.book_id,
           book_title: b?.title,
+          subject_id: b?.subject_id,
+          subject_name: s?.name,
         };
       });
     },
@@ -93,6 +105,19 @@ function MyMemosCard({ userId }: { userId?: string }) {
     queryClient.invalidateQueries({ queryKey: ["my-memos"] });
     toast({ title: "메모가 삭제되었습니다." });
   };
+
+  // Subject chips with counts
+  const subjectCounts = memos.reduce<Record<string, { id: string; name: string; count: number }>>((acc, m: any) => {
+    if (!m.subject_id || !m.subject_name) return acc;
+    if (!acc[m.subject_id]) acc[m.subject_id] = { id: m.subject_id, name: m.subject_name, count: 0 };
+    acc[m.subject_id].count++;
+    return acc;
+  }, {});
+  const subjectChips = Object.values(subjectCounts);
+
+  const filteredMemos = selectedSubjectId === "all"
+    ? memos
+    : memos.filter((m: any) => m.subject_id === selectedSubjectId);
 
   return (
     <div
@@ -128,32 +153,121 @@ function MyMemosCard({ userId }: { userId?: string }) {
       </button>
 
       {expanded && (
-        <div className="px-5 pb-4 space-y-1">
+        <div className="px-5 pb-4">
           {isLoading ? (
             <p className="text-xs text-muted-foreground text-center py-4">불러오는 중…</p>
           ) : memos.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-4">작성한 메모가 없습니다.</p>
           ) : (
-            memos.map((m: any) => (
-              <div
-                key={m.id}
-                className="flex items-start gap-2 p-3 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer group"
-                onClick={() => m.book_id && navigate(`/review/${m.book_id}`)}
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-[11px] text-muted-foreground truncate">
-                    {m.book_title} &gt; Ch.{m.chapter_number} 문제{m.question_number}
-                  </p>
-                  <p className="text-sm text-foreground truncate mt-0.5">{m.content}</p>
+            <>
+              {/* Subject filter chips */}
+              {subjectChips.length > 0 && (
+                <div className="flex gap-1.5 overflow-x-auto pb-2 mb-2 -mx-1 px-1 scrollbar-none">
+                  <button
+                    onClick={() => setSelectedSubjectId("all")}
+                    className={cn(
+                      "shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap",
+                      selectedSubjectId === "all"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground hover:bg-muted/70"
+                    )}
+                  >
+                    전체 {memos.length}
+                  </button>
+                  {subjectChips.map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setSelectedSubjectId(s.id)}
+                      className={cn(
+                        "shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap",
+                        selectedSubjectId === s.id
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-muted/70"
+                      )}
+                    >
+                      {s.name} {s.count}
+                    </button>
+                  ))}
                 </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); deleteMemo(m.id); }}
-                  className="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-destructive/10 transition-all shrink-0 mt-0.5"
-                >
-                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                </button>
+              )}
+
+              {/* Memo list */}
+              <div className="space-y-1">
+                {filteredMemos.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-4">해당 과목의 메모가 없습니다.</p>
+                ) : (
+                  filteredMemos.map((m: any) => {
+                    const isOpen = expandedMemoId === m.id;
+                    return (
+                      <div
+                        key={m.id}
+                        className={cn(
+                          "rounded-xl transition-colors",
+                          isOpen ? "bg-muted/60" : "hover:bg-muted/50"
+                        )}
+                      >
+                        <button
+                          onClick={() => setExpandedMemoId(isOpen ? null : m.id)}
+                          className="w-full flex items-start gap-2 p-3 text-left"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[11px] text-muted-foreground truncate">
+                              {m.subject_name && <span className="text-primary font-medium">{m.subject_name}</span>}
+                              {m.subject_name && " · "}
+                              {m.book_title} &gt; Ch.{m.chapter_number} 문제{m.question_number}
+                            </p>
+                            <p
+                              className={cn(
+                                "text-sm text-foreground mt-0.5",
+                                !isOpen && "truncate"
+                              )}
+                            >
+                              {!isOpen ? m.content : null}
+                            </p>
+                          </div>
+                          <ChevronDown
+                            className={cn(
+                              "h-3.5 w-3.5 text-muted-foreground shrink-0 mt-1 transition-transform duration-200",
+                              isOpen && "rotate-180"
+                            )}
+                          />
+                        </button>
+
+                        {isOpen && (
+                          <div className="px-3 pb-3 -mt-1">
+                            <div className="text-sm text-foreground whitespace-pre-wrap break-words max-h-60 overflow-auto rounded-lg bg-background p-3 border border-border">
+                              {m.content}
+                            </div>
+                            <div className="flex items-center justify-end gap-1.5 mt-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => deleteMemo(m.id)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5 mr-1" />
+                                삭제
+                              </Button>
+                              {m.book_id && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-7 px-2"
+                                  onClick={() => navigate(`/review/${m.book_id}`)}
+                                >
+                                  <ExternalLink className="h-3.5 w-3.5 mr-1" />
+                                  회독표에서 보기
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
               </div>
-            ))
+            </>
           )}
         </div>
       )}
