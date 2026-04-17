@@ -23,7 +23,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Pencil, Eye, LogOut, Users, User, GraduationCap, ShieldCheck, MessageCircle, StickyNote, Trash2, ChevronDown } from "lucide-react";
+import { Pencil, Eye, LogOut, Users, User, GraduationCap, ShieldCheck, MessageCircle, StickyNote, Trash2, ChevronDown, ExternalLink } from "lucide-react";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import { cn } from "@/lib/utils";
 
