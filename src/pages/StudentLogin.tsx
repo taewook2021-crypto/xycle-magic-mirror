@@ -49,7 +49,7 @@ const faqs = [
   },
   {
     q: "내 풀이 데이터는 안전한가요?",
-    a: "모든 데이터는 업계 표준 암호화를 적용하여 안전하게 관리됩니다. Google 계정 인증을 통해 본인만 데이터에 접근할 수 있습니다.",
+    a: "모든 데이터는 업계 표준 암호화를 적용하여 안전하게 관리됩니다. 로그인한 본인만 자신의 데이터에 접근할 수 있습니다.",
   },
   {
     q: "모바일에서도 사용할 수 있나요?",
@@ -181,7 +181,7 @@ export default function StudentLogin() {
             <img src={bungaejangLogo} alt="분개장" className="h-5" />
           </div>
           <button
-            onClick={handleGoogleLogin}
+            onClick={handleStart}
             className="rounded-full text-sm font-semibold px-5 py-2 transition-all hover:opacity-90 active:scale-95"
             style={{
               background: "hsl(0 0% 13%)",
@@ -269,7 +269,7 @@ export default function StudentLogin() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            onClick={handleGoogleLogin}
+            onClick={handleStart}
             className="rounded-full text-base font-bold px-8 py-3.5 transition-all hover:opacity-90 active:scale-[0.97] mb-10"
             style={{
               background: "hsl(304 56% 66%)",
@@ -277,7 +277,7 @@ export default function StudentLogin() {
               boxShadow: "0 4px 20px hsl(304 56% 66% / 0.3)",
             }}
           >
-            Google로 시작하기
+            이메일로 시작하기
           </motion.button>
 
           {/* Suggestion chips */}
@@ -419,7 +419,7 @@ export default function StudentLogin() {
                   </p>
                   <div>
                     <button
-                      onClick={handleGoogleLogin}
+                      onClick={handleStart}
                       className="inline-flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-70"
                       style={{ color: "hsl(304 56% 66%)" }}
                     >
@@ -499,7 +499,7 @@ export default function StudentLogin() {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <button
-              onClick={handleGoogleLogin}
+              onClick={handleStart}
               className="rounded-full text-base font-bold px-10 py-4 transition-all hover:opacity-90 active:scale-[0.97]"
               style={{
                 background: "hsl(304 56% 66%)",
