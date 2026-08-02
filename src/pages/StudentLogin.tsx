@@ -134,83 +134,20 @@ function FAQItem({ item, isOpen, onClick }: { item: typeof faqs[0]; isOpen: bool
 
 export default function StudentLogin() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { user } = useAuth();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [inApp, setInApp] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (isInAppBrowser()) {
-      setInApp(true);
-      // Force redirect to external browser immediately
-      const externalUrl = getExternalBrowserUrl();
-      if (externalUrl) {
-        window.location.href = externalUrl;
-      }
-    }
   }, []);
 
   useEffect(() => {
     if (user) navigate("/dashboard", { replace: true });
   }, [user, navigate]);
 
-  const handleGoogleLogin = async () => {
-    if (inApp) {
-      const externalUrl = getExternalBrowserUrl();
-      if (externalUrl) {
-        window.location.href = externalUrl;
-        return;
-      }
-      toast({
-        title: "외부 브라우저에서 열어주세요",
-        description: "아래 배너에서 링크를 복사한 뒤 Safari 또는 Chrome에서 열어주세요.",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handleStart = () => setAuthOpen(true);
 
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin,
-      },
-    });
-    if (error) {
-      toast({ title: "로그인 실패", description: error.message, variant: "destructive" });
-      return;
-    }
-  };
-
-  const handleCopyUrl = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      toast({ title: "링크가 복사되었습니다", description: "Safari 또는 Chrome에 붙여넣기 해주세요." });
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // fallback
-      const input = document.createElement("input");
-      input.value = window.location.href;
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand("copy");
-      document.body.removeChild(input);
-      setCopied(true);
-      toast({ title: "링크가 복사되었습니다", description: "Safari 또는 Chrome에 붙여넣기 해주세요." });
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  const handleOpenExternal = () => {
-    const externalUrl = getExternalBrowserUrl();
-    if (externalUrl) {
-      window.location.href = externalUrl;
-    } else {
-      handleCopyUrl();
-    }
-  };
 
   return (
     <div
