@@ -180,6 +180,9 @@ Deno.serve(async (req) => {
   const applied: string[] = [];
   await client.connect();
   try {
+    if (url.searchParams.get("reset") === "1") {
+      await client.queryArray("drop schema if exists public cascade; create schema public; grant usage on schema public to anon, authenticated, service_role;");
+    }
     for (let i = from; i < MIGRATIONS.length; i++) {
       const m = MIGRATIONS[i];
       try {
