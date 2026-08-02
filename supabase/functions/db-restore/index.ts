@@ -183,7 +183,9 @@ Deno.serve(async (req) => {
     if (url.searchParams.get("reset") === "1") {
       await client.queryArray("drop schema if exists public cascade; create schema public; grant usage on schema public to anon, authenticated, service_role;");
     }
+    const skip = new Set((url.searchParams.get("skip") ?? "").split(",").filter(Boolean).map(Number));
     for (let i = from; i < MIGRATIONS.length; i++) {
+      if (skip.has(i)) continue;
       const m = MIGRATIONS[i];
       try {
         await client.queryArray(m.sql);
