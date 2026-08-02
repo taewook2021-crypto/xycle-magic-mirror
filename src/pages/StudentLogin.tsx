@@ -1,12 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, Plus, Minus } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import bungaejangLogo from "@/assets/bungaejang-logo.svg";
-import { Copy, ExternalLink } from "lucide-react";
+import EmailAuthDialog from "@/components/EmailAuthDialog";
+
 
 const features = [
   {
