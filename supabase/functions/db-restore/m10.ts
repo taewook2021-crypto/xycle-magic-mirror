@@ -1,1 +1,0 @@
-export default "ALTER TABLE questions ADD COLUMN topic text;";

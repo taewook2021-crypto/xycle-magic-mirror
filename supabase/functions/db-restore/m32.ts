@@ -1,1 +1,0 @@
-export default "\n-- Remove seed attempts for fake users\nDELETE FROM attempts WHERE user_id::text LIKE 'dddd%';\n\n-- Remove seed profiles for fake users\nDELETE FROM profiles WHERE id::text LIKE 'dddd%';\n";
