@@ -15,6 +15,8 @@ import GroupDetail from "./pages/GroupDetail";
 import Groups from "./pages/Groups";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
+import ResetPassword from "./pages/ResetPassword";
+
 
 const queryClient = new QueryClient();
 
@@ -28,7 +30,9 @@ const App = () => (
           <AuthProvider>
             <Routes>
               <Route path="/" element={<StudentLogin />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+
               <Route path="/review/:bookId" element={<ProtectedRoute><Review /></ProtectedRoute>} />
               <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
