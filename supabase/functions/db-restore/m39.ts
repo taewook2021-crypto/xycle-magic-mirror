@@ -1,0 +1,1 @@
+export default "UPDATE chapters SET chapter_number = 1, title = '\uc0c1\uc18d\uc138 \ubc0f \uc99d\uc5ec\uc138\ubc95 - 1. \uc0c1\uc18d\uc138' WHERE id = '7eca7169-0e56-5592-be14-b1399e0f1061';\nUPDATE chapters SET chapter_number = 2, title = '\uc0c1\uc18d\uc138 \ubc0f \uc99d\uc5ec\uc138\ubc95 - 2. \uc99d\uc5ec\uc138' WHERE id = '141272b8-f39b-5a17-946e-46f75baac140';";

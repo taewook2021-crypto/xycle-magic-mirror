@@ -1,0 +1,1 @@
+export default "-- \uc784\uc138\uc9c4 \uc6d0\uac00\uad00\ub9ac\ud68c\uacc4 \ucd5c\uc801\uc11c\uc5d0 \ud544\uc218 \ud544\ud130 \ud65c\uc131\ud654\nUPDATE books SET filter_config = '{\"show_type_filters\": false, \"show_star_filter\": false, \"show_essential_filter\": true}'::jsonb WHERE id = '266af2bc-d010-496a-8c0d-a6cc80718666';";

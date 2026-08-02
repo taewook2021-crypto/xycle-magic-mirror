@@ -1,0 +1,1 @@
+export default "INSERT INTO public.books (subject_id, title, author, display_order) VALUES\n  ('54e4b9a1-998f-4584-b56a-3c954808d94f', 'CPA 2\ucc28 \ucd5c\uc801\uc11c \uc6d0\uac00\uad00\ub9ac\ud68c\uacc4', '\uc784\uc138\uc9c4', 1);";

@@ -1,0 +1,1 @@
+export default "UPDATE profiles SET display_name = '\uc218\ud5d8\uc0ddA' WHERE id = 'a4c8631b-5197-48f1-beb1-6ab9fe40dbc4';\nUPDATE profiles SET display_name = '\uc218\ud5d8\uc0ddB' WHERE id = '226727a5-2e77-45cc-8ab3-36bd76c9f5d7';\nUPDATE profiles SET display_name = '\uc218\ud5d8\uc0ddC' WHERE id = '772a90dc-5280-4795-ac36-a7a67993e2dc';";
