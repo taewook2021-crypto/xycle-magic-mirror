@@ -157,53 +157,9 @@ export default function StudentLogin() {
         background: "linear-gradient(180deg, #FFFFFF 0%, #F0C4EC 100%)",
       }}
     >
-      {/* ───── In-App Browser Banner ───── */}
-      <AnimatePresence>
-        {inApp && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="sticky top-0 z-[60] px-4 py-3"
-            style={{
-              background: "hsl(0 0% 13%)",
-              color: "hsl(0 0% 94%)",
-            }}
-          >
-            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-              <p className="text-sm text-center sm:text-left" style={{ fontFamily: "'Pretendard Variable', Pretendard, sans-serif" }}>
-                ⚠️ 인앱 브라우저에서는 Google 로그인이 제한됩니다.
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleCopyUrl}
-                  className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all active:scale-95"
-                  style={{
-                    background: "hsl(0 0% 100% / 0.15)",
-                    color: "hsl(0 0% 94%)",
-                    border: "1px solid hsl(0 0% 100% / 0.2)",
-                  }}
-                >
-                  <Copy className="h-3.5 w-3.5" />
-                  {copied ? "복사됨!" : "링크 복사"}
-                </button>
-                <button
-                  onClick={handleOpenExternal}
-                  className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all active:scale-95"
-                  style={{
-                    background: "hsl(304 56% 66%)",
-                    color: "hsl(0 0% 94%)",
-                  }}
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  외부 브라우저로 열기
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <EmailAuthDialog open={authOpen} onOpenChange={setAuthOpen} />
+
+
 
       {/* ───── Nav ───── */}
       <nav
