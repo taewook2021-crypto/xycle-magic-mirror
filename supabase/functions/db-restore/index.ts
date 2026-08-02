@@ -49,17 +49,14 @@ Deno.serve(async (req) => {
     });
   }
 
-  let sql: string;
-  try {
-    sql = await Deno.readTextFile(
-      new URL(`./chunk${chunk}.sql`, import.meta.url),
-    );
-  } catch (e) {
-    return new Response(JSON.stringify({ error: `read failed: ${e}` }), {
-      status: 500,
+  const sql = CHUNKS[chunk];
+  if (!sql) {
+    return new Response(JSON.stringify({ error: "unknown chunk" }), {
+      status: 400,
       headers: { "Content-Type": "application/json" },
     });
   }
+
 
   const client = new Client(dbUrl);
   try {
