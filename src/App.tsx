@@ -15,6 +15,8 @@ import GroupDetail from "./pages/GroupDetail";
 import Groups from "./pages/Groups";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
+import ResetPassword from "./pages/ResetPassword";
+
 
 const queryClient = new QueryClient();
 
