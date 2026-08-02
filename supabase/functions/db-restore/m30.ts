@@ -1,0 +1,1 @@
+export default "\n-- Update seed attempts to spread across recent days including today\n-- Spread each user's attempts across recent 7 days with some today\nUPDATE attempts\nSET attempted_at = now() - (random() * interval '6 days')\nWHERE user_id::text LIKE 'dddd%';\n";

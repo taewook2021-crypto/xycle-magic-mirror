@@ -1,0 +1,1 @@
+export default "-- Add display_order column to user_books\nALTER TABLE user_books ADD COLUMN display_order integer NOT NULL DEFAULT 0;\n\n-- Allow users to update their own user_books (for reordering)\nCREATE POLICY \"Users can update own books\"\nON user_books\nFOR UPDATE\nTO authenticated\nUSING (user_id = auth.uid())\nWITH CHECK (user_id = auth.uid());";

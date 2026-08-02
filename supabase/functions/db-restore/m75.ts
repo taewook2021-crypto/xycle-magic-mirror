@@ -1,0 +1,1 @@
+export default "UPDATE books SET filter_config = jsonb_set(\n  jsonb_set(filter_config, '{show_priority_filter}', 'true'),\n  '{priority_label}', '\"\ucd5c\ud544\uc218\"'\n) WHERE id = '266af2bc-d010-496a-8c0d-a6cc80718666';";
