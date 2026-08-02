@@ -1,1 +1,0 @@
-export default "\n-- Move some seed attempts to today so \"\uc624\ub298 \ud480\uc774 \uc218\" ranking shows data\nUPDATE attempts\nSET attempted_at = now() - (random() * interval '12 hours')\nWHERE user_id::text LIKE 'dddd%'\nAND id IN (\n  SELECT id FROM attempts \n  WHERE user_id::text LIKE 'dddd%' \n  ORDER BY random() \n  LIMIT 40\n);\n";

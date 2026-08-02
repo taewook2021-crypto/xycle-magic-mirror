@@ -1,1 +1,0 @@
-export default "\n-- \ubb38\ud56d\uc5d0 \uc608\uc81c/\uae30\ucd9c/\uc2e4\uc804 \uad6c\ubd84 \uceec\ub7fc \ucd94\uac00\nALTER TABLE public.questions ADD COLUMN question_type text NOT NULL DEFAULT 'example';\nCOMMENT ON COLUMN public.questions.question_type IS 'example | past_exam | practice';\n";

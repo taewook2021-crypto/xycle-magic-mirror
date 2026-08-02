@@ -1,1 +1,0 @@
-export default "-- Allow any authenticated user to find a group by invite_code (for joining)\nCREATE POLICY \"Anyone can find group by invite code\"\n  ON public.study_groups FOR SELECT TO authenticated\n  USING (true);";

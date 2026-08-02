@@ -1,1 +1,0 @@
-export default "CREATE POLICY \"Public user books readable\"\nON public.user_books FOR SELECT TO authenticated\nUSING (EXISTS (\n  SELECT 1 FROM public.profiles\n  WHERE profiles.id = user_books.user_id\n  AND profiles.is_public = true\n));";

@@ -14,16 +14,537 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attempts: {
+        Row: {
+          attempted_at: string
+          id: string
+          is_correct: boolean
+          question_id: string
+          result: string
+          round: number
+          student_answer: number | null
+          user_id: string
+        }
+        Insert: {
+          attempted_at?: string
+          id?: string
+          is_correct: boolean
+          question_id: string
+          result?: string
+          round?: number
+          student_answer?: number | null
+          user_id: string
+        }
+        Update: {
+          attempted_at?: string
+          id?: string
+          is_correct?: boolean
+          question_id?: string
+          result?: string
+          round?: number
+          student_answer?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attempts_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      books: {
+        Row: {
+          author: string | null
+          created_at: string
+          display_order: number
+          filter_config: Json
+          id: string
+          subject_id: string
+          title: string
+          user_count_offset: number
+        }
+        Insert: {
+          author?: string | null
+          created_at?: string
+          display_order?: number
+          filter_config?: Json
+          id?: string
+          subject_id: string
+          title: string
+          user_count_offset?: number
+        }
+        Update: {
+          author?: string | null
+          created_at?: string
+          display_order?: number
+          filter_config?: Json
+          id?: string
+          subject_id?: string
+          title?: string
+          user_count_offset?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "books_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chapters: {
+        Row: {
+          book_id: string
+          chapter_number: number
+          created_at: string
+          display_order: number
+          id: string
+          title: string
+        }
+        Insert: {
+          book_id: string
+          chapter_number: number
+          created_at?: string
+          display_order?: number
+          id?: string
+          title: string
+        }
+        Update: {
+          book_id?: string
+          chapter_number?: number
+          created_at?: string
+          display_order?: number
+          id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chapters_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      kudos: {
+        Row: {
+          created_at: string
+          created_date: string
+          id: string
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_date?: string
+          id?: string
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          created_date?: string
+          id?: string
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          exam_status: string | null
+          id: string
+          is_public: boolean
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          exam_status?: string | null
+          id: string
+          is_public?: boolean
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          exam_status?: string | null
+          id?: string
+          is_public?: boolean
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          chapter_id: string
+          correct_answer: number | null
+          created_at: string
+          exam_year: string | null
+          id: string
+          is_essential: boolean
+          is_priority: boolean
+          question_number: number
+          question_type: string
+          sub_topic_id: string | null
+          topic: string | null
+        }
+        Insert: {
+          chapter_id: string
+          correct_answer?: number | null
+          created_at?: string
+          exam_year?: string | null
+          id?: string
+          is_essential?: boolean
+          is_priority?: boolean
+          question_number: number
+          question_type?: string
+          sub_topic_id?: string | null
+          topic?: string | null
+        }
+        Update: {
+          chapter_id?: string
+          correct_answer?: number | null
+          created_at?: string
+          exam_year?: string | null
+          id?: string
+          is_essential?: boolean
+          is_priority?: boolean
+          question_number?: number
+          question_type?: string
+          sub_topic_id?: string | null
+          topic?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "questions_sub_topic_id_fkey"
+            columns: ["sub_topic_id"]
+            isOneToOne: false
+            referencedRelation: "sub_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_group_members: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_groups: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          invite_code: string
+          is_public: boolean
+          max_members: number
+          name: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          invite_code?: string
+          is_public?: boolean
+          max_members?: number
+          name: string
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          invite_code?: string
+          is_public?: boolean
+          max_members?: number
+          name?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
+      sub_topics: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          name: string
+          topic_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name: string
+          topic_id: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name?: string
+          topic_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sub_topics_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subjects: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      topics: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          name: string
+          subject_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name: string
+          subject_id: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topics_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_books: {
+        Row: {
+          book_id: string
+          created_at: string
+          display_order: number
+          id: string
+          user_id: string
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          user_id: string
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_books_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_question_memos: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          question_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          question_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          question_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_question_memos_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_question_skips: {
+        Row: {
+          created_at: string
+          id: string
+          question_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          question_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          question_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_question_skips_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_invite_code: { Args: never; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_group_member: {
+        Args: { _group_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_in_same_group: {
+        Args: { _target: string; _viewer: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +671,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "student"],
+    },
   },
 } as const
