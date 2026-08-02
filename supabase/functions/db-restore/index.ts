@@ -1,6 +1,26 @@
 import { Client } from "https://deno.land/x/postgres@v0.17.0/mod.ts";
+import chunk01 from "./chunk01.ts";
+import chunk02 from "./chunk02.ts";
+import chunk03 from "./chunk03.ts";
+import chunk04 from "./chunk04.ts";
+import chunk05 from "./chunk05.ts";
+import chunk06 from "./chunk06.ts";
+import chunk07 from "./chunk07.ts";
+import chunk08 from "./chunk08.ts";
+
+const CHUNKS: Record<string, string> = {
+  "01": chunk01,
+  "02": chunk02,
+  "03": chunk03,
+  "04": chunk04,
+  "05": chunk05,
+  "06": chunk06,
+  "07": chunk07,
+  "08": chunk08,
+};
 
 const TOKEN = "1b0f0b79c00bae79baf718d816e53c21";
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok");
